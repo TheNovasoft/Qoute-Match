@@ -2650,6 +2650,75 @@ body.admin-panel .navbar-wrapper .navbar {
     box-shadow: none !important;
 }
 
+/* Top-right action icons — ink on glass (bg--dark was forcing white) */
+body.admin-panel .navbar-wrapper.bg--dark .navbar__right button i,
+body.admin-panel .navbar-wrapper.bg--dark .navbar__right a i,
+body.admin-panel .navbar-wrapper.bg--dark .navbar__action-list i,
+body.admin-panel .navbar-wrapper.bg--dark .navbar-user__name,
+body.admin-panel .navbar-wrapper.bg--dark .navbar-user .icon i,
+body.admin-panel .navbar-wrapper.bg--dark .fullscreen-btn,
+body.admin-panel .navbar-wrapper .navbar__right button i,
+body.admin-panel .navbar-wrapper .navbar__right a i,
+body.admin-panel .navbar-wrapper .navbar__action-list .primary--layer,
+body.admin-panel .navbar-wrapper .navbar__action-list .primary--layer a,
+body.admin-panel .navbar-wrapper .res-sidebar-open-btn,
+body.admin-panel .navbar-wrapper .res-sidebar-open-btn i {
+    color: var(--ink) !important;
+    -webkit-text-fill-color: var(--ink) !important;
+}
+
+body.admin-panel .navbar-wrapper .navbar__action-list .primary--layer {
+    background: var(--gray) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 999px !important;
+    width: 36px !important;
+    height: 36px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+}
+
+body.admin-panel .navbar-wrapper .navbar__action-list .primary--layer:hover,
+body.admin-panel .navbar-wrapper .navbar__action-list .primary--layer:hover i,
+body.admin-panel .navbar-wrapper .navbar__action-list .primary--layer:hover a,
+body.admin-panel .navbar-wrapper .navbar__action-list .primary--layer:hover a i {
+    color: #0071e3 !important;
+    -webkit-text-fill-color: #0071e3 !important;
+    border-color: rgba(0, 113, 227, 0.35) !important;
+    background: #ffffff !important;
+}
+
+body.admin-panel .navbar-wrapper .navbar__action-list .text--warning,
+body.admin-panel .navbar-wrapper .navbar__action-list i.text--warning {
+    color: #ff9f0a !important;
+    -webkit-text-fill-color: #ff9f0a !important;
+}
+
+body.admin-panel .navbar-wrapper .notification-count {
+    background: #0071e3 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+body.admin-panel .navbar-wrapper .navbar-user__name,
+body.admin-panel .navbar-wrapper .navbar-user .icon i {
+    color: var(--ink) !important;
+    -webkit-text-fill-color: var(--ink) !important;
+}
+
+body.admin-panel .navbar-wrapper .profile-dropdown > button {
+    background: transparent !important;
+    border: none !important;
+    width: auto !important;
+    height: auto !important;
+    border-radius: 0 !important;
+}
+
+body.admin-panel .navbar-wrapper .navbar-user__name {
+    font-weight: 500 !important;
+}
+
 body.admin-panel .card,
 body.admin-panel .card.custom--card,
 body.admin-panel .widget-two,
