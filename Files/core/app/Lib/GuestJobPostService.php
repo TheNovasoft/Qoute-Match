@@ -130,7 +130,7 @@ class GuestJobPostService
         $job->status = $budgetData['status'];
 
         if ((int) $budgetData['status'] === Status::JOB_PUBLISH) {
-            $job->is_approved = gs('job_auto_approved') ? Status::JOB_APPROVED : Status::JOB_PENDING;
+            $job->is_approved = Status::JOB_APPROVED;
         }
 
         $job->save();

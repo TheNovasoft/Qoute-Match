@@ -830,7 +830,7 @@ CREATE TABLE `general_settings` (
   `currency_format` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1=>Both\r\n2=>Text Only\r\n3=>Symbol Only',
   `config_progress` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `escrow_payment` tinyint(1) NOT NULL DEFAULT '1',
-  `job_auto_approved` tinyint(1) NOT NULL DEFAULT '0',
+  `job_auto_approved` tinyint(1) NOT NULL DEFAULT '1',
   `percent_service_charge` tinyint(1) NOT NULL DEFAULT '0',
   `fixed_service_charge` decimal(28,8) NOT NULL DEFAULT '0.00000000',
   `trial_task` tinyint(1) NOT NULL DEFAULT '0',

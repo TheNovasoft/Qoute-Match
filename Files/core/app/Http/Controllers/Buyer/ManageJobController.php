@@ -344,7 +344,6 @@ class ManageJobController extends Controller
 
         $notification = $job->wasRecentlyCreated && !$job->getChanges() ? 'Job post created successfully' : 'Job post updated successfully';
 
-        $wasApproved = (int) $job->is_approved === Status::JOB_APPROVED;
         $wasPublished = (int) $job->status === Status::JOB_PUBLISH;
         $status = $request->filled('status') ? (int) $request->status : Status::JOB_PUBLISH;
 
@@ -355,11 +354,7 @@ class ManageJobController extends Controller
         $job->status = $status;
 
         if ($status === Status::JOB_PUBLISH) {
-            if (gs('job_auto_approved') || $wasApproved) {
-                $job->is_approved = Status::JOB_APPROVED;
-            } else {
-                $job->is_approved = Status::JOB_PENDING;
-            }
+            $job->is_approved = Status::JOB_APPROVED;
         }
 
         $job->save();
