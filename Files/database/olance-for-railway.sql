@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: localhost    Database: olance
+-- Host: localhost    Database: railway
 -- ------------------------------------------------------
 -- Server version	8.4.3
 
@@ -16,12 +16,10 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `olance`
+-- Current Database: `railway`
 --
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `olance` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-
-USE `olance`;
+USE `railway`;
 
 --
 -- Table structure for table `admin_notifications`
