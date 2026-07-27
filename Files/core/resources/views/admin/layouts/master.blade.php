@@ -20,8 +20,8 @@
     @stack('style-lib')
 
     <link rel="stylesheet" href="{{asset('assets/global/css/select2.min.css')}}">
-    <link rel="stylesheet" href="{{asset('assets/admin/css/app.css')}}">
-
+    <link rel="stylesheet" href="{{asset('assets/admin/css/app.css')}}?v={{ @filemtime(base_path('../assets/admin/css/app.css')) ?: time() }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/apple.css') }}?v={{ @filemtime(base_path('../assets/templates/basic/css/apple.css')) ?: time() }}">
 
     @stack('style')
 </head>

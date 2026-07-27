@@ -13,16 +13,21 @@
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/main.css') }}">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/custom.css') }}">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/color.php') }}?color={{ gs('base_color') }}&secondColor={{ gs('secondary_color') }}">
+        <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/apple.css') }}?v={{ @filemtime(base_path('../assets/templates/basic/css/apple.css')) ?: time() }}">
     @else
         <link rel="stylesheet" href="{{ asset('assets/admin/css/app.css') }}">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/custom.css') }}">
+        <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/apple.css') }}?v={{ @filemtime(base_path('../assets/templates/basic/css/apple.css')) ?: time() }}">
     @endunless
 
     @viteReactRefresh
     @vite(['resources/js/app.jsx'])
     @inertiaHead
 </head>
-<body @class(['admin-panel' => request()->is('admin') || request()->is('admin/*')])>
+<body @class([
+        'admin-panel' => request()->is('admin') || request()->is('admin/*'),
+        'dashboard' => request()->is('buyer') || request()->is('buyer/*') || request()->is('freelancer') || request()->is('freelancer/*') || request()->is('user') || request()->is('user/*') || request()->is('provider') || request()->is('provider/*') || request()->is('customer') || request()->is('customer/*'),
+    ])>
     @inertia
 </body>
 </html>
