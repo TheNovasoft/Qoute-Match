@@ -95,7 +95,7 @@ export default function JobDetails({
     }, [existingBid?.id, quoteFields]);
 
     const loadMoreFreelancers = async () => {
-        const response = await window.axios.get('/explore-get-similar-freelancers', {
+        const response = await window.axios.get('/explore-get-similar-providers', {
             params: { job_id: job.id, offset: freelancerOffset, limit: 5 },
             headers: { Accept: 'application/json' },
         });
@@ -364,7 +364,7 @@ export default function JobDetails({
                                                                 Insufficient lead credits. You need {bidState.monetisation.quote_cost} credit(s) to submit a new quote
                                                                 (balance: {bidState.monetisation.credits}).
                                                                 {' '}
-                                                                <Link href={routes.userLeadCredits ?? '/freelancer/lead-credits'} className="text--base">
+                                                                <Link href={routes.userLeadCredits ?? '/provider/lead-credits'} className="text--base">
                                                                     Buy credits
                                                                 </Link>
                                                             </>
@@ -379,7 +379,7 @@ export default function JobDetails({
                                                 )}
                                             </>
                                         ) : (
-                                            <Link href="/freelancer/login" className="btn btn--base w-100">Bid on the project</Link>
+                                            <Link href="/provider/login" className="btn btn--base w-100">Bid on the project</Link>
                                         )}
                                         <p className="sidebar-header__text">
                                             By clicking contact, you have read and agreed to our{' '}

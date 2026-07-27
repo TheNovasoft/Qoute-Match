@@ -25,13 +25,13 @@ export default function ProviderPreferences({ pageTitle, job, skills, guestMode 
         event.preventDefault();
         const storeUrl = guestMode
             ? (jobPostRoutes?.preferencesStore ?? '/post-job/preferences')
-            : `${routes?.buyerJobPostPreferencesStore ?? '/buyer/job/post/freelancer-details'}/${job.id}`;
+            : `${routes?.buyerJobPostPreferencesStore ?? '/customer/job/post/provider-details'}/${job.id}`;
         post(storeUrl);
     };
 
     const previousHref = guestMode
         ? (jobPostRoutes?.details ?? routes?.postJob ?? '/post-job')
-        : `${routes?.buyerJobPostDetails ?? '/buyer/job/post/job-details'}/${job.id}`;
+        : `${routes?.buyerJobPostDetails ?? '/customer/job/post/job-details'}/${job.id}`;
 
     return (
         <JobPostShell pageTitle={pageTitle} guestMode={guestMode}>

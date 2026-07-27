@@ -38,10 +38,31 @@ return Application::configure(basePath: dirname(__DIR__))
                     ->name('ipn.')
                     ->group(base_path('routes/ipn.php'));
 
-                    Route::middleware(['web', 'maintenance'])->prefix('buyer')->group(base_path('routes/buyer.php'));
+                Route::middleware(['web'])->group(function () {
+                    Route::get('buyer/{path?}', function (?string $path = null) {
+                        $path = $path ? str_replace(
+                            ['buyer-data-submit', 'buyer-data', 'freelancer-details'],
+                            ['customer-data-submit', 'customer-data', 'provider-details'],
+                            $path
+                        ) : 'login';
 
+                        return redirect('/customer/' . ltrim($path, '/'), 301);
+                    })->where('path', '.*');
 
-                    Route::middleware(['web', 'maintenance'])->prefix('freelancer')->group(base_path('routes/user.php'));
+                    Route::get('freelancer/{path?}', function (?string $path = null) {
+                        $path = $path ? str_replace(
+                            ['user-data-submit', 'user-data'],
+                            ['provider-data-submit', 'provider-data'],
+                            $path
+                        ) : 'login';
+
+                        return redirect('/provider/' . ltrim($path, '/'), 301);
+                    })->where('path', '.*');
+                });
+
+                Route::middleware(['web', 'maintenance'])->prefix('customer')->group(base_path('routes/buyer.php'));
+
+                Route::middleware(['web', 'maintenance'])->prefix('provider')->group(base_path('routes/user.php'));
                 Route::middleware(['web', 'maintenance'])->group(base_path('routes/web.php'));
             });
         }
@@ -81,7 +102,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->validateCsrfTokens(
-            except: ['user/deposit', 'ipn*','pusher/auth*']
+            except: ['provider/deposit', 'ipn*', 'pusher/auth*']
         );
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -12,7 +12,7 @@ export default function Index({ pageTitle, projects, filters, statusOptions }) {
                 filters={filters}
                 statusOptions={statusOptions}
                 role="buyer"
-                indexUrl={routes.buyerProjects ?? '/buyer/project/index'}
+                indexUrl={routes.buyerProjects ?? '/customer/project/index'}
             />
         </BuyerMasterLayout>
     );

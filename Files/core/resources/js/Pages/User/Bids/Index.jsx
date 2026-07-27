@@ -7,7 +7,7 @@ export default function Index({ pageTitle, bids }) {
 
     return (
         <MasterLayout pageTitle={pageTitle}>
-            <BidList bids={bids} indexUrl={routes.userBidIndex ?? '/freelancer/bid/index'} />
+            <BidList bids={bids} indexUrl={routes.userBidIndex ?? '/provider/bid/index'} />
         </MasterLayout>
     );
 }

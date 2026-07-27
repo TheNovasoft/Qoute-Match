@@ -34,16 +34,21 @@ Route::controller('GuestJobController')->prefix('post-job')->name('post.job.')->
     Route::get('check-slug', 'checkSlug')->name('check.slug');
 });
 
+Route::redirect('freelance-jobs', '/jobs', 301);
+Route::redirect('freelance-filter-jobs', '/filter-jobs', 301);
+Route::redirect('talents', '/providers', 301);
+Route::redirect('talent/details/{username}', '/provider/details/{username}', 301);
+Route::redirect('explore-get-similar-freelancers', '/explore-get-similar-providers', 301);
+
 Route::controller('JobExploreController')->group(function () {
-    Route::get('freelance-jobs', 'freelanceJobs')->name('freelance.jobs');
-    Route::get('freelance-filter-jobs', 'filterJobs')->name('freelance.filter.jobs');
+    Route::get('jobs', 'freelanceJobs')->name('freelance.jobs');
+    Route::get('filter-jobs', 'filterJobs')->name('freelance.filter.jobs');
     Route::get('explore-job/{slug}', 'exploreJob')->name('explore.bid.job');
 
-    Route::get('explore-get-similar-freelancers', 'getSimilarFreelancers')->name('explore.get-similar-freelancers');
+    Route::get('explore-get-similar-providers', 'getSimilarFreelancers')->name('explore.get-similar-freelancers');
     Route::get('explore-get-similar-jobs', 'getSimilarJobs')->name('explore.get-similar-jobs');
 
-    //talent-area
-    Route::get('talent/details/{username}', 'exploreFreelancer')->name('talent.explore');
+    Route::get('provider/details/{username}', 'exploreFreelancer')->name('talent.explore');
 });
 
 Route::controller('SiteController')->group(function () {
@@ -58,7 +63,7 @@ Route::controller('SiteController')->group(function () {
     Route::get('sitemap.xml', 'sitemap')->name('sitemap');
     Route::get('robots.txt', 'robots')->name('robots');
 
-    Route::get('talents', 'allFreelancers')->name('all.freelancers');
+    Route::get('providers', 'allFreelancers')->name('all.freelancers');
 
     Route::post('/social-login/{type}', 'socialLogin')->name('login.google');
 

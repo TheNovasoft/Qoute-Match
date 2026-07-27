@@ -22,7 +22,7 @@ export default function Skill({ pageTitle, skills, user }) {
 
     const submit = (event) => {
         event.preventDefault();
-        post(routes?.userStoreProfileSkill ?? '/freelancer/profile-skill-store');
+        post(routes?.userStoreProfileSkill ?? '/provider/profile-skill-store');
     };
 
     return (
@@ -102,7 +102,7 @@ export default function Skill({ pageTitle, skills, user }) {
                                         </div>
 
                                         <div className="btn-wrapper d-flex flex-wrap gap-2">
-                                            <Link href={routes?.userHome ?? '/freelancer/dashboard'} className="btn btn-outline--dark">
+                                            <Link href={routes?.userHome ?? '/provider/dashboard'} className="btn btn-outline--dark">
                                                 Cancel
                                             </Link>
                                             <button type="submit" className="btn btn--dark" disabled={processing || skills.length === 0}>

@@ -76,7 +76,7 @@ export default function Basic({ pageTitle, user }) {
 
     const submit = (event) => {
         event.preventDefault();
-        post(routes?.userStoreProfileSetting ?? '/freelancer/profile-setting', {
+        post(routes?.userStoreProfileSetting ?? '/provider/profile-setting', {
             forceFormData: true,
         });
     };
@@ -200,7 +200,7 @@ export default function Basic({ pageTitle, user }) {
                                         </div>
 
                                         <div className="btn-wrapper d-flex flex-wrap gap-2">
-                                            <Link href={routes?.userProfileSkill ?? '/freelancer/profile-skill'} className="btn btn-outline--dark">
+                                            <Link href={routes?.userProfileSkill ?? '/provider/profile-skill'} className="btn btn-outline--dark">
                                                 Previous
                                             </Link>
                                             <button type="submit" className="btn btn--dark" disabled={processing || data.language.length === 0}>

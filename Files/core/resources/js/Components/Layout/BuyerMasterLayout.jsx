@@ -57,27 +57,27 @@ export default function BuyerMasterLayout({ children, pageTitle }) {
                                     roleLabel="Buyer"
                                     unreadCount={unreadCount}
                                     notificationUnreadCount={notificationUnreadCount}
-                                    conversationUrl={routes.buyerConversation ?? '/buyer/conversation'}
-                                    notificationsUrl={routes.buyerNotifications ?? '/buyer/notifications'}
+                                    conversationUrl={routes.buyerConversation ?? '/customer/conversation'}
+                                    notificationsUrl={routes.buyerNotifications ?? '/customer/notifications'}
                                     menuItems={[
                                         {
                                             label: 'My Profile',
-                                            href: routes.buyerProfileSetting ?? '/buyer/profile-setting',
+                                            href: routes.buyerProfileSetting ?? '/customer/profile-setting',
                                             icon: 'fas fa-user-circle',
                                         },
                                         {
                                             label: 'Password',
-                                            href: routes.buyerChangePassword ?? '/buyer/change-password',
+                                            href: routes.buyerChangePassword ?? '/customer/change-password',
                                             icon: 'fas fa-lock',
                                         },
                                         {
                                             label: '2FA Security',
-                                            href: routes.buyerTwofactor ?? '/buyer/twofactor',
+                                            href: routes.buyerTwofactor ?? '/customer/twofactor',
                                             icon: 'fas fa-key',
                                         },
                                         {
                                             label: 'Logout',
-                                            href: routes.buyerLogout ?? '/buyer/logout',
+                                            href: routes.buyerLogout ?? '/customer/logout',
                                             icon: 'fas fa-sign-out-alt',
                                             danger: true,
                                         },

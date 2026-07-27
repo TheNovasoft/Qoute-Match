@@ -38,8 +38,8 @@ Route::namespace('Buyer\Auth')->name('buyer.')->group(function () {
 
 Route::middleware('buyer')->name('buyer.')->group(function () {
 
-    Route::get('buyer-data', 'Buyer\BuyerController@buyerData')->name('data');
-    Route::post('buyer-data-submit', 'Buyer\BuyerController@buyerDataSubmit')->name('data.submit');
+    Route::get('customer-data', 'Buyer\BuyerController@buyerData')->name('data');
+    Route::post('customer-data-submit', 'Buyer\BuyerController@buyerDataSubmit')->name('data.submit');
 
     //authorization
     Route::middleware('buyer.registration.complete')->namespace('Buyer')->controller('AuthorizationController')->group(function () {
@@ -84,8 +84,8 @@ Route::middleware('buyer')->name('buyer.')->group(function () {
                 Route::post('job-details/{id?}','storeJobDetails')->name('details.store');
 
                 // Step 2: Freelancer Details
-                Route::get('freelancer-details/{id}','createFreelancerDetails')->name('freelancer.details');
-                Route::post('freelancer-details/{id}','storeFreelancerDetails')->name('freelancer.details.store');
+                Route::get('provider-details/{id}', 'createFreelancerDetails')->name('freelancer.details');
+                Route::post('provider-details/{id}', 'storeFreelancerDetails')->name('freelancer.details.store');
 
                 // Step 3: Budget & Review
                 Route::get('budget/{id}','createBudget')->name('budget');

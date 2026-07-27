@@ -172,7 +172,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                         Accepting a quote requires your wallet balance to cover the quote amount (escrow is enabled).
                         Your balance: <strong>{hireRequirements.buyerBalance}</strong>.
                         {' '}
-                        <Link href={routes.buyerDeposit ?? '/buyer/deposit'} className="alert-link">Deposit funds</Link>
+                        <Link href={routes.buyerDeposit ?? '/customer/deposit'} className="alert-link">Deposit funds</Link>
                     </div>
                 )}
 

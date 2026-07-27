@@ -35,8 +35,8 @@ Route::namespace('User\Auth')->name('user.')->middleware('guest')->group(functio
 
 Route::middleware('auth')->name('user.')->group(function () {
 
-    Route::get('user-data', 'User\UserController@userData')->name('data');
-    Route::post('user-data-submit', 'User\UserController@userDataSubmit')->name('data.submit');
+    Route::get('provider-data', 'User\UserController@userData')->name('data');
+    Route::post('provider-data-submit', 'User\UserController@userDataSubmit')->name('data.submit');
 
     //authorization
     Route::middleware('registration.complete')->namespace('User')->controller('AuthorizationController')->group(function () {

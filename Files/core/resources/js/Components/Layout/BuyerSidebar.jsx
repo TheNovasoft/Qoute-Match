@@ -65,7 +65,7 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
 
                 <ul className="sidebar-menu-list">
                     <li className="sidebar-menu-list__item">
-                        <Link href={routes.buyerDashboard ?? '/buyer/dashboard'} className="sidebar-menu-list__link">
+                        <Link href={routes.buyerDashboard ?? '/customer/dashboard'} className="sidebar-menu-list__link">
                             <span className="icon"><i className="las la-home"></i></span>
                             <span className="text">Dashboard</span>
                         </Link>
@@ -80,13 +80,13 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                         active
                     >
                         <ul className="sidebar-submenu-list">
-                            <DropdownItem href={routes.buyerJobList ?? '/buyer/job/post/index'} label="Job List" />
-                            <DropdownItem href={routes.buyerJobPost ?? '/buyer/job/post/job-details'} label="Post Job" />
+                            <DropdownItem href={routes.buyerJobList ?? '/customer/job/post/index'} label="Job List" />
+                            <DropdownItem href={routes.buyerJobPost ?? '/customer/job/post/job-details'} label="Post Job" />
                         </ul>
                     </DropdownMenu>
 
                     <li className="sidebar-menu-list__item">
-                        <Link href={routes.buyerJobList ?? '/buyer/job/post/index'} className="sidebar-menu-list__link">
+                        <Link href={routes.buyerJobList ?? '/customer/job/post/index'} className="sidebar-menu-list__link">
                             <span className="icon"><i className="las la-columns"></i></span>
                             <span className="text">Compare Quotes</span>
                         </Link>
@@ -94,7 +94,7 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
 
                     {trialTask && (
                         <li className="sidebar-menu-list__item">
-                            <Link href={routes.buyerTrialTasks ?? '/buyer/trial-task'} className="sidebar-menu-list__link">
+                            <Link href={routes.buyerTrialTasks ?? '/customer/trial-task'} className="sidebar-menu-list__link">
                                 <span className="icon"><i className="las la-tasks"></i></span>
                                 <span className="text">Trial Tasks</span>
                             </Link>
@@ -102,14 +102,14 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                     )}
 
                     <li className="sidebar-menu-list__item">
-                        <Link href={routes.buyerProjects ?? '/buyer/projects'} className="sidebar-menu-list__link">
+                        <Link href={routes.buyerProjects ?? '/customer/project/index'} className="sidebar-menu-list__link">
                             <span className="icon"><i className="las la-briefcase"></i></span>
                             <span className="text">My Projects</span>
                         </Link>
                     </li>
 
                     <li className="sidebar-menu-list__item">
-                        <Link href={routes.buyerDisputes ?? '/buyer/disputes'} className="sidebar-menu-list__link">
+                        <Link href={routes.buyerDisputes ?? '/customer/disputes'} className="sidebar-menu-list__link">
                             <span className="icon"><i className="las la-exclamation-triangle"></i></span>
                             <span className="text">
                                 Disputes
@@ -121,7 +121,7 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                     </li>
 
                     <li className="sidebar-menu-list__item">
-                        <Link href={routes.buyerNotifications ?? '/buyer/notifications'} className="sidebar-menu-list__link">
+                        <Link href={routes.buyerNotifications ?? '/customer/notifications'} className="sidebar-menu-list__link">
                             <span className="icon"><i className="las la-bell"></i></span>
                             <span className="text">
                                 Notifications
@@ -139,20 +139,20 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
 
                     <DropdownMenu id="deposit" icon="las la-wallet" label="Deposit" openId={openId} setOpenId={setOpenId}>
                         <ul className="sidebar-submenu-list">
-                            <DropdownItem href={routes.buyerDeposit ?? '/buyer/deposit'} label="Deposit Money" />
-                            <DropdownItem href={routes.buyerDepositHistory ?? '/buyer/deposit/history'} label="Deposit History" />
+                            <DropdownItem href={routes.buyerDeposit ?? '/customer/deposit'} label="Deposit Money" />
+                            <DropdownItem href={routes.buyerDepositHistory ?? '/customer/deposit/history'} label="Deposit History" />
                         </ul>
                     </DropdownMenu>
 
                     <DropdownMenu id="withdraw" icon="las la-money-check-alt" label="Withdraw" openId={openId} setOpenId={setOpenId}>
                         <ul className="sidebar-submenu-list">
-                            <DropdownItem href={routes.buyerWithdraw ?? '/buyer/withdraw'} label="Withdraw Money" />
-                            <DropdownItem href={routes.buyerWithdrawHistory ?? '/buyer/withdraw/history'} label="Withdraw History" />
+                            <DropdownItem href={routes.buyerWithdraw ?? '/customer/withdraw'} label="Withdraw Money" />
+                            <DropdownItem href={routes.buyerWithdrawHistory ?? '/customer/withdraw/history'} label="Withdraw History" />
                         </ul>
                     </DropdownMenu>
 
                     <li className="sidebar-menu-list__item">
-                        <Link href={routes.buyerTransactions ?? '/buyer/transactions'} className="sidebar-menu-list__link">
+                        <Link href={routes.buyerTransactions ?? '/customer/transactions'} className="sidebar-menu-list__link">
                             <span className="icon"><i className="las la-exchange-alt"></i></span>
                             <span className="text">Transactions</span>
                         </Link>
@@ -160,13 +160,13 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
 
                     <DropdownMenu id="support" icon="las la-ticket-alt" label="Support Ticket" openId={openId} setOpenId={setOpenId}>
                         <ul className="sidebar-submenu-list">
-                            <DropdownItem href={routes.buyerTicketOpen ?? '/buyer/ticket/open'} label="Create New" />
-                            <DropdownItem href={routes.buyerTicketIndex ?? '/buyer/ticket'} label="Ticket History" />
+                            <DropdownItem href={routes.buyerTicketOpen ?? '/customer/ticket/open'} label="Create New" />
+                            <DropdownItem href={routes.buyerTicketIndex ?? '/customer/ticket'} label="Ticket History" />
                         </ul>
                     </DropdownMenu>
 
                     <li className="sidebar-menu-list__item">
-                        <Link href={routes.buyerConversation ?? '/buyer/conversation'} className="sidebar-menu-list__link">
+                        <Link href={routes.buyerConversation ?? '/customer/conversation'} className="sidebar-menu-list__link">
                             <span className="icon"><i className="lab la-rocketchat"></i></span>
                             <span className="text">
                                 Chat
@@ -189,14 +189,14 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
 
                     <DropdownMenu id="settings" icon="las la-cog" label="Settings" openId={openId} setOpenId={setOpenId}>
                         <ul className="sidebar-submenu-list">
-                            <DropdownItem href={routes.buyerProfileSetting ?? '/buyer/profile-setting'} label="Profile Setting" />
-                            <DropdownItem href={routes.buyerChangePassword ?? '/buyer/change-password'} label="Change Password" />
-                            <DropdownItem href={routes.buyerTwofactor ?? '/buyer/twofactor'} label="2FA Security" />
+                            <DropdownItem href={routes.buyerProfileSetting ?? '/customer/profile-setting'} label="Profile Setting" />
+                            <DropdownItem href={routes.buyerChangePassword ?? '/customer/change-password'} label="Change Password" />
+                            <DropdownItem href={routes.buyerTwofactor ?? '/customer/twofactor'} label="2FA Security" />
                         </ul>
                     </DropdownMenu>
 
                     <li className="sidebar-menu-list__item">
-                        <Link href={routes.buyerLogout ?? '/buyer/logout'} method="get" as="button" className="sidebar-menu-list__link">
+                        <Link href={routes.buyerLogout ?? '/customer/logout'} method="get" as="button" className="sidebar-menu-list__link">
                             <span className="icon"><i className="las la-sign-out-alt"></i></span>
                             <span className="text">Logout</span>
                         </Link>

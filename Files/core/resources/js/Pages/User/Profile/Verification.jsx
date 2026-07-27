@@ -138,7 +138,7 @@ export default function Verification({ pageTitle, identity, providerApproved, do
                         <div className="col-lg-4" key={document.type}>
                             <DocumentCard
                                 document={document}
-                                storeUrl={`${routes.userVerificationStore ?? '/freelancer/verification'}/${document.type}`}
+                                storeUrl={`${routes.userVerificationStore ?? '/provider/verification'}/${document.type}`}
                             />
                         </div>
                     ))}

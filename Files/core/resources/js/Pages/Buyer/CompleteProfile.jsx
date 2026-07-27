@@ -30,7 +30,7 @@ export default function CompleteProfile({ pageTitle, authContent, countries, sug
 
     const submit = (event) => {
         event.preventDefault();
-        post(routes?.buyerDataSubmit ?? '/buyer/buyer-data-submit');
+        post(routes?.buyerDataSubmit ?? '/customer/customer-data-submit');
     };
 
     const errorMessages = Object.values(errors).flat();

@@ -41,13 +41,13 @@ export default function Budget({ pageTitle, job, requestFields, currencyText, gu
         event.preventDefault();
         const storeUrl = guestMode
             ? (jobPostRoutes?.budgetStore ?? '/post-job/budget')
-            : `${routes?.buyerJobPostBudgetStore ?? '/buyer/job/post/budget'}/${job.id}`;
+            : `${routes?.buyerJobPostBudgetStore ?? '/customer/job/post/budget'}/${job.id}`;
         post(storeUrl);
     };
 
     const previousHref = guestMode
         ? (jobPostRoutes?.preferences ?? '/post-job/preferences')
-        : `${routes?.buyerJobPostPreferences ?? '/buyer/job/post/freelancer-details'}/${job.id}`;
+        : `${routes?.buyerJobPostPreferences ?? '/customer/job/post/provider-details'}/${job.id}`;
 
     return (
         <JobPostShell pageTitle={pageTitle} guestMode={guestMode}>
@@ -173,7 +173,7 @@ export default function Budget({ pageTitle, job, requestFields, currencyText, gu
                                     <h6 className="mb-3">Your contact details</h6>
                                     <p className="text-muted small mb-3">
                                         We will create a free customer account so you can receive quotes and manage your job. Already have an account?{' '}
-                                        <Link href={routes?.buyerLogin ?? '/buyer/login'}>Log in here</Link>.
+                                        <Link href={routes?.buyerLogin ?? '/customer/login'}>Log in here</Link>.
                                     </p>
                                     <div className="row gy-3">
                                         <div className="col-md-6">

@@ -42,7 +42,7 @@ export default function Dashboard({ pageTitle, widget, holdBalance, kycAlert }) 
                             </p>
                         </div>
                         <Link
-                            href={routes.buyerJobPost ?? '/buyer/job/post/details'}
+                            href={routes.buyerJobPost ?? '/customer/job/post/job-details'}
                             className="btn btn--base dashboard-cta-card__btn"
                         >
                             <i className="las la-plus-circle"></i> Post a Request

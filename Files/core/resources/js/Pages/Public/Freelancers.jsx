@@ -7,7 +7,7 @@ export default function Freelancers({ pageTitle, seo, sections, freelancers, ski
     const submit = (event) => {
         event.preventDefault();
         const formData = new FormData(event.target);
-        router.get('/talents', Object.fromEntries(formData), { preserveState: true });
+        router.get('/providers', Object.fromEntries(formData), { preserveState: true });
     };
 
     return (

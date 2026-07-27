@@ -82,14 +82,14 @@ export default function LeadCredits({
 
     const submitCredits = (packageId) => {
         submitPurchase(
-            routes.userMonetisationCredits ?? '/freelancer/monetisation-payment/credits',
+            routes.userMonetisationCredits ?? '/provider/monetisation-payment/credits',
             { package_id: packageId },
         );
     };
 
     const submitPlan = (planId) => {
         submitPurchase(
-            routes.userMonetisationSubscription ?? '/freelancer/monetisation-payment/subscription',
+            routes.userMonetisationSubscription ?? '/provider/monetisation-payment/subscription',
             { plan_id: planId },
         );
     };

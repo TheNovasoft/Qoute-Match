@@ -11,7 +11,7 @@ export default function Index({ pageTitle, projects, filters }) {
                 projects={projects}
                 filters={filters}
                 role="freelancer"
-                indexUrl={routes.userProjectIndex ?? '/freelancer/project/index'}
+                indexUrl={routes.userProjectIndex ?? '/provider/project/index'}
             />
         </MasterLayout>
     );

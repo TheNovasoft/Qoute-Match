@@ -47,7 +47,7 @@ export default function Portfolio({ pageTitle, user, portfolios, skills, workPro
 
     const submitPortfolio = (event) => {
         event.preventDefault();
-        const baseUrl = routes?.userStoreProfilePortfolio ?? '/freelancer/store-profile-portfolio';
+        const baseUrl = routes?.userStoreProfilePortfolio ?? '/provider/store-profile-portfolio';
         const url = editingId ? `${baseUrl}/${editingId}` : baseUrl;
 
         post(url, {
@@ -63,7 +63,7 @@ export default function Portfolio({ pageTitle, user, portfolios, skills, workPro
     const toggleStatus = (portfolio) => {
         const action = routes?.userStatusProfilePortfolio
             ? `${routes.userStatusProfilePortfolio}/${portfolio.id}`
-            : `/freelancer/status-profile-portfolio/${portfolio.id}`;
+            : `/provider/status-profile-portfolio/${portfolio.id}`;
         const question = portfolio.status
             ? 'Are you sure you want to disable this portfolio?'
             : 'Are you sure you want to enable this portfolio?';
@@ -79,7 +79,7 @@ export default function Portfolio({ pageTitle, user, portfolios, skills, workPro
             : 'Are you sure you want to publish your profile?';
 
         if (window.confirm(question)) {
-            router.post(routes?.userProfileComplete ?? '/freelancer/work-profile-complete');
+            router.post(routes?.userProfileComplete ?? '/provider/work-profile-complete');
         }
     };
 
@@ -263,12 +263,12 @@ export default function Portfolio({ pageTitle, user, portfolios, skills, workPro
                                     </div>
 
                                     <div className="btn-wrapper d-flex flex-wrap gap-2 mt-4">
-                                        <Link href={routes?.userProfileEducation ?? '/freelancer/profile-education'} className="btn btn-outline--dark">
+                                        <Link href={routes?.userProfileEducation ?? '/provider/profile-education'} className="btn btn-outline--dark">
                                             Previous
                                         </Link>
                                         {workProfileComplete ? (
                                             <>
-                                                <Link href={routes?.freelanceJobs ?? '/freelance-jobs'} className="btn btn--base">
+                                                <Link href={routes?.freelanceJobs ?? '/jobs'} className="btn btn--base">
                                                     Browse jobs
                                                 </Link>
                                                 <button type="button" className="btn btn-outline--danger" onClick={togglePublish}>

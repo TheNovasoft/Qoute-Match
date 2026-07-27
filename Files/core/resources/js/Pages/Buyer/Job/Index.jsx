@@ -65,7 +65,7 @@ export default function Index({ pageTitle, jobs, filters }) {
 
     const submitSearch = (event) => {
         event.preventDefault();
-        router.get(routes.buyerJobList ?? '/buyer/job/post/index', { search: data.search }, { preserveState: true });
+        router.get(routes.buyerJobList ?? '/customer/job/post/index', { search: data.search }, { preserveState: true });
     };
 
     const jobRows = jobs?.data ?? [];

@@ -30,7 +30,7 @@ export default function CompleteProfile({ pageTitle, authContent, countries, sug
 
     const submit = (event) => {
         event.preventDefault();
-        post(routes?.userDataSubmit ?? '/freelancer/user-data-submit');
+        post(routes?.userDataSubmit ?? '/provider/provider-data-submit');
     };
 
     const errorMessages = Object.values(errors).flat();

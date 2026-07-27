@@ -31,7 +31,7 @@ export default function View({ pageTitle, job, requestFields, backUrl }) {
                         {!job.isApproved && (
                             <div className="right">
                                 <Link
-                                    href={`${routes?.buyerJobPostDetails ?? '/buyer/job/post/job-details'}/${job.id}`}
+                                    href={`${routes?.buyerJobPostDetails ?? '/customer/job/post/job-details'}/${job.id}`}
                                     className="btn btn--base btn--sm"
                                 >
                                     Edit
@@ -79,7 +79,7 @@ export default function View({ pageTitle, job, requestFields, backUrl }) {
                 )}
 
                 <div className="mt-4 pt-2">
-                    <Link href={backUrl ?? routes?.buyerJobList ?? '/buyer/job/post/index'} className="btn btn-outline--base">
+                    <Link href={backUrl ?? routes?.buyerJobList ?? '/customer/job/post/index'} className="btn btn-outline--base">
                         Back to requests
                     </Link>
                 </div>

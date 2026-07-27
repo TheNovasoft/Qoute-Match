@@ -21,11 +21,6 @@ class RegisterController extends Controller
 {
     use RegistersUsers;
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     protected function guard()
     {
         return auth()->guard('buyer');

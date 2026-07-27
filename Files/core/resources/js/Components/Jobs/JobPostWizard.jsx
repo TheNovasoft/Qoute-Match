@@ -385,16 +385,16 @@ export default function JobPostWizard({
 
     const detailsStoreUrl = isBuyer
         ? (jobId
-            ? `${routes?.buyerJobPostDetailsStore ?? '/buyer/job/post/job-details'}/${jobId}`
-            : (routes?.buyerJobPostDetailsStore ?? '/buyer/job/post/job-details'))
+            ? `${routes?.buyerJobPostDetailsStore ?? '/customer/job/post/job-details'}/${jobId}`
+            : (routes?.buyerJobPostDetailsStore ?? '/customer/job/post/job-details'))
         : (jobPostRoutes?.detailsStore ?? '/post-job');
 
     const preferencesStoreUrl = isBuyer
-        ? `${routes?.buyerJobPostPreferencesStore ?? '/buyer/job/post/freelancer-details'}/${jobId}`
+        ? `${routes?.buyerJobPostPreferencesStore ?? '/customer/job/post/provider-details'}/${jobId}`
         : (jobPostRoutes?.preferencesStore ?? '/post-job/preferences');
 
     const budgetStoreUrl = isBuyer
-        ? `${routes?.buyerJobPostBudgetStore ?? '/buyer/job/post/budget'}/${jobId}`
+        ? `${routes?.buyerJobPostBudgetStore ?? '/customer/job/post/budget'}/${jobId}`
         : (jobPostRoutes?.budgetStore ?? '/post-job/budget');
 
     const findScreenIndex = useCallback((phase) => {
@@ -710,7 +710,7 @@ export default function JobPostWizard({
                 {screen.id === 'email' && form.errors.email && (
                     <p className="text-danger mt-2 mb-0">
                         {form.errors.email}{' '}
-                        <Link href={routes?.buyerLogin ?? '/buyer/login'}>Log in</Link>
+                        <Link href={routes?.buyerLogin ?? '/customer/login'}>Log in</Link>
                     </p>
                 )}
             </div>

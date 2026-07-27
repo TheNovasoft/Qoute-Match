@@ -11,7 +11,7 @@ export default function Login({ pageTitle, authContent, bannerContent, switching
 
     const submit = (event) => {
         event.preventDefault();
-        post('/freelancer/login');
+        post('/provider/login');
     };
 
     return (
@@ -57,7 +57,7 @@ export default function Login({ pageTitle, authContent, bannerContent, switching
                                                         checked={data.remember} onChange={(e) => setData('remember', e.target.checked)} />
                                                     <label className="form-check-label" htmlFor="remember">Remember Me</label>
                                                 </div>
-                                                <a href="/freelancer/password/reset" className="forgot-password">Forgot password?</a>
+                                                <a href="/provider/password/reset" className="forgot-password">Forgot password?</a>
                                             </div>
                                         </div>
                                     </div>
@@ -69,7 +69,7 @@ export default function Login({ pageTitle, authContent, bannerContent, switching
                                 </div>
                                 <p className="account-form__text">
                                     Don't have on account yet?{' '}
-                                    <a href="/freelancer/register" className="text--base">Create Account</a>
+                                    <a href="/provider/register" className="text--base">Create Account</a>
                                 </p>
                             </div>
                         </form>

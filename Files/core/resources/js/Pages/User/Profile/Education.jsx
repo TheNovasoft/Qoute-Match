@@ -37,7 +37,7 @@ export default function Education({ pageTitle, user, educations: initialEducatio
 
     const submit = (event) => {
         event.preventDefault();
-        post(routes?.userStoreProfileEducation ?? '/freelancer/profile-education-store');
+        post(routes?.userStoreProfileEducation ?? '/provider/profile-education-store');
     };
 
     return (
@@ -132,13 +132,13 @@ export default function Education({ pageTitle, user, educations: initialEducatio
                                         ))}
 
                                         <div className="btn-wrapper d-flex flex-wrap gap-2 mt-4">
-                                            <Link href={routes?.userProfileSetting ?? '/freelancer/profile-setting'} className="btn btn-outline--dark">
+                                            <Link href={routes?.userProfileSetting ?? '/provider/profile-setting'} className="btn btn-outline--dark">
                                                 Previous
                                             </Link>
                                             <button
                                                 type="button"
                                                 className="btn btn-outline--base"
-                                                onClick={() => router.post(routes?.userSkipProfileEducation ?? '/freelancer/profile-education-skip')}
+                                                onClick={() => router.post(routes?.userSkipProfileEducation ?? '/provider/profile-education-skip')}
                                             >
                                                 Skip for now
                                             </button>

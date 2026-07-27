@@ -57,31 +57,31 @@ export default function MasterLayout({ children, pageTitle }) {
                             </div>
                             <ul className="sidebar-menu-list">
                                 <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userHome ?? '/freelancer/dashboard'} className="sidebar-menu-list__link">
+                                    <Link href={routes.userHome ?? '/provider/dashboard'} className="sidebar-menu-list__link">
                                         <span className="icon"><i className="las la-home"></i></span>
                                         <span className="text">Dashboard</span>
                                     </Link>
                                 </li>
                                 <li className="sidebar-menu-list__item sidebar-menu-list__item--cta">
-                                    <Link href={routes.freelanceJobs ?? '/freelance-jobs'} className="sidebar-menu-list__link">
+                                    <Link href={routes.freelanceJobs ?? '/jobs'} className="sidebar-menu-list__link">
                                         <span className="icon"><i className="las la-search"></i></span>
                                         <span className="text">Browse Requests</span>
                                     </Link>
                                 </li>
                                 <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userBidIndex ?? '/freelancer/bid/list'} className="sidebar-menu-list__link">
+                                    <Link href={routes.userBidIndex ?? '/provider/bid/list'} className="sidebar-menu-list__link">
                                         <span className="icon"><i className="las la-gavel"></i></span>
                                         <span className="text">All Bids</span>
                                     </Link>
                                 </li>
                                 <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userProjectIndex ?? '/freelancer/project/index'} className="sidebar-menu-list__link">
+                                    <Link href={routes.userProjectIndex ?? '/provider/project/index'} className="sidebar-menu-list__link">
                                         <span className="icon"><i className="las la-briefcase"></i></span>
                                         <span className="text">My Projects</span>
                                     </Link>
                                 </li>
                                 <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userDisputes ?? '/freelancer/disputes'} className="sidebar-menu-list__link">
+                                    <Link href={routes.userDisputes ?? '/provider/disputes'} className="sidebar-menu-list__link">
                                         <span className="icon"><i className="las la-exclamation-triangle"></i></span>
                                         <span className="text">
                                             Disputes
@@ -92,7 +92,7 @@ export default function MasterLayout({ children, pageTitle }) {
                                     </Link>
                                 </li>
                                 <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userNotifications ?? '/freelancer/notifications'} className="sidebar-menu-list__link">
+                                    <Link href={routes.userNotifications ?? '/provider/notifications'} className="sidebar-menu-list__link">
                                         <span className="icon"><i className="las la-bell"></i></span>
                                         <span className="text">
                                             Notifications
@@ -108,33 +108,33 @@ export default function MasterLayout({ children, pageTitle }) {
                                     </Link>
                                 </li>
                                 <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userWithdraw ?? '/freelancer/withdraw'} className="sidebar-menu-list__link">
+                                    <Link href={routes.userWithdraw ?? '/provider/withdraw'} className="sidebar-menu-list__link">
                                         <span className="icon"><i className="las la-money-check-alt"></i></span>
                                         <span className="text">Withdraw</span>
                                     </Link>
                                 </li>
                                 <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userTransactions ?? '/freelancer/transactions'} className="sidebar-menu-list__link">
+                                    <Link href={routes.userTransactions ?? '/provider/transactions'} className="sidebar-menu-list__link">
                                         <span className="icon"><i className="las la-exchange-alt"></i></span>
                                         <span className="text">Transactions</span>
                                     </Link>
                                 </li>
                                 {monetisation?.enabled && (
                                     <li className="sidebar-menu-list__item">
-                                        <Link href={routes.userLeadCredits ?? '/freelancer/lead-credits'} className="sidebar-menu-list__link">
+                                        <Link href={routes.userLeadCredits ?? '/provider/lead-credits'} className="sidebar-menu-list__link">
                                             <span className="icon"><i className="las la-coins"></i></span>
                                             <span className="text">Lead Credits</span>
                                         </Link>
                                     </li>
                                 )}
                                 <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userVerification ?? '/freelancer/verification'} className="sidebar-menu-list__link">
+                                    <Link href={routes.userVerification ?? '/provider/verification'} className="sidebar-menu-list__link">
                                         <span className="icon"><i className="las la-certificate"></i></span>
                                         <span className="text">Verification</span>
                                     </Link>
                                 </li>
                                 <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userConversation ?? '/freelancer/conversation'} className="sidebar-menu-list__link">
+                                    <Link href={routes.userConversation ?? '/provider/conversation'} className="sidebar-menu-list__link">
                                         <span className="icon"><i className="lab la-rocketchat"></i></span>
                                         <span className="text">
                                             Chat
@@ -155,13 +155,13 @@ export default function MasterLayout({ children, pageTitle }) {
                                     </Link>
                                 </li>
                                 <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userProfileSetting ?? '/freelancer/profile-setting'} className="sidebar-menu-list__link">
+                                    <Link href={routes.userProfileSetting ?? '/provider/profile-setting'} className="sidebar-menu-list__link">
                                         <span className="icon"><i className="las la-cog"></i></span>
                                         <span className="text">Settings</span>
                                     </Link>
                                 </li>
                                 <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userLogout ?? '/freelancer/logout'} method="get" as="button" className="sidebar-menu-list__link">
+                                    <Link href={routes.userLogout ?? '/provider/logout'} method="get" as="button" className="sidebar-menu-list__link">
                                         <span className="icon"><i className="las la-sign-out-alt"></i></span>
                                         <span className="text">Logout</span>
                                     </Link>
@@ -189,33 +189,33 @@ export default function MasterLayout({ children, pageTitle }) {
                                     roleLabel="Provider"
                                     unreadCount={unreadCount}
                                     notificationUnreadCount={notificationUnreadCount}
-                                    conversationUrl={routes.userConversation ?? '/freelancer/conversation'}
-                                    notificationsUrl={routes.userNotifications ?? '/freelancer/notifications'}
+                                    conversationUrl={routes.userConversation ?? '/provider/conversation'}
+                                    notificationsUrl={routes.userNotifications ?? '/provider/notifications'}
                                     menuItems={[
                                         {
                                             label: 'My Profile',
-                                            href: routes.userProfileSetting ?? '/freelancer/profile-setting',
+                                            href: routes.userProfileSetting ?? '/provider/profile-setting',
                                             icon: 'fas fa-user-circle',
                                         },
                                         ...(user?.username ? [{
                                             label: 'Public Profile',
-                                            href: `${routes.talentExplore ?? '/talent/details'}/${user.username}`,
+                                            href: `${routes.talentExplore ?? '/provider/details'}/${user.username}`,
                                             icon: 'las la-external-link-alt',
                                             external: true,
                                         }] : []),
                                         {
                                             label: 'Password',
-                                            href: routes.userChangePassword ?? '/freelancer/change-password',
+                                            href: routes.userChangePassword ?? '/provider/change-password',
                                             icon: 'fas fa-lock',
                                         },
                                         {
                                             label: '2FA Security',
-                                            href: routes.userTwofactor ?? '/freelancer/twofactor',
+                                            href: routes.userTwofactor ?? '/provider/twofactor',
                                             icon: 'fas fa-key',
                                         },
                                         {
                                             label: 'Logout',
-                                            href: routes.userLogout ?? '/freelancer/logout',
+                                            href: routes.userLogout ?? '/provider/logout',
                                             icon: 'fas fa-sign-out-alt',
                                             danger: true,
                                         },

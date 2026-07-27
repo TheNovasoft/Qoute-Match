@@ -26,7 +26,7 @@ export default function BidList({ bids, indexUrl }) {
                     <h6 className="mb-1">Your submitted quotes</h6>
                     <p className="text-muted mb-0 small">To place a new bid, browse open customer requests first.</p>
                 </div>
-                <Link href="/freelance-jobs" className="btn btn--base">
+                <Link href="/jobs" className="btn btn--base">
                     <i className="las la-search" /> Browse Requests &amp; Bid
                 </Link>
             </div>

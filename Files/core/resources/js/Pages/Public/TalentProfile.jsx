@@ -32,7 +32,7 @@ export default function TalentProfile({
         if (!freelancer.inviteUrl || inviteLoading) return;
 
         if (!auth?.buyer) {
-            window.location.href = routes.buyerLogin ?? '/buyer/login';
+            window.location.href = routes.buyerLogin ?? '/customer/login';
             return;
         }
 

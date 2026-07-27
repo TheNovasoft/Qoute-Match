@@ -10,7 +10,6 @@ class TicketController extends Controller {
     use SupportTicketManager;
 
     public function __construct() {
-        parent::__construct();
         $this->redirectLink = 'buyer.ticket.view';
         $this->userType = 'buyer';
         $this->column = 'buyer_id';

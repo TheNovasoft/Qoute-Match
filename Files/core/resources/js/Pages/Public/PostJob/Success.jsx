@@ -28,11 +28,11 @@ export default function Success({ pageTitle, job, buyerLoggedIn }) {
                             )}
                             <div className="d-flex flex-wrap justify-content-center gap-2">
                                 {buyerLoggedIn && (
-                                    <Link href={routes.buyerJobList ?? '/buyer/job/post/index'} className="btn btn--base">
+                                    <Link href={routes.buyerJobList ?? '/customer/job/post/index'} className="btn btn--base">
                                         View my jobs
                                     </Link>
                                 )}
-                                <Link href={routes.freelanceJobs ?? '/freelance-jobs'} className="btn btn-outline--base">
+                                <Link href={routes.freelanceJobs ?? '/jobs'} className="btn btn-outline--base">
                                     Browse requests
                                 </Link>
                                 <Link href={routes.home ?? '/'} className="btn btn-outline--dark">

@@ -11,7 +11,7 @@ export default function Login({ pageTitle, authContent }) {
 
     const submit = (event) => {
         event.preventDefault();
-        post('/buyer/login');
+        post('/customer/login');
     };
 
     return (
@@ -57,7 +57,7 @@ export default function Login({ pageTitle, authContent }) {
                                                         checked={data.remember} onChange={(e) => setData('remember', e.target.checked)} />
                                                     <label className="form-check-label" htmlFor="remember">Remember Me</label>
                                                 </div>
-                                                <a href="/buyer/password/reset" className="forgot-password">Forgot password?</a>
+                                                <a href="/customer/password/reset" className="forgot-password">Forgot password?</a>
                                             </div>
                                         </div>
                                     </div>
@@ -69,7 +69,7 @@ export default function Login({ pageTitle, authContent }) {
                                 </div>
                                 <p className="account-form__text">
                                     Don't have on account yet?{' '}
-                                    <a href="/buyer/register" className="text--base">Create Account</a>
+                                    <a href="/customer/register" className="text--base">Create Account</a>
                                 </p>
                             </div>
                         </form>

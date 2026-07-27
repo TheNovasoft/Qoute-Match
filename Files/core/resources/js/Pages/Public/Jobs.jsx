@@ -35,7 +35,7 @@ export default function Jobs({
         }
 
         const timer = setTimeout(() => {
-            router.get('/freelance-jobs', localFilters, {
+            router.get('/jobs', localFilters, {
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,

@@ -61,6 +61,7 @@ Route::middleware('admin')->group(function () {
 
     //Config Categories
     Route::controller('ConfigCategoryController')->prefix('category')->name('category.')->group(function () {
+        Route::redirect('/', '/admin/category/index');
         Route::get('index', 'index')->name('index');
         Route::post('store/{id?}', 'store')->name('store');
         Route::post('status/{id}', 'status')->name('status');
