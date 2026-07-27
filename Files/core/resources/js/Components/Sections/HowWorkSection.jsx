@@ -1,18 +1,18 @@
 function HowWorkArrow() {
     return (
-        <svg viewBox="0 0 90 36" width="90" height="36" aria-hidden="true" className="how-work-arrow">
+        <svg viewBox="0 0 100 40" width="100" height="40" aria-hidden="true" className="how-work-arrow">
             <path
-                d="M4 28 C28 4 52 4 78 18"
+                d="M4 32 C30 6 58 6 86 22"
                 fill="none"
-                stroke="#2563eb"
-                strokeWidth="5"
+                stroke="#0071e3"
+                strokeWidth="3.5"
                 strokeLinecap="round"
             />
             <path
-                d="M62 10 L80 18 L62 26"
+                d="M72 12 L88 22 L70 28"
                 fill="none"
-                stroke="#2563eb"
-                strokeWidth="5"
+                stroke="#0071e3"
+                strokeWidth="3.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
             />

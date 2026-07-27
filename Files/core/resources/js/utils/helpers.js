@@ -5,6 +5,21 @@ export function asset(path) {
     return `${base}/${path.replace(/^\//, '')}`;
 }
 
+/** Match current Inertia URL to a sidebar href (admin-style active states). */
+export function isNavActive(currentUrl, href, { exact = false } = {}) {
+    if (!href || !currentUrl) return false;
+    let path = String(href);
+    try {
+        path = new URL(path, window.location.origin).pathname;
+    } catch {
+        path = path.split('?')[0].split('#')[0];
+    }
+    path = path.replace(/\/+$/, '') || '/';
+    const url = String(currentUrl).split('?')[0].split('#')[0].replace(/\/+$/, '') || '/';
+    if (exact) return url === path;
+    return url === path || url.startsWith(`${path}/`);
+}
+
 export function templateAsset(path, templatePath) {
     return asset(`${templatePath}${path}`);
 }

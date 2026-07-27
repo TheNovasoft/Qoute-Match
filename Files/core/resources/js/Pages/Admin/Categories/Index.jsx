@@ -1,6 +1,7 @@
 import { Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import CategoryTabs from '@/Components/Admin/CategoryTabs';
 import Pagination from '@/Components/Shared/Pagination';
 
 /**
@@ -14,8 +15,10 @@ export default function Index({ pageTitle, categories }) {
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="admin-categories admin-categories--wp">
+                <CategoryTabs active="categories" />
                 <p className="text-muted small mb-3">
                     Add a main category, then use <strong>Edit Subcategories</strong> to manage its children — same idea as WordPress.
+                    Use <strong>Form Builder</strong> to create request/quote forms, then assign them here.
                 </p>
 
                 <div className="row gy-4">

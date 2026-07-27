@@ -63,7 +63,7 @@
                                         <td>
                                             <button class="btn btn-sm btn-outline--primary notifyDetail"
                                                 data-type="{{ $log->notification_type }}"
-                                                @if ($log->notification_type == 'email') data-message="{{ route('admin.report.email.details', $log->id) }}" @else data-message="{{ $log->message }}" @if ($log->image) data-image="{{ asset(getFilePath('push') . '/' . $log->image) }}" @endif
+                                                @if ($log->notification_type == 'email') data-message="{{ route('admin.report.email.details', $log->id) }}" @else data-message="{{ notificationPlainText($log->message) }}" @if ($log->image) data-image="{{ asset(getFilePath('push') . '/' . $log->image) }}" @endif
                                                 @endif data-sent_to="{{ $log->sent_to }}"><i
                                                     class="las la-desktop"></i> @lang('Detail')</button>
                                         </td>

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Lib\InertiaResource;
 use App\Lib\NotificationInboxService;
-use App\Models\NotificationLog;
 use Inertia\Inertia;
 
 class NotificationController extends Controller
@@ -14,8 +13,7 @@ class NotificationController extends Controller
     {
         $user = auth()->user();
         $pageTitle = 'Notifications';
-        $logs = NotificationLog::query()
-            ->where('user_id', $user->id)
+        $logs = NotificationInboxService::inboxQuery('user_id', $user->id)
             ->orderByDesc('id')
             ->paginate(getPaginate());
 

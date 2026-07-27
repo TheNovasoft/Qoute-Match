@@ -304,7 +304,7 @@ class ManageBuyersController extends Controller
     public function showNotificationSingleForm($id)
     {
         $buyer = Buyer::findOrFail($id);
-        if (!gs('en') && !gs('sn') && !gs('pn')) {
+        if (!gs('en') && !gs('sn') && !gs('pn') && !gs('in') && !gs('wn')) {
             $notify[] = ['warning', 'Notification options are disabled currently'];
             return to_route('admin.buyers.detail', $buyer->id)->withNotify($notify);
         }
@@ -323,7 +323,7 @@ class ManageBuyersController extends Controller
             'image'   => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])],
         ]);
 
-        if (!gs('en') && !gs('sn') && !gs('pn')) {
+        if (!gs('en') && !gs('sn') && !gs('pn') && !gs('in') && !gs('wn')) {
             $notify[] = ['warning', 'Notification options are disabled currently'];
             return to_route('admin.dashboard')->withNotify($notify);
         }
@@ -333,7 +333,7 @@ class ManageBuyersController extends Controller
 
     public function showNotificationAllForm()
     {
-        if (!gs('en') && !gs('sn') && !gs('pn')) {
+        if (!gs('en') && !gs('sn') && !gs('pn') && !gs('in') && !gs('wn')) {
             $notify[] = ['warning', 'Notification options are disabled currently'];
             return to_route('admin.dashboard')->withNotify($notify);
         }
@@ -368,7 +368,7 @@ class ManageBuyersController extends Controller
             'number_of_top_deposited_buyer.required_if' => "Number of top deposited buyer field is required",
         ]);
 
-        if (!gs('en') && !gs('sn') && !gs('pn')) {
+        if (!gs('en') && !gs('sn') && !gs('pn') && !gs('in') && !gs('wn')) {
             $notify[] = ['warning', 'Notification options are disabled currently'];
             return to_route('admin.dashboard')->withNotify($notify);
         }

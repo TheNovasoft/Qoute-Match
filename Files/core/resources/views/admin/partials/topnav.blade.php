@@ -252,7 +252,7 @@
         margin: 8vh auto 0;
         background: #fff;
         border-radius: 16px;
-        border: 1px solid rgba(70, 52, 255, 0.08);
+        border: 1px solid rgba(0, 113, 227, 0.08);
         box-shadow: 0 24px 80px rgba(7, 18, 81, 0.18), 0 0 0 1px rgba(7, 18, 81, 0.04);
         overflow: hidden;
         transform: translateY(28px) scale(.96);
@@ -289,8 +289,8 @@
     }
 
     .admin-spotlight__head .spotlight-input-wrap:focus-within {
-        border-color: #4634ff;
-        box-shadow: 0 0 0 3px rgba(70, 52, 255, 0.10);
+        border-color: #0071e3;
+        box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
     }
 
     .admin-spotlight__head i {
@@ -323,7 +323,7 @@
         overflow: auto;
         background: #f6f7fb;
         scrollbar-width: thin;
-        scrollbar-color: rgba(70, 52, 255, 0.25) transparent;
+        scrollbar-color: rgba(0, 113, 227, 0.25) transparent;
     }
 
     .admin-spotlight__results::-webkit-scrollbar {
@@ -335,12 +335,12 @@
     }
 
     .admin-spotlight__results::-webkit-scrollbar-thumb {
-        background: rgba(70, 52, 255, 0.25);
+        background: rgba(0, 113, 227, 0.25);
         border-radius: 999px;
     }
 
     .admin-spotlight__results::-webkit-scrollbar-thumb:hover {
-        background: rgba(70, 52, 255, 0.45);
+        background: rgba(0, 113, 227, 0.45);
     }
 
     .admin-spotlight__results .search-list {
@@ -377,8 +377,8 @@
         width: 38px;
         height: 38px;
         border-radius: 10px;
-        background: rgba(70, 52, 255, 0.08);
-        color: #4634ff;
+        background: rgba(0, 113, 227, 0.08);
+        color: #0071e3;
         font-size: 18px;
         flex-shrink: 0;
         transition: all .18s ease;
@@ -422,7 +422,7 @@
     /* Hover & Active states */
     .admin-spotlight__results .search-list li.active .search-list-link,
     .admin-spotlight__results .search-list li .search-list-link:hover {
-        background: #4634ff;
+        background: #0071e3;
     }
 
     .admin-spotlight__results .search-list li.active .search-item-icon,
@@ -468,7 +468,7 @@
     }
 
     .admin-spotlight__footer i {
-        color: #4634ff;
+        color: #0071e3;
         font-size: 12px;
     }
 
@@ -480,9 +480,9 @@
         height: 18px;
         padding: 0 5px;
         border-radius: 4px;
-        border: 1px solid rgba(70, 52, 255, 0.14);
-        background: rgba(70, 52, 255, 0.08);
-        color: #4634ff;
+        border: 1px solid rgba(0, 113, 227, 0.14);
+        background: rgba(0, 113, 227, 0.08);
+        color: #0071e3;
         font-size: 10px;
         font-weight: 700;
         box-shadow: none;

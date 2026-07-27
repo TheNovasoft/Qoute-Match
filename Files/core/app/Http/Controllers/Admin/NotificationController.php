@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Lib\RequiredConfig;
+use App\Models\NotificationLog;
 use App\Models\NotificationTemplate;
 use App\Notify\Sms;
 use App\Rules\FileTypeValidate;
@@ -12,6 +13,112 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
+    public function channels()
+    {
+        $pageTitle = 'Notification Channels';
+        $channels = [
+            [
+                'key' => 'en',
+                'title' => 'Email',
+                'description' => 'Send emails for marketplace events and account alerts.',
+                'icon' => 'las la-envelope',
+                'enabled' => (bool) gs('en'),
+                'links' => [
+                    ['label' => 'Email Setting', 'url' => route('admin.setting.notification.email')],
+                    ['label' => 'Global Template', 'url' => route('admin.setting.notification.global.email')],
+                    ['label' => 'Templates', 'url' => route('admin.setting.notification.templates')],
+                ],
+            ],
+            [
+                'key' => 'sn',
+                'title' => 'SMS',
+                'description' => 'Optional SMS alerts. Keep off if you do not use an SMS gateway.',
+                'icon' => 'las la-sms',
+                'enabled' => (bool) gs('sn'),
+                'links' => [
+                    ['label' => 'SMS Setting', 'url' => route('admin.setting.notification.sms')],
+                    ['label' => 'Global Template', 'url' => route('admin.setting.notification.global.sms')],
+                    ['label' => 'Templates', 'url' => route('admin.setting.notification.templates')],
+                ],
+            ],
+            [
+                'key' => 'in',
+                'title' => 'In-app',
+                'description' => 'Show alerts inside buyer and provider notification inbox.',
+                'icon' => 'las la-bell',
+                'enabled' => (bool) gs('in'),
+                'links' => [
+                    ['label' => 'Global Template', 'url' => route('admin.setting.notification.global.in_app')],
+                    ['label' => 'Templates', 'url' => route('admin.setting.notification.templates')],
+                ],
+            ],
+            [
+                'key' => 'pn',
+                'title' => 'Push',
+                'description' => 'Firebase web push now; also prepared for the future mobile app.',
+                'icon' => 'las la-broadcast-tower',
+                'enabled' => (bool) gs('pn'),
+                'links' => [
+                    ['label' => 'Push Setting', 'url' => route('admin.setting.notification.push')],
+                    ['label' => 'Global Template', 'url' => route('admin.setting.notification.global.push')],
+                    ['label' => 'Templates', 'url' => route('admin.setting.notification.templates')],
+                ],
+            ],
+            [
+                'key' => 'wn',
+                'title' => 'WhatsApp',
+                'description' => 'Future channel. Prepare templates now; live send comes later.',
+                'icon' => 'lab la-whatsapp',
+                'badge' => 'Coming soon',
+                'enabled' => (bool) gs('wn'),
+                'links' => [
+                    ['label' => 'WhatsApp Setting', 'url' => route('admin.setting.notification.whatsapp')],
+                    ['label' => 'Global Template', 'url' => route('admin.setting.notification.global.whatsapp')],
+                    ['label' => 'Templates', 'url' => route('admin.setting.notification.templates')],
+                ],
+            ],
+        ];
+
+        return \App\Lib\InertiaBridge::admin('admin.notification.channels', compact('pageTitle', 'channels'));
+    }
+
+    public function channelsUpdate(Request $request)
+    {
+        $general = gs();
+        $general->en = $request->en ? Status::ENABLE : Status::DISABLE;
+        $general->sn = $request->sn ? Status::ENABLE : Status::DISABLE;
+        $general->in = $request->in ? Status::ENABLE : Status::DISABLE;
+        $general->pn = $request->pn ? Status::ENABLE : Status::DISABLE;
+        $general->wn = $request->wn ? Status::ENABLE : Status::DISABLE;
+        $general->save();
+
+        $notify[] = ['success', 'Notification channels updated successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function channelsCleanup()
+    {
+        $updated = 0;
+        NotificationLog::query()
+            ->whereIn('notification_type', ['sms', 'push', 'in_app', 'whatsapp'])
+            ->orderBy('id')
+            ->chunkById(200, function ($logs) use (&$updated) {
+                foreach ($logs as $log) {
+                    $cleanMessage = notificationPlainText((string) $log->message);
+                    $cleanSubject = notificationPlainText((string) $log->subject);
+                    if ($cleanMessage !== (string) $log->message || $cleanSubject !== (string) $log->subject) {
+                        $log->message = $cleanMessage;
+                        $log->subject = $cleanSubject;
+                        $log->save();
+                        $updated++;
+                    }
+                }
+            });
+
+        $notify[] = ['success', $updated . ' notification log(s) cleaned'];
+        return back()->withNotify($notify);
+    }
+
     public function globalEmail(){
         $pageTitle = 'Global Email Template';
         return \App\Lib\InertiaBridge::admin('admin.notification.global_email_template', compact('pageTitle'));
@@ -76,6 +183,42 @@ class NotificationController extends Controller
         return back()->withNotify($notify);
     }
 
+    public function globalInApp(){
+        $pageTitle = 'Global In-app Notification Template';
+        return \App\Lib\InertiaBridge::admin('admin.notification.global_in_app_template', compact('pageTitle'));
+    }
+
+    public function globalInAppUpdate(Request $request){
+        $request->validate([
+            'in_app_template' => 'required',
+        ]);
+
+        $general = gs();
+        $general->in_app_template = $request->in_app_template;
+        $general->save();
+
+        $notify[] = ['success','Global in-app notification template updated successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function globalWhatsApp(){
+        $pageTitle = 'Global WhatsApp Notification Template';
+        return \App\Lib\InertiaBridge::admin('admin.notification.global_whatsapp_template', compact('pageTitle'));
+    }
+
+    public function globalWhatsAppUpdate(Request $request){
+        $request->validate([
+            'whatsapp_template' => 'required',
+        ]);
+
+        $general = gs();
+        $general->whatsapp_template = $request->whatsapp_template;
+        $general->save();
+
+        $notify[] = ['success','Global WhatsApp notification template updated successfully'];
+        return back()->withNotify($notify);
+    }
+
     public function templates(){
         $pageTitle = 'Notification Templates';
         $templates = NotificationTemplate::orderBy('name')->get();
@@ -107,6 +250,16 @@ class NotificationController extends Controller
                 'push_body' => 'required',
             ];
         }
+        if ($type == 'in_app') {
+            $validationRule = [
+                'in_app_body' => 'required',
+            ];
+        }
+        if ($type == 'whatsapp') {
+            $validationRule = [
+                'whatsapp_body' => 'required',
+            ];
+        }
         $request->validate($validationRule);
         $template = NotificationTemplate::findOrFail($id);
         if ($type == 'email') {
@@ -125,6 +278,14 @@ class NotificationController extends Controller
             $template->push_title = $request->push_title;
             $template->push_body = $request->push_body;
             $template->push_status = $request->push_status ? Status::ENABLE : Status::DISABLE;
+        }
+        if ($type == 'in_app') {
+            $template->in_app_body = $request->in_app_body;
+            $template->in_app_status = $request->in_app_status ? Status::ENABLE : Status::DISABLE;
+        }
+        if ($type == 'whatsapp') {
+            $template->whatsapp_body = $request->whatsapp_body;
+            $template->whatsapp_status = $request->whatsapp_status ? Status::ENABLE : Status::DISABLE;
         }
         $template->save();
 
@@ -377,6 +538,44 @@ class NotificationController extends Controller
             return back()->withNotify($notify);
         }
         return response()->download($filePath);
+    }
+
+    public function whatsappSetting()
+    {
+        $pageTitle = 'WhatsApp Notification Settings';
+        return \App\Lib\InertiaBridge::admin('admin.notification.whatsapp_setting', compact('pageTitle'));
+    }
+
+    public function whatsappSettingUpdate(Request $request)
+    {
+        $request->validate([
+            'whatsapp_method' => 'required|in:disabled,meta,twilio',
+            'meta_phone_number_id' => 'required_if:whatsapp_method,meta|nullable|string',
+            'meta_access_token' => 'required_if:whatsapp_method,meta|nullable|string',
+            'twilio_account_sid' => 'required_if:whatsapp_method,twilio|nullable|string',
+            'twilio_auth_token' => 'required_if:whatsapp_method,twilio|nullable|string',
+            'twilio_from' => 'required_if:whatsapp_method,twilio|nullable|string',
+        ]);
+
+        $data = [
+            'name' => $request->whatsapp_method,
+            'meta' => [
+                'phone_number_id' => $request->meta_phone_number_id,
+                'access_token' => $request->meta_access_token,
+            ],
+            'twilio' => [
+                'account_sid' => $request->twilio_account_sid,
+                'auth_token' => $request->twilio_auth_token,
+                'from' => $request->twilio_from,
+            ],
+        ];
+
+        $general = gs();
+        $general->whatsapp_config = $data;
+        $general->save();
+
+        $notify[] = ['success', 'WhatsApp settings saved. Live delivery will be enabled when the provider integration is ready.'];
+        return back()->withNotify($notify);
     }
 
 }

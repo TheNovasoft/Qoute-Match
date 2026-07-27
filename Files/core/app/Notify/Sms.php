@@ -48,7 +48,7 @@ class Sms extends NotifyProcess implements Notifiable{
                     $sendSms = new SmsGateway();
                     $sendSms->to = $this->mobile;
                     $sendSms->from = $this->getSmsFrom();
-                    $sendSms->message = strip_tags($message);
+                    $sendSms->message = notificationPlainText($message);
                     $sendSms->config = gs('sms_config');
                     $sendSms->$gateway();
                     $this->createLog('sms');

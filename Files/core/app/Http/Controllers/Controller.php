@@ -8,6 +8,11 @@ abstract class Controller
 {
     use ValidatesRequests;
 
+    public function __construct()
+    {
+        //
+    }
+
     public static function middleware()
     {
         return [];

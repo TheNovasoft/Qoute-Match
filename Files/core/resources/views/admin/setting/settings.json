@@ -21,11 +21,11 @@
         "route_name": "admin.setting.system.configuration"
     },
     "notification_setting": {
-        "keyword": ["email configuration","sms configure","push notification configure","email setting","sms setting","push notification setting","firebase setting","firebase control","email template","sms template","push notification template","notification template","smtp","sendgrid","send grid","mailjet","mail jet","php","nexmo","clickatell","click a tell","infobip","info bip","message bird","sms broadcast","twilio","text magic","custom api","template setting","global template","global notification"],
+        "keyword": ["email configuration","sms configure","push notification configure","email setting","sms setting","push notification setting","firebase setting","firebase control","email template","sms template","push notification template","notification template","smtp","sendgrid","send grid","mailjet","mail jet","php","nexmo","clickatell","click a tell","infobip","info bip","message bird","sms broadcast","twilio","text magic","custom api","template setting","global template","global notification","in-app notification","whatsapp notification","notification channels"],
         "title": "Notification Setting",
-        "subtitle": "Control and configure overall notification elements of the system.",
+        "subtitle": "Manage Email, SMS, In-app, Push and WhatsApp notification channels.",
         "icon": "las la-bell",
-        "route_name": "admin.setting.notification.global.email"
+        "route_name": "admin.setting.notification.channels"
     },
     "payment_gateways": {
         "keyword": ["automatic", "manual", "configure payment gateways","aamarpay","amarpay","authorize","autorize.net","btcpay","btc pay","binance","blockchain","cashmaal","checkout","coinbase commerce","coingate","coinpayments","flutterwave","instamojo","mercado pago","mollie","nmi","now payments","nowpayments","payeer","paypal","paystack","paytm","perfect money","perfectmoney","razorpay","skrill","sslcommerz","stripe","twocheckout","two checkout","2checkout"],

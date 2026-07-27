@@ -45,7 +45,7 @@ export default function Dashboard({ pageTitle, metrics, chart, recentDisputes, r
                 <MetricCard title="Open Disputes" value={metrics.openDisputes} url="/admin/disputes" tone="danger" />
                 <MetricCard title="Pending Providers" value={metrics.pendingProviders} url="/admin/users/pending-approval" tone="dark" />
                 <MetricCard title="Pending Badges" value={metrics.pendingVerifications} url="/admin/provider-verifications?status=pending" tone="warning" />
-                <MetricCard title="Pending Reviews" value={metrics.pendingReviews} url="/admin/reviews" />
+                <MetricCard title="Pending Reviews" value={metrics.pendingReviews} url="/admin/reviews/pending" />
                 <MetricCard title="Reported Projects" value={metrics.reportedProjects} url="/admin/project/reported" />
             </div>
 

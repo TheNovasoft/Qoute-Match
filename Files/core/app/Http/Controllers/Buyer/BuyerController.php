@@ -409,7 +409,7 @@ class BuyerController extends Controller
         $deviceToken          = new DeviceToken();
         $deviceToken->buyer_id = auth()->guard('buyer')->user()->id;
         $deviceToken->token   = $request->token;
-        $deviceToken->is_app  = Status::NO;
+        $deviceToken->is_app  = $request->boolean('is_app') ? Status::YES : Status::NO;
         $deviceToken->save();
 
         return ['success' => true, 'message' => 'Token saved successfully'];

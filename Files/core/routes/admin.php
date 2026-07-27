@@ -128,9 +128,17 @@ Route::middleware('admin')->group(function () {
 
     Route::controller('ReviewModerationController')->prefix('reviews')->name('reviews.')->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::get('pending', 'pending')->name('pending');
+        Route::get('approved', 'approved')->name('approved');
+        Route::get('hidden', 'hidden')->name('hidden');
+        Route::get('verified', 'verified')->name('verified');
+        Route::get('disputed', 'disputed')->name('disputed');
         Route::get('detail/{id}', 'detail')->name('detail');
         Route::post('approve/{id}', 'approve')->name('approve');
         Route::post('hide/{id}', 'hide')->name('hide');
+        Route::post('verify/{id}', 'verify')->name('verify');
+        Route::post('investigate/{id}', 'investigate')->name('investigate');
+        Route::post('reply/{id}', 'reply')->name('reply');
     });
 
     // Module 12 — Monetisation (lead credits & subscriptions)
@@ -429,6 +437,10 @@ Route::middleware('admin')->group(function () {
 
     //Notification Setting
     Route::name('setting.notification.')->controller('NotificationController')->prefix('notification')->group(function () {
+        Route::get('channels', 'channels')->name('channels');
+        Route::post('channels', 'channelsUpdate')->name('channels.update');
+        Route::post('channels/cleanup', 'channelsCleanup')->name('channels.cleanup');
+
         //Template Setting
         Route::get('global/email', 'globalEmail')->name('global.email');
         Route::post('global/email/update', 'globalEmailUpdate')->name('global.email.update');
@@ -438,6 +450,12 @@ Route::middleware('admin')->group(function () {
 
         Route::get('global/push', 'globalPush')->name('global.push');
         Route::post('global/push/update', 'globalPushUpdate')->name('global.push.update');
+
+        Route::get('global/in-app', 'globalInApp')->name('global.in_app');
+        Route::post('global/in-app/update', 'globalInAppUpdate')->name('global.in_app.update');
+
+        Route::get('global/whatsapp', 'globalWhatsApp')->name('global.whatsapp');
+        Route::post('global/whatsapp/update', 'globalWhatsAppUpdate')->name('global.whatsapp.update');
 
         Route::get('templates', 'templates')->name('templates');
         Route::get('template/edit/{type}/{id}', 'templateEdit')->name('template.edit');
@@ -457,6 +475,9 @@ Route::middleware('admin')->group(function () {
         Route::post('notification/push/setting', 'pushSettingUpdate');
         Route::post('notification/push/setting/upload', 'pushSettingUpload')->name('push.upload');
         Route::get('notification/push/setting/download', 'pushSettingDownload')->name('push.download');
+
+        Route::get('whatsapp/setting', 'whatsappSetting')->name('whatsapp');
+        Route::post('whatsapp/setting', 'whatsappSettingUpdate');
     });
 
     // Plugin

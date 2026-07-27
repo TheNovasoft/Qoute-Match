@@ -261,18 +261,31 @@ class NotifyProcess{
         $userColumn = $this->userColumn;
 		if ($this->user && $this->createLog) {
 			$notifyConfig = $this->notifyConfig;
-			$config = gs($notifyConfig);
+			$config = $notifyConfig ? gs($notifyConfig) : null;
 			$notificationLog = new NotificationLog();
             if (@$this->user->id) {
                 $notificationLog->$userColumn = $this->user->id;
             }
 		    $notificationLog->notification_type = $type;
-		    $notificationLog->sender = @$config->name ?? 'firebase';
+		    $notificationLog->sender = match ($type) {
+		        'in_app' => 'in_app',
+		        'whatsapp' => @$config->name ?? 'whatsapp',
+		        'email' => @$config->name ?? 'email',
+		        'sms' => @$config->name ?? 'sms',
+		        'push' => @$config->name ?? 'firebase',
+		        default => @$config->name ?? $type,
+		    };
 		    $notificationLog->sent_from = $this->sentFrom;
-		    $notificationLog->sent_to = $type == 'push' ? 'Firebase Token' : $this->toAddress;
-		    $notificationLog->subject = $this->subject;
+		    $notificationLog->sent_to = match ($type) {
+		        'push' => 'Firebase Token',
+		        'in_app' => 'In-app inbox',
+		        default => $this->toAddress,
+		    };
+		    $notificationLog->subject = notificationPlainText((string) $this->subject);
 		    $notificationLog->image = @$this->pushImage ?? null;
-		    $notificationLog->message = $type == 'email' ? $this->finalMessage : strip_tags($this->finalMessage);
+		    $notificationLog->message = $type === 'email'
+		        ? $this->finalMessage
+		        : notificationPlainText((string) $this->finalMessage);
 		    $notificationLog->save();
 		}
 	}

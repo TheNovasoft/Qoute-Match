@@ -88,6 +88,12 @@ class AppServiceProvider extends ServiceProvider
                 'kycPendingUsersCount'   => User::kycPending()->count(),
                 'pendingProviderVerificationsCount' => ProviderVerification::where('status', Status::VERIFICATION_PENDING)->count(),
                 'pendingReviewsCount' => Review::where('status', Status::REVIEW_PENDING)->count(),
+                'disputedReviewsCount' => Schema::hasColumn('reviews', 'investigation_status')
+                    ? Review::whereIn('investigation_status', [
+                        Status::REVIEW_INVESTIGATION_OPEN,
+                        Status::REVIEW_INVESTIGATION_ACTIVE,
+                    ])->count()
+                    : 0,
 
                 'bannedBuyersCount'   => Buyer::banned()->count(),
                 'emailUnverifiedBuyersCount' => Buyer::emailUnverified()->count(),

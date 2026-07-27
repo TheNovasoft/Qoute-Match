@@ -87,7 +87,9 @@ export default function NotificationInbox({ logs }) {
                                 {active.image && (
                                     <img src={active.image} className="w-100 mb-2" alt="" />
                                 )}
-                                <div dangerouslySetInnerHTML={{ __html: active.message }} />
+                                <div className="notification-message" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                                    {active.message || 'No message'}
+                                </div>
                             </div>
                         </div>
                     </div>

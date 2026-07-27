@@ -124,9 +124,11 @@ class Notify
     */
 	protected function notifyMethods($sendVia = null){
 		$methods = [
-			'email'=>Email::class,
-			'sms'=>Sms::class,
-            'push'=>Push::class,
+			'in_app'   => InApp::class,
+			'email'    => Email::class,
+			'sms'      => Sms::class,
+			'whatsapp' => WhatsApp::class,
+			'push'     => Push::class,
 		];
 		if ($sendVia) {
 			return $methods[$sendVia];

@@ -30,8 +30,8 @@
         "keyword": ["Marketplace", "QuoteMatch", "Requests", "Quotes", "Analytics", "Disputes", "Reports"],
         "title": "Marketplace",
         "icon": "las la-store",
-        "counters": ["openDisputesCount", "pendingProviderVerificationsCount"],
-        "menu_active": ["admin.marketplace*", "admin.disputes*", "admin.provider.verifications*"],
+        "counters": ["openDisputesCount", "pendingProviderVerificationsCount", "pendingReviewsCount", "disputedReviewsCount"],
+        "menu_active": ["admin.marketplace*", "admin.disputes*", "admin.provider.verifications*", "admin.reviews*"],
         "submenu": [
             {
                 "title": "Dashboard",
@@ -57,9 +57,59 @@
             },
             {
                 "title": "Review Moderation",
-                "route_name": "admin.reviews.index",
+                "route_name": "admin.reviews.pending",
                 "menu_active": "admin.reviews*",
                 "counter": "pendingReviewsCount"
+            }
+        ]
+    },
+    "reviews": {
+        "keyword": [
+            "Reviews",
+            "Review Moderation",
+            "Ratings",
+            "Customer reviews",
+            "Provider ratings",
+            "Disputed reviews",
+            "Verified reviews",
+            "Hidden reviews"
+        ],
+        "title": "Reviews",
+        "icon": "las la-star",
+        "counters": ["pendingReviewsCount", "disputedReviewsCount"],
+        "menu_active": "admin.reviews*",
+        "submenu": [
+            {
+                "title": "Pending",
+                "route_name": "admin.reviews.pending",
+                "menu_active": "admin.reviews.pending",
+                "counter": "pendingReviewsCount",
+                "keyword": ["pending reviews", "review moderation"]
+            },
+            {
+                "title": "Approved",
+                "route_name": "admin.reviews.approved",
+                "menu_active": "admin.reviews.approved",
+                "keyword": ["approved reviews"]
+            },
+            {
+                "title": "Hidden",
+                "route_name": "admin.reviews.hidden",
+                "menu_active": "admin.reviews.hidden",
+                "keyword": ["hidden reviews", "abusive reviews"]
+            },
+            {
+                "title": "Verified",
+                "route_name": "admin.reviews.verified",
+                "menu_active": "admin.reviews.verified",
+                "keyword": ["verified reviews"]
+            },
+            {
+                "title": "Disputed",
+                "route_name": "admin.reviews.disputed",
+                "menu_active": "admin.reviews.disputed",
+                "counter": "disputedReviewsCount",
+                "keyword": ["disputed reviews", "investigation"]
             }
         ]
     },
@@ -67,12 +117,33 @@
         "keyword": ["Category", "Subcategory", "Skills", "Speciality", "Form Builder", "Request Form", "Quote Form"],
         "title": "Manage Categories",
         "icon": "las la-layer-group",
-        "route_name": "admin.category.index",
         "menu_active": [
             "admin.category.index",
             "admin.category.subcategories",
             "admin.category.skills",
             "admin.marketplace.forms*"
+        ],
+        "submenu": [
+            {
+                "title": "Categories",
+                "route_name": "admin.category.index",
+                "menu_active": "admin.category.index"
+            },
+            {
+                "title": "Subcategories",
+                "route_name": "admin.category.subcategories",
+                "menu_active": "admin.category.subcategories"
+            },
+            {
+                "title": "Skills",
+                "route_name": "admin.category.skills",
+                "menu_active": "admin.category.skills"
+            },
+            {
+                "title": "Form Builder",
+                "route_name": "admin.marketplace.forms.index",
+                "menu_active": "admin.marketplace.forms*"
+            }
         ]
     },
     "monetisation": {
@@ -414,7 +485,7 @@
                     "provider ratings"
                 ],
                 "title": "Review Moderation",
-                "route_name": "admin.reviews.index",
+                "route_name": "admin.reviews.pending",
                 "menu_active": "admin.reviews*",
                 "counter": "pendingReviewsCount"
             },
@@ -935,6 +1006,31 @@
         "route_name": "admin.subscriber.index",
         "menu_active": "admin.subscriber.*"
     },
+    "notification_channels": {
+        "keyword": [
+            "Notification Channels",
+            "Email notification",
+            "SMS notification",
+            "In-app notification",
+            "Push notification",
+            "WhatsApp notification",
+            "Notification templates",
+            "Firebase"
+        ],
+        "title": "Notifications",
+        "icon": "las la-bell",
+        "route_name": "admin.setting.notification.channels",
+        "menu_active": [
+            "admin.setting.notification.channels",
+            "admin.setting.notification.global.*",
+            "admin.setting.notification.email",
+            "admin.setting.notification.sms",
+            "admin.setting.notification.push",
+            "admin.setting.notification.whatsapp",
+            "admin.setting.notification.templates",
+            "admin.setting.notification.template.edit"
+        ]
+    },
     "system_setting": {
         "keyword": [
             "System Setting",
@@ -969,12 +1065,16 @@
             "admin.setting.custom.css",
             "admin.setting.sitemap",
             "admin.setting.robot",
+            "admin.setting.notification.channels",
             "admin.setting.notification.global.email",
             "admin.setting.notification.global.sms",
             "admin.setting.notification.global.push",
+            "admin.setting.notification.global.in_app",
+            "admin.setting.notification.global.whatsapp",
             "admin.setting.notification.email",
             "admin.setting.notification.sms",
             "admin.setting.notification.push",
+            "admin.setting.notification.whatsapp",
             "admin.setting.notification.templates",
             "admin.setting.notification.template.edit",
             "admin.frontend.index",

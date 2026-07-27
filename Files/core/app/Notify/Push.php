@@ -33,13 +33,35 @@ class Push extends NotifyProcess implements Notifiable{
 
 
     public function redirectForApp($getTemplateName){
-
+        // Deep-link map for the future mobile app (FCM data.app_click_action).
         $screens = [
-
+            'JOBS' => [
+                'JOB_APPROVED', 'JOB_REJECTED', 'JOB_PUBLISHED', 'NEW_JOB', 'JOB_APPLY',
+                'QUOTE_DEADLINE_EXPIRED', 'QUOTE_SHORTLISTED', 'QUOTE_REVISION_REQUESTED',
+            ],
+            'PROJECTS' => [
+                'PROJECT_STARTED', 'PROJECT_COMPLETED', 'PROJECT_DELIVERED', 'PROJECT_REPORTED',
+            ],
+            'CHAT' => [
+                'NEW_CHAT_MESSAGE', 'FREELANCER_INVITATION',
+            ],
+            'DISPUTES' => [
+                'DISPUTE_OPENED', 'DISPUTE_RESOLVED', 'DISPUTE_REJECTED', 'DISPUTE_IN_REVIEW',
+            ],
+            'REVIEWS' => [
+                'REVIEW_RECEIVED', 'REVIEW_APPROVED', 'REVIEW_HIDDEN',
+            ],
+            'WALLET' => [
+                'DEPOSIT_COMPLETE', 'WITHDRAW_APPROVE', 'WITHDRAW_REJECT', 'BALANCE_ADD', 'BALANCE_SUB',
+                'LEAD_CREDITS_GRANTED', 'SUBSCRIPTION_ACTIVATED', 'SUBSCRIPTION_EXPIRED',
+            ],
+            'PROFILE' => [
+                'PROVIDER_APPROVED', 'KYC_APPROVE', 'KYC_REJECT',
+            ],
         ];
 
-        foreach($screens as $screen => $array){
-            if(in_array($getTemplateName ,$array)){
+        foreach ($screens as $screen => $array) {
+            if (in_array($getTemplateName, $array, true)) {
                 return $screen;
             }
         }
@@ -119,8 +141,8 @@ class Push extends NotifyProcess implements Notifiable{
                         'Content-Type: application/json'
                     ];
                     $data['notification'] = [
-                        'body'=>$message,
-                        'title'=>$this->getTitle(),
+                        'body'=>notificationPlainText($message),
+                        'title'=>notificationPlainText($this->getTitle()),
                         'image'=>$this->pushImage ? asset(getFilePath('push')).'/'.$this->pushImage : null,
                     ];
 
@@ -163,6 +185,7 @@ class Push extends NotifyProcess implements Notifiable{
     */
 	public function prevConfiguration(){
 		if ($this->user) {
+            // Web + future mobile app tokens (device_tokens.is_app).
             $this->deviceId = $this->user->deviceTokens()->pluck('token')->toArray();
 			$this->receiverName = $this->user->fullname;
 		}

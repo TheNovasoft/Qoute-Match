@@ -185,6 +185,64 @@ class StructuredReviewService
         }
     }
 
+    public static function markVerified(Review $review, bool $verified = true, ?int $adminId = null): void
+    {
+        $review->is_verified = $verified ? Status::YES : Status::NO;
+        $review->moderated_at = now();
+        $review->moderated_by = $adminId ?? auth()->guard('admin')->id();
+        $review->save();
+    }
+
+    public static function updateInvestigation(
+        Review $review,
+        int $investigationStatus,
+        ?string $providerComplaint = null,
+        ?string $adminNote = null,
+        ?int $adminId = null
+    ): void {
+        $review->investigation_status = $investigationStatus;
+
+        if ($providerComplaint !== null) {
+            $review->provider_complaint = $providerComplaint;
+        }
+
+        if ($adminNote !== null && $adminNote !== '') {
+            $review->admin_note = $adminNote;
+        }
+
+        $review->moderated_at = now();
+        $review->moderated_by = $adminId ?? auth()->guard('admin')->id();
+        $review->save();
+    }
+
+    public static function replyToProvider(Review $review, string $reply, ?int $adminId = null): void
+    {
+        $review->loadMissing(['user', 'buyer', 'project.job']);
+        $review->admin_reply = $reply;
+        $review->moderated_at = now();
+        $review->moderated_by = $adminId ?? auth()->guard('admin')->id();
+        $review->save();
+
+        if ($review->user) {
+            notify($review->user, 'REVIEW_ADMIN_REPLY', [
+                'buyer' => $review->buyer?->fullname ?? 'Customer',
+                'rating' => $review->rating,
+                'job' => $review->project?->job?->title ?? 'Project',
+                'admin_reply' => $reply,
+            ]);
+        }
+    }
+
+    public static function investigationLabel(int $status): string
+    {
+        return match ($status) {
+            Status::REVIEW_INVESTIGATION_OPEN => 'Open dispute',
+            Status::REVIEW_INVESTIGATION_ACTIVE => 'Investigating',
+            Status::REVIEW_INVESTIGATION_RESOLVED => 'Resolved',
+            default => 'None',
+        };
+    }
+
     public static function reviewPayload(Review $review): array
     {
         $scores = is_array($review->scores) ? $review->scores : [];

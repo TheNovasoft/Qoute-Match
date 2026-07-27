@@ -1,6 +1,7 @@
 import { Link, useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import CategoryTabs from '@/Components/Admin/CategoryTabs';
 import Pagination from '@/Components/Shared/Pagination';
 
 export default function Skills({ pageTitle, skills, categories = [] }) {
@@ -10,9 +11,7 @@ export default function Skills({ pageTitle, skills, categories = [] }) {
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="admin-categories">
-            <div className="mb-3">
-                <Link href="/admin/category/index" className="btn btn-sm btn-outline--dark admin-categories__btn admin-categories__btn--dark">← Categories</Link>
-            </div>
+            <CategoryTabs active="skills" />
             <div className="row gy-4">
                 <div className="col-lg-4">
                     <SkillForm

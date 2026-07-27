@@ -11,6 +11,8 @@ class Review extends Model
     protected $casts = [
         'scores' => 'array',
         'moderated_at' => 'datetime',
+        'is_verified' => 'integer',
+        'investigation_status' => 'integer',
     ];
 
     public function user()
@@ -43,6 +45,19 @@ class Review extends Model
         return $query->where('status', Status::REVIEW_HIDDEN);
     }
 
+    public function scopeVerified($query)
+    {
+        return $query->where('is_verified', Status::YES);
+    }
+
+    public function scopeDisputed($query)
+    {
+        return $query->whereIn('investigation_status', [
+            Status::REVIEW_INVESTIGATION_OPEN,
+            Status::REVIEW_INVESTIGATION_ACTIVE,
+        ]);
+    }
+
     public function statusLabel(): string
     {
         return match ((int) $this->status) {
@@ -50,6 +65,11 @@ class Review extends Model
             Status::REVIEW_HIDDEN => 'Hidden',
             default => 'Pending',
         };
+    }
+
+    public function investigationLabel(): string
+    {
+        return \App\Lib\StructuredReviewService::investigationLabel((int) $this->investigation_status);
     }
 
     public function dimensionScores(): array

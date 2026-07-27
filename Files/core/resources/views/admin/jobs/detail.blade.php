@@ -309,7 +309,7 @@
 
         .project-icon {
             font-size: 1.5rem;
-            color: #4634ff;
+            color: #0071e3;
         }
 
         .info-label {
@@ -400,13 +400,13 @@
 
         .question-item:hover {
             background-color: #e9f5ff;
-            border-color: #4634ff;
+            border-color: #0071e3;
             transform: translateY(-2px);
         }
 
         .question-icon {
             font-size: 1.2rem;
-            color: #4634ff;
+            color: #0071e3;
         }
 
         .question-item span {

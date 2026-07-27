@@ -1,6 +1,7 @@
 import { Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import CategoryTabs from '@/Components/Admin/CategoryTabs';
 import Pagination from '@/Components/Shared/Pagination';
 
 /**
@@ -15,6 +16,7 @@ export default function Subcategories({ pageTitle, subcategories }) {
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="admin-categories admin-categories--wp">
+                <CategoryTabs active="subcategories" />
                 <div className="admin-categories__breadcrumb mb-3">
                     <Link href={subcategories.categoriesUrl ?? '/admin/category/index'} className="btn btn-sm btn-outline--dark admin-categories__btn admin-categories__btn--dark">
                         ← All Categories

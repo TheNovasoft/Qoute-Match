@@ -90,13 +90,35 @@
                                             </div>
                                         </div>
                                     @endif
-                                    @if (gs('pn'))
-                                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-3 col-sm-12">
-                                            <div class="notification-via mb-4 @if ($viaName == 'push') active @endif" data-method="push">
+                                    @if (gs('in'))
+                                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-3 col-sm-6">
+                                            <div class="notification-via mb-4 @if ($viaName == 'in_app') active @endif " data-method="in_app">
                                                 <span class="active-badge"> <i class="las la-check"></i> </span>
                                                 <div class="send-via-method">
                                                     <i class="las la-bell"></i>
-                                                    <h5>@lang('Send Via Firebase')</h5>
+                                                    <h5>@lang('Send Via In-app')</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    @if (gs('pn'))
+                                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-3 col-sm-6">
+                                            <div class="notification-via mb-4 @if ($viaName == 'push') active @endif" data-method="push">
+                                                <span class="active-badge"> <i class="las la-check"></i> </span>
+                                                <div class="send-via-method">
+                                                    <i class="las la-broadcast-tower"></i>
+                                                    <h5>@lang('Send Via Push')</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    @if (gs('wn'))
+                                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-3 col-sm-6">
+                                            <div class="notification-via mb-4 @if ($viaName == 'whatsapp') active @endif" data-method="whatsapp">
+                                                <span class="active-badge"> <i class="las la-check"></i> </span>
+                                                <div class="send-via-method">
+                                                    <i class="lab la-whatsapp"></i>
+                                                    <h5>@lang('Send Via WhatsApp')</h5>
                                                 </div>
                                             </div>
                                         </div>

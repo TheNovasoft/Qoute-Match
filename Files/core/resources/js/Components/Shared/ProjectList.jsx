@@ -19,81 +19,80 @@ export default function ProjectList({ projects, filters, statusOptions = [], rol
     };
 
     return (
-        <div className="table-wrapper">
-            {role === 'buyer' && (
-                <div className="table-wrapper-header gap-3">
-                    <div className="show-filter mb-3 text-end">
-                        <button type="button" className="btn btn--base showFilterBtn btn--sm" onClick={() => setShowFilter((v) => !v)}>
-                            <i className="las la-filter" /> Filter
-                        </button>
-                    </div>
-                    {showFilter && (
-                        <div className="responsive-filter-card my-4">
-                            <form onSubmit={submitFilter}>
-                                <div className="d-flex flex-wrap gap-4">
-                                    <div className="flex-grow-1">
-                                        <input
-                                            type="search"
-                                            name="search"
-                                            value={data.search}
-                                            onChange={(e) => setData('search', e.target.value)}
-                                            placeholder="Search by Job"
-                                            className="form-control form--control"
-                                        />
-                                    </div>
-                                    <div className="flex-grow-1">
-                                        <select
-                                            name="status"
-                                            value={data.status}
-                                            onChange={(e) => setData('status', e.target.value)}
-                                            className="form-control form--control"
-                                        >
-                                            {statusOptions.map((opt) => (
-                                                <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div className="flex-grow-1">
-                                        <input
-                                            name="date"
-                                            type="search"
-                                            value={data.date}
-                                            onChange={(e) => setData('date', e.target.value)}
-                                            className="form-control form--control"
-                                            placeholder="Start Date - End Date"
-                                        />
-                                    </div>
-                                    <div className="flex-grow-1 align-self-end">
-                                        <button className="btn btn--base w-100" type="submit">
-                                            <i className="las la-filter" /> Filter
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    )}
-                </div>
-            )}
+        <div className="card shadow-sm dashboard-list-card">
+            <div className="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <h5 className="card-title mb-0">My Projects</h5>
 
-            {role === 'freelancer' && (
-                <div className="table-wrapper-header d-flex justify-content-end">
+                {role === 'buyer' && (
+                    <button type="button" className="btn btn-sm btn-outline--primary" onClick={() => setShowFilter((v) => !v)}>
+                        <i className="las la-filter" /> Filter
+                    </button>
+                )}
+
+                {role === 'freelancer' && (
                     <form className="table-search" onSubmit={submitFilter}>
                         <input
                             className="form-control form--control"
                             type="search"
                             value={data.search}
                             onChange={(e) => setData('search', e.target.value)}
-                            placeholder="Search Here..."
+                            placeholder="Search here..."
                         />
-                        <button className="table-search-text" type="submit">
+                        <button className="table-search-text" type="submit" aria-label="Search">
                             <i className="las la-search" />
                         </button>
+                    </form>
+                )}
+            </div>
+
+            {role === 'buyer' && showFilter && (
+                <div className="card-body border-bottom">
+                    <form onSubmit={submitFilter}>
+                        <div className="d-flex flex-wrap gap-3">
+                            <div className="flex-grow-1">
+                                <input
+                                    type="search"
+                                    name="search"
+                                    value={data.search}
+                                    onChange={(e) => setData('search', e.target.value)}
+                                    placeholder="Search by Job"
+                                    className="form-control form--control"
+                                />
+                            </div>
+                            <div className="flex-grow-1">
+                                <select
+                                    name="status"
+                                    value={data.status}
+                                    onChange={(e) => setData('status', e.target.value)}
+                                    className="form-control form--control"
+                                >
+                                    {statusOptions.map((opt) => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex-grow-1">
+                                <input
+                                    name="date"
+                                    type="search"
+                                    value={data.date}
+                                    onChange={(e) => setData('date', e.target.value)}
+                                    className="form-control form--control"
+                                    placeholder="Start Date - End Date"
+                                />
+                            </div>
+                            <div className="align-self-end">
+                                <button className="btn btn--base btn-sm" type="submit">
+                                    <i className="las la-filter" /> Apply
+                                </button>
+                            </div>
+                        </div>
                     </form>
                 </div>
             )}
 
             <div className="table-responsive">
-                <table className="table table--responsive--md">
+                <table className="table table--light mb-0">
                     <thead>
                         <tr>
                             <th>Job</th>
@@ -141,17 +140,17 @@ export default function ProjectList({ projects, filters, statusOptions = [], rol
                                     <td data-label="Status"><StatusBadge status={project.status} /></td>
                                     <td data-label="Assigned at">{project.assignedAt}</td>
                                     <td data-label="Action">
-                                        <div className="btn-group gap-2">
+                                        <div className="d-flex flex-wrap gap-2">
                                             {project.canViewDetail ? (
-                                                <Link href={project.detailUrl} className="view-btn" title="Project Details">
-                                                    <i className="las la-desktop" />
+                                                <Link href={project.detailUrl} className="btn btn-sm btn-outline--primary">
+                                                    Details
                                                 </Link>
                                             ) : (
-                                                <span className="view-btn disabled"><i className="las la-desktop" /></span>
+                                                <span className="btn btn-sm btn-outline--primary disabled">Details</span>
                                             )}
                                             {project.uploadUrl && (
-                                                <Link href={project.uploadUrl} className="view-btn" title="Upload">
-                                                    <i className="las la-upload" />
+                                                <Link href={project.uploadUrl} className="btn btn-sm btn-outline--primary">
+                                                    Upload
                                                 </Link>
                                             )}
                                         </div>
@@ -163,7 +162,7 @@ export default function ProjectList({ projects, filters, statusOptions = [], rol
                 </table>
             </div>
             {projects?.links?.length > 3 && (
-                <div className="table-wrapper-footer">
+                <div className="card-footer">
                     <Pagination links={projects.links} />
                 </div>
             )}

@@ -69,7 +69,9 @@ class MarketplaceFormController extends Controller
         $form->save();
 
         $notify[] = ['success', 'Form created. Add fields below and save.'];
-        return redirect()->route('admin.marketplace.forms.edit', $form->id)->withNotify($notify);
+
+        // Force a full browser visit — edit page is Blade, not Inertia.
+        return \Inertia\Inertia::location(route('admin.marketplace.forms.edit', $form->id));
     }
 
     public function edit($id)
@@ -77,7 +79,7 @@ class MarketplaceFormController extends Controller
         $pageTitle = 'Edit Form Fields';
         $form = Form::marketplace()->findOrFail($id);
 
-        return \App\Lib\InertiaBridge::admin('admin.marketplace_forms.edit', compact('pageTitle', 'form'));
+        return view('admin.marketplace_forms.edit', compact('pageTitle', 'form'));
     }
 
     public function update(Request $request, $id)

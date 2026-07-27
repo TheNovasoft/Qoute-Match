@@ -410,7 +410,7 @@ class ManageUsersController extends Controller
     public function showNotificationSingleForm($id)
     {
         $user = User::findOrFail($id);
-        if (!gs('en') && !gs('sn') && !gs('pn')) {
+        if (!gs('en') && !gs('sn') && !gs('pn') && !gs('in') && !gs('wn')) {
             $notify[] = ['warning', 'Notification options are disabled currently'];
             return to_route('admin.users.detail', $user->id)->withNotify($notify);
         }
@@ -427,7 +427,7 @@ class ManageUsersController extends Controller
             'image'   => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])],
         ]);
 
-        if (!gs('en') && !gs('sn') && !gs('pn')) {
+        if (!gs('en') && !gs('sn') && !gs('pn') && !gs('in') && !gs('wn')) {
             $notify[] = ['warning', 'Notification options are disabled currently'];
             return to_route('admin.dashboard')->withNotify($notify);
         }
@@ -438,7 +438,7 @@ class ManageUsersController extends Controller
 
     public function showNotificationAllForm()
     {
-        if (!gs('en') && !gs('sn') && !gs('pn')) {
+        if (!gs('en') && !gs('sn') && !gs('pn') && !gs('in') && !gs('wn')) {
             $notify[] = ['warning', 'Notification options are disabled currently'];
             return to_route('admin.dashboard')->withNotify($notify);
         }
@@ -472,7 +472,7 @@ class ManageUsersController extends Controller
             'number_of_top_deposited_user.required_if' => "Number of top deposited user field is required",
         ]);
 
-        if (!gs('en') && !gs('sn') && !gs('pn')) {
+        if (!gs('en') && !gs('sn') && !gs('pn') && !gs('in') && !gs('wn')) {
             $notify[] = ['warning', 'Notification options are disabled currently'];
             return to_route('admin.dashboard')->withNotify($notify);
         }

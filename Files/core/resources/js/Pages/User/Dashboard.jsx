@@ -4,6 +4,13 @@ import MasterLayout from '@/Components/Layout/MasterLayout';
 export default function Dashboard({ pageTitle, widget, user, profileCompletion, profileCompletionBadge }) {
     const { routes } = usePage().props;
 
+    const cards = [
+        { href: routes?.userTransactions ?? '/freelancer/transactions', label: 'Total Earning', value: widget.total_earning, icon: 'las la-coins' },
+        { href: routes?.userBidIndex ?? '/freelancer/bid/list', label: 'Total Bids', value: widget.total_bid, icon: 'las la-gavel' },
+        { href: routes?.userProjectIndex ?? '/freelancer/project/index', label: 'Running Projects', value: widget.total_running_project, icon: 'las la-briefcase' },
+        { href: routes?.userProjectIndex ?? '/freelancer/project/index', label: 'Completed Projects', value: widget.total_completed_project, icon: 'las la-check-circle' },
+    ];
+
     return (
         <MasterLayout pageTitle={pageTitle}>
             <div className="container-fluid px-0">
@@ -11,7 +18,7 @@ export default function Dashboard({ pageTitle, widget, user, profileCompletion, 
                     <div className="profile-complete-notification">
                         <p>
                             <i className="las la-exclamation-circle"></i> Finish your profile to start bidding.{' '}
-                            <Link className="update-link" href={routes?.userProfileSkill ?? '/provider/profile-skill'}>
+                            <Link className="update-link" href={routes?.userProfileSkill ?? '/freelancer/profile-skill'}>
                                 Continue setup
                             </Link>
                             {' '}— one portfolio is enough.
@@ -30,7 +37,7 @@ export default function Dashboard({ pageTitle, widget, user, profileCompletion, 
                                     </p>
                                 </div>
                                 <Link
-                                    href={routes?.freelanceJobs ?? '/jobs'}
+                                    href={routes?.freelanceJobs ?? '/freelance-jobs'}
                                     className="btn btn--base dashboard-cta-card__btn"
                                 >
                                     <i className="las la-search"></i> Browse Requests
@@ -38,47 +45,29 @@ export default function Dashboard({ pageTitle, widget, user, profileCompletion, 
                             </div>
                         </div>
 
-                        <div className="row g-3 g-md-4 justify-content-center dashboard-widget-grid">
-                            <div className="col-12 col-sm-6 col-xl-3">
-                                <Link className="dashboard-widget" href={routes?.userTransactions ?? '/provider/transactions'}>
-                                    <div className="dashboard-widget__icon flex-center"><i className="las la-coins"></i></div>
-                                    <div className="dashboard-widget__content">
-                                        <span className="dashboard-widget__text">Total Earning</span>
-                                        <h5 className="dashboard-widget__number">{widget.total_earning}</h5>
-                                    </div>
-                                </Link>
-                            </div>
-                            <div className="col-12 col-sm-6 col-xl-3">
-                                <Link className="dashboard-widget" href={routes?.userBidIndex ?? '/provider/bid/list'}>
-                                    <div className="dashboard-widget__icon flex-center"><i className="las la-gavel"></i></div>
-                                    <div className="dashboard-widget__content">
-                                        <span className="dashboard-widget__text">Total Bids</span>
-                                        <h5 className="dashboard-widget__number">{widget.total_bid}</h5>
-                                    </div>
-                                </Link>
-                            </div>
-                            <div className="col-12 col-sm-6 col-xl-3">
-                                <Link className="dashboard-widget" href={routes?.userProjectIndex ?? '/provider/project/index'}>
-                                    <div className="dashboard-widget__icon flex-center"><i className="las la-briefcase"></i></div>
-                                    <div className="dashboard-widget__content">
-                                        <span className="dashboard-widget__text">Running Projects</span>
-                                        <h5 className="dashboard-widget__number">{widget.total_running_project}</h5>
-                                    </div>
-                                </Link>
-                            </div>
-                            <div className="col-12 col-sm-6 col-xl-3">
-                                <Link className="dashboard-widget" href={routes?.userProjectIndex ?? '/provider/project/index'}>
-                                    <div className="dashboard-widget__icon flex-center"><i className="las la-check-circle"></i></div>
-                                    <div className="dashboard-widget__content">
-                                        <span className="dashboard-widget__text">Completed Projects</span>
-                                        <h5 className="dashboard-widget__number">{widget.total_completed_project}</h5>
-                                    </div>
-                                </Link>
-                            </div>
+                        <div className="row gy-4 dashboard-widget-grid">
+                            {cards.map((card) => (
+                                <div className="col-xxl-3 col-sm-6" key={card.label}>
+                                    <Link className="dashboard-widget" href={card.href}>
+                                        <div className="dashboard-widget__main">
+                                            <div className="dashboard-widget__icon flex-center">
+                                                <i className={card.icon}></i>
+                                            </div>
+                                            <div className="dashboard-widget__content">
+                                                <span className="dashboard-widget__text">{card.label}</span>
+                                                <h5 className="dashboard-widget__number">{card.value}</h5>
+                                            </div>
+                                        </div>
+                                        <span className="dashboard-widget__arrow">
+                                            <i className="las la-angle-right"></i>
+                                        </span>
+                                    </Link>
+                                </div>
+                            ))}
                         </div>
 
-                        <div className="row g-3 g-md-4 mt-1 dashboard-profile-row">
-                            <div className="col-2 col-lg-6">
+                        <div className="row gy-4 mt-1 dashboard-profile-row">
+                            <div className="col-12 col-lg-6">
                                 <div className="dashboard-card">
                                     <div className="dashboard-card__header">
                                         <h6 className="dashboard-card__title">Profile Completion</h6>
@@ -90,7 +79,7 @@ export default function Dashboard({ pageTitle, widget, user, profileCompletion, 
                                             </div>
                                         </div>
                                         {profileCompletionBadge && (
-                                            <p className="mt-2 mb-0">{profileCompletionBadge}</p>
+                                            <p className="mt-2 mb-0 text-muted small">{profileCompletionBadge}</p>
                                         )}
                                     </div>
                                 </div>

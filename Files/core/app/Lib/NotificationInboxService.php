@@ -31,19 +31,44 @@ class NotificationInboxService
 
     public static function markAllReadForBuyer(Buyer $buyer): void
     {
-        self::unreadQuery('buyer_id', $buyer->id)->update(['user_read' => 1]);
+        NotificationLog::query()
+            ->where('buyer_id', $buyer->id)
+            ->where('user_read', 0)
+            ->update(['user_read' => 1]);
     }
 
     public static function markAllReadForProvider(User $user): void
     {
-        self::unreadQuery('user_id', $user->id)->update(['user_read' => 1]);
+        NotificationLog::query()
+            ->where('user_id', $user->id)
+            ->where('user_read', 0)
+            ->update(['user_read' => 1]);
+    }
+
+    public static function inboxQuery(string $column, int $id): Builder
+    {
+        $query = NotificationLog::query()->where($column, $id);
+
+        // Dedicated in-app channel is the inbox source of truth.
+        // Fall back to older email/sms/push logs when no in-app rows exist yet.
+        if (self::hasInAppRows($column, $id)) {
+            $query->where('notification_type', 'in_app');
+        }
+
+        return $query;
     }
 
     private static function unreadQuery(string $column, int $id): Builder
     {
+        return self::inboxQuery($column, $id)->where('user_read', 0);
+    }
+
+    private static function hasInAppRows(string $column, int $id): bool
+    {
         return NotificationLog::query()
             ->where($column, $id)
-            ->where('user_read', 0);
+            ->where('notification_type', 'in_app')
+            ->exists();
     }
 
     private static function summary(string $column, int $id): array
@@ -53,7 +78,7 @@ class NotificationInboxService
         return [
             'count' => self::unreadQuery($column, $id)->distinct('subject')->count('subject'),
             'subject' => $latest?->subject,
-            'preview' => $latest ? strLimit(strip_tags((string) $latest->message), 80) : null,
+            'preview' => $latest ? strLimit(notificationPlainText((string) $latest->message), 80) : null,
         ];
     }
 }

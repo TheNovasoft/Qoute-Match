@@ -340,6 +340,11 @@ class AdminResource
             'buyerUsername' => $review->buyer?->username ?? '—',
             'jobTitle' => strLimit($review->project?->job?->title ?? '—', 35),
             'status' => self::reviewStatus((int) $review->status),
+            'isVerified' => (bool) $review->is_verified,
+            'investigation' => [
+                'status' => (int) $review->investigation_status,
+                'label' => StructuredReviewService::investigationLabel((int) $review->investigation_status),
+            ],
             'createdAt' => showDateTime($review->created_at),
             'detailUrl' => route('admin.reviews.detail', $review->id),
         ];
@@ -350,6 +355,7 @@ class AdminResource
         $payload = StructuredReviewService::reviewPayload($review);
         $isPending = (int) $review->status === Status::REVIEW_PENDING;
         $isHidden = (int) $review->status === Status::REVIEW_HIDDEN;
+        $isVerified = (bool) $review->is_verified;
 
         return [
             'id' => (int) $review->id,
@@ -357,7 +363,14 @@ class AdminResource
             'review' => $payload['review'],
             'scores' => array_values($payload['scores']),
             'status' => self::reviewStatus((int) $review->status),
+            'isVerified' => $isVerified,
+            'investigation' => [
+                'status' => (int) $review->investigation_status,
+                'label' => StructuredReviewService::investigationLabel((int) $review->investigation_status),
+            ],
             'adminNote' => $review->admin_note,
+            'providerComplaint' => $review->provider_complaint,
+            'adminReply' => $review->admin_reply,
             'createdAt' => $payload['createdAt'],
             'provider' => $review->user ? [
                 'fullname' => $review->user->fullname,
@@ -376,8 +389,11 @@ class AdminResource
             'actions' => [
                 'approveUrl' => $isPending ? route('admin.reviews.approve', $review->id) : null,
                 'hideUrl' => !$isHidden ? route('admin.reviews.hide', $review->id) : null,
+                'verifyUrl' => route('admin.reviews.verify', $review->id),
+                'investigateUrl' => route('admin.reviews.investigate', $review->id),
+                'replyUrl' => route('admin.reviews.reply', $review->id),
             ],
-            'indexUrl' => route('admin.reviews.index'),
+            'indexUrl' => route('admin.reviews.pending'),
             'dashboardUrl' => route('admin.marketplace.dashboard'),
         ];
     }
@@ -535,7 +551,7 @@ class AdminResource
             ['label' => 'Customers', 'url' => route('admin.buyers.index'), 'icon' => 'las la-user-tie'],
             ['label' => 'Provider Approvals', 'url' => route('admin.users.pending.approval'), 'icon' => 'las la-user-check'],
             ['label' => 'Verifications', 'url' => route('admin.provider.verifications.index'), 'icon' => 'las la-id-card'],
-            ['label' => 'Reviews', 'url' => route('admin.reviews.index'), 'icon' => 'las la-star'],
+            ['label' => 'Reviews', 'url' => route('admin.reviews.pending'), 'icon' => 'las la-star'],
             ['label' => 'Categories', 'url' => route('admin.category.index'), 'icon' => 'las la-layer-group'],
             ['label' => 'Forms', 'url' => route('admin.marketplace.forms.index'), 'icon' => 'las la-wpforms'],
             ['label' => 'Monetisation', 'url' => route('admin.monetisation.settings'), 'icon' => 'las la-coins'],
@@ -668,7 +684,7 @@ class AdminResource
                 'kycUrl' => route('admin.users.kyc.details', $user->id),
                 'grantCreditsUrl' => route('admin.monetisation.grant.credits', $user->id),
                 'verificationsUrl' => route('admin.provider.verifications.index', ['user_id' => $user->id]),
-                'reviewsUrl' => route('admin.reviews.index', ['user_id' => $user->id]),
+                'reviewsUrl' => route('admin.reviews.pending', ['user_id' => $user->id]),
             ],
             'verificationSummary' => VerificationBadgeService::profileVerificationSummary($user),
             'pendingVerifications' => $user->providerVerifications

@@ -50,17 +50,22 @@ export default function Dashboard({ pageTitle, widget, holdBalance, kycAlert }) 
                     </div>
                 </div>
 
-                <div className="row g-3 g-md-4 justify-content-center dashboard-widget-grid">
+                <div className="row gy-4 dashboard-widget-grid">
                     {cards.map((card) => (
-                        <div className="col-12 col-sm-6 col-xl-4" key={card.label}>
+                        <div className="col-xxl-3 col-sm-6" key={card.label}>
                             <Link href={card.href ?? '#'} className="dashboard-widget">
-                                <div className="dashboard-widget__icon flex-center">
-                                    <i className={card.icon}></i>
+                                <div className="dashboard-widget__main">
+                                    <div className="dashboard-widget__icon flex-center">
+                                        <i className={card.icon}></i>
+                                    </div>
+                                    <div className="dashboard-widget__content">
+                                        <span className="dashboard-widget__text">{card.label}</span>
+                                        <h5 className="dashboard-widget__number">{card.value}</h5>
+                                    </div>
                                 </div>
-                                <div className="dashboard-widget__content">
-                                    <span className="dashboard-widget__text">{card.label}</span>
-                                    <h5 className="dashboard-widget__number">{card.value}</h5>
-                                </div>
+                                <span className="dashboard-widget__arrow">
+                                    <i className="las la-angle-right"></i>
+                                </span>
                             </Link>
                         </div>
                     ))}

@@ -20,32 +20,32 @@ export default function BidList({ bids, indexUrl }) {
     };
 
     return (
-        <div className="table-wrapper">
-            <div className="table-wrapper-header d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+        <div className="card shadow-sm dashboard-list-card">
+            <div className="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div>
-                    <h6 className="mb-1">Your submitted quotes</h6>
+                    <h5 className="card-title mb-1">Your submitted quotes</h5>
                     <p className="text-muted mb-0 small">To place a new bid, browse open customer requests first.</p>
                 </div>
-                <Link href="/jobs" className="btn btn--base">
-                    <i className="las la-search" /> Browse Requests &amp; Bid
-                </Link>
+                <div className="d-flex flex-wrap align-items-center gap-2">
+                    <form className="table-search" onSubmit={submitSearch}>
+                        <input
+                            className="form-control form--control"
+                            type="search"
+                            value={data.search}
+                            onChange={(e) => setData('search', e.target.value)}
+                            placeholder="Search here..."
+                        />
+                        <button className="table-search-text" type="submit" aria-label="Search">
+                            <i className="las la-search" />
+                        </button>
+                    </form>
+                    <Link href="/freelance-jobs" className="btn btn--base btn-sm">
+                        <i className="las la-search" /> Browse Requests
+                    </Link>
+                </div>
             </div>
-            <div className="table-wrapper-header d-flex justify-content-end">
-                <form className="table-search" onSubmit={submitSearch}>
-                    <input
-                        className="form-control form--control"
-                        type="search"
-                        value={data.search}
-                        onChange={(e) => setData('search', e.target.value)}
-                        placeholder="Search Here..."
-                    />
-                    <button className="table-search-text" type="submit">
-                        <i className="las la-search" />
-                    </button>
-                </form>
-            </div>
-            <div className="dashboard-table">
-                <table className="table table--responsive--md">
+            <div className="table-responsive">
+                <table className="table table--light mb-0">
                     <thead>
                         <tr>
                             <th>Job</th>
@@ -100,32 +100,30 @@ export default function BidList({ bids, indexUrl }) {
                                         </div>
                                     </td>
                                     <td data-label="Action" className="bid-actions-cell">
-                                        <div className="bid-actions-wrap">
-                                            <div className="bid-actions-primary">
+                                        <div className="bid-actions-wrap d-flex flex-wrap gap-2">
+                                            <button
+                                                type="button"
+                                                className="btn btn-sm btn-outline--primary"
+                                                onClick={() => setQuoteModal(bid)}
+                                            >
+                                                Quote
+                                            </button>
+                                            {bid.withdrawUrl && bid.status?.label === 'Pending' && (
                                                 <button
                                                     type="button"
-                                                    className="btn btn--dark btn-sm"
-                                                    onClick={() => setQuoteModal(bid)}
+                                                    className="btn btn-sm btn-outline--primary"
+                                                    onClick={() => setWithdrawModal({ url: bid.withdrawUrl, question: 'Are you sure to withdraw this job proposal / bid?' })}
                                                 >
-                                                    Quote
+                                                    Withdraw
                                                 </button>
-                                                {bid.withdrawUrl && bid.status?.label === 'Pending' && (
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn--danger btn-sm"
-                                                        onClick={() => setWithdrawModal({ url: bid.withdrawUrl, question: 'Are you sure to withdraw this job proposal / bid?' })}
-                                                    >
-                                                        Withdraw
-                                                    </button>
-                                                )}
-                                            </div>
+                                            )}
                                             {bid.canEdit && (
-                                                <Link href={bid.editUrl} className="btn btn--base btn-sm">
-                                                    <i className="las la-edit" /> Edit Bid
+                                                <Link href={bid.editUrl} className="btn btn-sm btn--base">
+                                                    Edit Bid
                                                 </Link>
                                             )}
                                             {bid.projectUrl && (
-                                                <Link href={bid.projectUrl} className="btn btn-outline--base btn-sm">Project</Link>
+                                                <Link href={bid.projectUrl} className="btn btn-sm btn-outline--primary">Project</Link>
                                             )}
                                         </div>
                                     </td>
@@ -136,7 +134,7 @@ export default function BidList({ bids, indexUrl }) {
                 </table>
             </div>
             {bids?.links?.length > 3 && (
-                <div className="table-wrapper-footer">
+                <div className="card-footer">
                     <Pagination links={bids.links} />
                 </div>
             )}

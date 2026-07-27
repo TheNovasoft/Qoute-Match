@@ -81,6 +81,8 @@ class GeneralSettingController extends Controller
         $general->sv = $request->sv ? Status::ENABLE : Status::DISABLE;
         $general->sn = $request->sn ? Status::ENABLE : Status::DISABLE;
         $general->pn = $request->pn ? Status::ENABLE : Status::DISABLE;
+        $general->in = $request->in ? Status::ENABLE : Status::DISABLE;
+        $general->wn = $request->wn ? Status::ENABLE : Status::DISABLE;
         $general->force_ssl = $request->force_ssl ? Status::ENABLE : Status::DISABLE;
         $general->secure_password = $request->secure_password ? Status::ENABLE : Status::DISABLE;
         $general->registration = $request->registration ? Status::ENABLE : Status::DISABLE;

@@ -2,11 +2,36 @@ import AppLayout from '@/Components/Layout/AppLayout';
 import DashboardUserMenu from '@/Components/Layout/DashboardUserMenu';
 import useInboxNotifications from '@/hooks/useInboxNotifications';
 import useMessageNotifications from '@/hooks/useMessageNotifications';
+import { isNavActive } from '@/utils/helpers';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
+function SidebarLink({ href, icon, label, active, badge, asButton, cta }) {
+    const linkClass = `sidebar-menu-list__link${active ? ' active' : ''}`;
+    const content = (
+        <>
+            <span className="icon"><i className={icon}></i></span>
+            <span className="text">
+                {label}
+                {badge}
+            </span>
+        </>
+    );
+
+    return (
+        <li className={`sidebar-menu-list__item${cta ? ' sidebar-menu-list__item--cta' : ''}${active ? ' active' : ''}`}>
+            {asButton ? (
+                <Link href={href} method="get" as="button" className={linkClass}>{content}</Link>
+            ) : (
+                <Link href={href} className={linkClass}>{content}</Link>
+            )}
+        </li>
+    );
+}
+
 export default function MasterLayout({ children, pageTitle }) {
-    const { auth, site, template, routes, monetisation } = usePage().props;
+    const { url, props } = usePage();
+    const { auth, site, template, routes, monetisation } = props;
     const user = auth?.user;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const unreadCount = useMessageNotifications(
@@ -19,6 +44,20 @@ export default function MasterLayout({ children, pageTitle }) {
     );
 
     useEffect(() => router.on('navigate', () => setSidebarOpen(false)), []);
+
+    const homeHref = routes.userHome ?? '/freelancer/dashboard';
+    const browseHref = routes.freelanceJobs ?? '/freelance-jobs';
+    const bidsHref = routes.userBidIndex ?? '/freelancer/bid/list';
+    const projectsHref = routes.userProjectIndex ?? '/freelancer/project/index';
+    const disputesHref = routes.userDisputes ?? '/freelancer/disputes';
+    const notificationsHref = routes.userNotifications ?? '/freelancer/notifications';
+    const withdrawHref = routes.userWithdraw ?? '/freelancer/withdraw';
+    const transactionsHref = routes.userTransactions ?? '/freelancer/transactions';
+    const leadCreditsHref = routes.userLeadCredits ?? '/freelancer/lead-credits';
+    const verificationHref = routes.userVerification ?? '/freelancer/verification';
+    const conversationHref = routes.userConversation ?? '/freelancer/conversation';
+    const settingsHref = routes.userProfileSetting ?? '/freelancer/profile-setting';
+    const logoutHref = routes.userLogout ?? '/freelancer/logout';
 
     return (
         <AppLayout pageTitle={pageTitle} showPreloader={false}>
@@ -56,116 +95,115 @@ export default function MasterLayout({ children, pageTitle }) {
                                 </div>
                             </div>
                             <ul className="sidebar-menu-list">
-                                <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userHome ?? '/provider/dashboard'} className="sidebar-menu-list__link">
-                                        <span className="icon"><i className="las la-home"></i></span>
-                                        <span className="text">Dashboard</span>
-                                    </Link>
-                                </li>
-                                <li className="sidebar-menu-list__item sidebar-menu-list__item--cta">
-                                    <Link href={routes.freelanceJobs ?? '/jobs'} className="sidebar-menu-list__link">
-                                        <span className="icon"><i className="las la-search"></i></span>
-                                        <span className="text">Browse Requests</span>
-                                    </Link>
-                                </li>
-                                <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userBidIndex ?? '/provider/bid/list'} className="sidebar-menu-list__link">
-                                        <span className="icon"><i className="las la-gavel"></i></span>
-                                        <span className="text">All Bids</span>
-                                    </Link>
-                                </li>
-                                <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userProjectIndex ?? '/provider/project/index'} className="sidebar-menu-list__link">
-                                        <span className="icon"><i className="las la-briefcase"></i></span>
-                                        <span className="text">My Projects</span>
-                                    </Link>
-                                </li>
-                                <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userDisputes ?? '/provider/disputes'} className="sidebar-menu-list__link">
-                                        <span className="icon"><i className="las la-exclamation-triangle"></i></span>
-                                        <span className="text">
-                                            Disputes
-                                            {(user?.active_disputes ?? 0) > 0 && (
-                                                <span className="shake text--warning"><i className="las la-bell"></i></span>
-                                            )}
-                                        </span>
-                                    </Link>
-                                </li>
-                                <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userNotifications ?? '/provider/notifications'} className="sidebar-menu-list__link">
-                                        <span className="icon"><i className="las la-bell"></i></span>
-                                        <span className="text">
-                                            Notifications
-                                            {notificationUnreadCount > 0 && (
-                                                <span className="shake text--warning ms-1">
-                                                    <i className="las la-bell"></i>
-                                                    <span className="sidebar-chat-notify__count">
-                                                        {notificationUnreadCount > 9 ? '9+' : notificationUnreadCount}
-                                                    </span>
-                                                </span>
-                                            )}
-                                        </span>
-                                    </Link>
-                                </li>
-                                <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userWithdraw ?? '/provider/withdraw'} className="sidebar-menu-list__link">
-                                        <span className="icon"><i className="las la-money-check-alt"></i></span>
-                                        <span className="text">Withdraw</span>
-                                    </Link>
-                                </li>
-                                <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userTransactions ?? '/provider/transactions'} className="sidebar-menu-list__link">
-                                        <span className="icon"><i className="las la-exchange-alt"></i></span>
-                                        <span className="text">Transactions</span>
-                                    </Link>
-                                </li>
-                                {monetisation?.enabled && (
-                                    <li className="sidebar-menu-list__item">
-                                        <Link href={routes.userLeadCredits ?? '/provider/lead-credits'} className="sidebar-menu-list__link">
-                                            <span className="icon"><i className="las la-coins"></i></span>
-                                            <span className="text">Lead Credits</span>
-                                        </Link>
-                                    </li>
-                                )}
-                                <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userVerification ?? '/provider/verification'} className="sidebar-menu-list__link">
-                                        <span className="icon"><i className="las la-certificate"></i></span>
-                                        <span className="text">Verification</span>
-                                    </Link>
-                                </li>
-                                <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userConversation ?? '/provider/conversation'} className="sidebar-menu-list__link">
-                                        <span className="icon"><i className="lab la-rocketchat"></i></span>
-                                        <span className="text">
-                                            Chat
-                                            <span
-                                                className={`sidebar-chat-notify ${unreadCount > 0 ? 'shake text--warning' : 'd-none'}`}
-                                                data-sidebar-chat-notify
-                                            >
-                                                {unreadCount > 0 && (
-                                                    <>
-                                                        <i className="las la-bell"></i>
-                                                        <span className="sidebar-chat-notify__count">
-                                                            {unreadCount > 9 ? '9+' : unreadCount}
-                                                        </span>
-                                                    </>
-                                                )}
+                                <SidebarLink
+                                    href={homeHref}
+                                    icon="las la-home"
+                                    label="Dashboard"
+                                    active={isNavActive(url, homeHref, { exact: true })}
+                                />
+                                <SidebarLink
+                                    href={browseHref}
+                                    icon="las la-search"
+                                    label="Browse Requests"
+                                    cta
+                                    active={isNavActive(url, browseHref)}
+                                />
+                                <SidebarLink
+                                    href={bidsHref}
+                                    icon="las la-gavel"
+                                    label="All Bids"
+                                    active={isNavActive(url, bidsHref)}
+                                />
+                                <SidebarLink
+                                    href={projectsHref}
+                                    icon="las la-briefcase"
+                                    label="My Projects"
+                                    active={isNavActive(url, projectsHref)}
+                                />
+                                <SidebarLink
+                                    href={disputesHref}
+                                    icon="las la-exclamation-triangle"
+                                    label="Disputes"
+                                    active={isNavActive(url, disputesHref)}
+                                    badge={(user?.active_disputes ?? 0) > 0 ? (
+                                        <span className="shake text--warning"><i className="las la-bell"></i></span>
+                                    ) : null}
+                                />
+                                <SidebarLink
+                                    href={notificationsHref}
+                                    icon="las la-bell"
+                                    label="Notifications"
+                                    active={isNavActive(url, notificationsHref)}
+                                    badge={notificationUnreadCount > 0 ? (
+                                        <span className="shake text--warning ms-1">
+                                            <i className="las la-bell"></i>
+                                            <span className="sidebar-chat-notify__count">
+                                                {notificationUnreadCount > 9 ? '9+' : notificationUnreadCount}
                                             </span>
                                         </span>
-                                    </Link>
-                                </li>
-                                <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userProfileSetting ?? '/provider/profile-setting'} className="sidebar-menu-list__link">
-                                        <span className="icon"><i className="las la-cog"></i></span>
-                                        <span className="text">Settings</span>
-                                    </Link>
-                                </li>
-                                <li className="sidebar-menu-list__item">
-                                    <Link href={routes.userLogout ?? '/provider/logout'} method="get" as="button" className="sidebar-menu-list__link">
-                                        <span className="icon"><i className="las la-sign-out-alt"></i></span>
-                                        <span className="text">Logout</span>
-                                    </Link>
-                                </li>
+                                    ) : null}
+                                />
+                                <SidebarLink
+                                    href={withdrawHref}
+                                    icon="las la-money-check-alt"
+                                    label="Withdraw"
+                                    active={isNavActive(url, withdrawHref)}
+                                />
+                                <SidebarLink
+                                    href={transactionsHref}
+                                    icon="las la-exchange-alt"
+                                    label="Transactions"
+                                    active={isNavActive(url, transactionsHref)}
+                                />
+                                {monetisation?.enabled && (
+                                    <SidebarLink
+                                        href={leadCreditsHref}
+                                        icon="las la-coins"
+                                        label="Lead Credits"
+                                        active={isNavActive(url, leadCreditsHref)}
+                                    />
+                                )}
+                                <SidebarLink
+                                    href={verificationHref}
+                                    icon="las la-certificate"
+                                    label="Verification"
+                                    active={isNavActive(url, verificationHref)}
+                                />
+                                <SidebarLink
+                                    href={conversationHref}
+                                    icon="lab la-rocketchat"
+                                    label="Chat"
+                                    active={isNavActive(url, conversationHref)}
+                                    badge={(
+                                        <span
+                                            className={`sidebar-chat-notify ${unreadCount > 0 ? 'shake text--warning' : 'd-none'}`}
+                                            data-sidebar-chat-notify
+                                        >
+                                            {unreadCount > 0 && (
+                                                <>
+                                                    <i className="las la-bell"></i>
+                                                    <span className="sidebar-chat-notify__count">
+                                                        {unreadCount > 9 ? '9+' : unreadCount}
+                                                    </span>
+                                                </>
+                                            )}
+                                        </span>
+                                    )}
+                                />
+                                <SidebarLink
+                                    href={settingsHref}
+                                    icon="las la-cog"
+                                    label="Settings"
+                                    active={isNavActive(url, settingsHref)
+                                        || isNavActive(url, routes.userChangePassword ?? '/freelancer/change-password')
+                                        || isNavActive(url, routes.userTwofactor ?? '/freelancer/twofactor')}
+                                />
+                                <SidebarLink
+                                    href={logoutHref}
+                                    icon="las la-sign-out-alt"
+                                    label="Logout"
+                                    asButton
+                                />
                             </ul>
                         </div>
                     </div>
@@ -189,33 +227,33 @@ export default function MasterLayout({ children, pageTitle }) {
                                     roleLabel="Provider"
                                     unreadCount={unreadCount}
                                     notificationUnreadCount={notificationUnreadCount}
-                                    conversationUrl={routes.userConversation ?? '/provider/conversation'}
-                                    notificationsUrl={routes.userNotifications ?? '/provider/notifications'}
+                                    conversationUrl={conversationHref}
+                                    notificationsUrl={notificationsHref}
                                     menuItems={[
                                         {
                                             label: 'My Profile',
-                                            href: routes.userProfileSetting ?? '/provider/profile-setting',
+                                            href: settingsHref,
                                             icon: 'fas fa-user-circle',
                                         },
                                         ...(user?.username ? [{
                                             label: 'Public Profile',
-                                            href: `${routes.talentExplore ?? '/provider/details'}/${user.username}`,
+                                            href: `${routes.talentExplore ?? '/talent/details'}/${user.username}`,
                                             icon: 'las la-external-link-alt',
                                             external: true,
                                         }] : []),
                                         {
                                             label: 'Password',
-                                            href: routes.userChangePassword ?? '/provider/change-password',
+                                            href: routes.userChangePassword ?? '/freelancer/change-password',
                                             icon: 'fas fa-lock',
                                         },
                                         {
                                             label: '2FA Security',
-                                            href: routes.userTwofactor ?? '/provider/twofactor',
+                                            href: routes.userTwofactor ?? '/freelancer/twofactor',
                                             icon: 'fas fa-key',
                                         },
                                         {
                                             label: 'Logout',
-                                            href: routes.userLogout ?? '/provider/logout',
+                                            href: logoutHref,
                                             icon: 'fas fa-sign-out-alt',
                                             danger: true,
                                         },

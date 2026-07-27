@@ -186,6 +186,8 @@
                                         <small>
                                             @lang('If you enable this module, the system will send push notifications to users. Otherwise, no push notification will be sent.')
                                             <a href="{{ route('admin.setting.notification.push') }}">@lang('Setting here')</a>
+                                            <br>
+                                            <i>@lang('Firebase powers web push now and the future mobile app.')</i>
                                         </small>
                                     </p>
                                 </div>
@@ -194,6 +196,39 @@
                                         data-offstyle="-danger" data-bs-toggle="toggle" data-height="35"
                                         data-on="@lang('Enable')" data-off="@lang('Disable')" name="pn"
                                         @if (gs('pn')) checked @endif>
+                                </div>
+                            </li>
+                            <li
+                                class="list-group-item d-flex flex-wrap flex-sm-nowrap gap-2 justify-content-between align-items-center">
+                                <div>
+                                    <p class="fw-bold mb-0">@lang('In-app Notification')</p>
+                                    <p class="mb-0">
+                                        <small>@lang('Shows alerts inside the buyer/provider notification inbox on the website.')</small>
+                                    </p>
+                                </div>
+                                <div class="form-group">
+                                    <input type="checkbox" data-width="100%" data-size="large" data-onstyle="-success"
+                                        data-offstyle="-danger" data-bs-toggle="toggle" data-height="35"
+                                        data-on="@lang('Enable')" data-off="@lang('Disable')" name="in"
+                                        @if (gs('in')) checked @endif>
+                                </div>
+                            </li>
+                            <li
+                                class="list-group-item d-flex flex-wrap flex-sm-nowrap gap-2 justify-content-between align-items-center">
+                                <div>
+                                    <p class="fw-bold mb-0">@lang('WhatsApp Notification') <span class="badge badge--warning">@lang('Coming soon')</span></p>
+                                    <p class="mb-0">
+                                        <small>
+                                            @lang('Future channel for WhatsApp alerts. Templates can be prepared now; delivery providers will be enabled later.')
+                                            <a href="{{ route('admin.setting.notification.whatsapp') }}">@lang('Setting here')</a>
+                                        </small>
+                                    </p>
+                                </div>
+                                <div class="form-group">
+                                    <input type="checkbox" data-width="100%" data-size="large" data-onstyle="-success"
+                                        data-offstyle="-danger" data-bs-toggle="toggle" data-height="35"
+                                        data-on="@lang('Enable')" data-off="@lang('Disable')" name="wn"
+                                        @if (gs('wn')) checked @endif>
                                 </div>
                             </li>
                             <li

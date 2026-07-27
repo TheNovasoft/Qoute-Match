@@ -6,51 +6,51 @@ export default function DisputeList({ disputes, emptyMessage }) {
     const rows = disputes?.data ?? [];
 
     return (
-        <div className="card custom--card">
-            <div className="card-header">
+        <div className="card shadow-sm dashboard-list-card">
+            <div className="card-header bg-white">
                 <h5 className="card-title mb-0">Disputes</h5>
             </div>
-            <div className="card-body p-0">
-                <div className="table-responsive">
-                    <table className="table table--responsive--md mb-0">
-                        <thead>
+            <div className="table-responsive">
+                <table className="table table--light mb-0">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Request</th>
+                            <th>Provider</th>
+                            <th>Type</th>
+                            <th>Raised By</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rows.length === 0 ? (
                             <tr>
-                                <th>Subject</th>
-                                <th>Request</th>
-                                <th>Provider</th>
-                                <th>Type</th>
-                                <th>Raised By</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Action</th>
+                                <td colSpan={8} className="text-center text-muted py-4">
+                                    {emptyMessage || 'No disputes yet.'}
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {rows.length === 0 ? (
-                                <tr>
-                                    <td colSpan={8} className="text-center text-muted py-4">
-                                        {emptyMessage || 'No disputes yet.'}
+                        ) : (
+                            rows.map((dispute) => (
+                                <tr key={dispute.id}>
+                                    <td>{dispute.subject}</td>
+                                    <td>{dispute.jobTitle}</td>
+                                    <td>{dispute.providerName}</td>
+                                    <td>{dispute.typeLabel}</td>
+                                    <td>{dispute.raisedBy}</td>
+                                    <td>{dispute.createdAt}</td>
+                                    <td><StatusBadge status={dispute.status} /></td>
+                                    <td>
+                                        <Link href={dispute.detailUrl} className="btn btn-sm btn-outline--primary">
+                                            Details
+                                        </Link>
                                     </td>
                                 </tr>
-                            ) : (
-                                rows.map((dispute) => (
-                                    <tr key={dispute.id}>
-                                        <td>{dispute.subject}</td>
-                                        <td>{dispute.jobTitle}</td>
-                                        <td>{dispute.providerName}</td>
-                                        <td>{dispute.typeLabel}</td>
-                                        <td>{dispute.raisedBy}</td>
-                                        <td>{dispute.createdAt}</td>
-                                        <td><StatusBadge status={dispute.status} /></td>
-                                        <td>
-                                            <Link href={dispute.detailUrl} className="btn btn--base btn-sm">Details</Link>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            ))
+                        )}
+                    </tbody>
+                </table>
             </div>
             {disputes?.links?.length > 3 && (
                 <div className="card-footer">

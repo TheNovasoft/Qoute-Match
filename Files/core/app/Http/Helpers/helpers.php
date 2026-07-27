@@ -157,6 +157,29 @@ function strLimit($title = null, $length = 10) {
     return Str::limit($title, $length);
 }
 
+/**
+ * Convert HTML notification content to readable plain text.
+ * Prevents CSS/JS from email templates leaking into SMS, in-app, push, WhatsApp.
+ */
+function notificationPlainText(?string $content): string
+{
+    if ($content === null || $content === '') {
+        return '';
+    }
+
+    $text = preg_replace('#<(style|script|head|title|meta|link)[^>]*>.*?</\1>#is', ' ', $content) ?? $content;
+    $text = preg_replace('#<(style|script|meta|link)[^>]*/?>#is', ' ', $text) ?? $text;
+    $text = preg_replace('#<!--.*?-->#s', ' ', $text) ?? $text;
+    $text = preg_replace('#<(br\s*/?|/p|/div|/li|/tr|/h[1-6])[^>]*>#i', "\n", $text) ?? $text;
+    $text = strip_tags($text);
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $text = preg_replace('/[ \t\f\v]+/', ' ', $text) ?? $text;
+    $text = preg_replace("/\n[ \t]+/", "\n", $text) ?? $text;
+    $text = preg_replace("/\n{3,}/", "\n\n", $text) ?? $text;
+
+    return trim($text);
+}
+
 function getIpInfo() {
     $ipInfo = ClientInfo::ipInfo();
     return $ipInfo;

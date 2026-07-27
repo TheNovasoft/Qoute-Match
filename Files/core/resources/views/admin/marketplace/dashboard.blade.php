@@ -26,7 +26,7 @@
                 icon="las la-user-check" value="{{ $metrics['pending_providers'] }}" bg="dark" />
         </div>
         <div class="col-xxl-3 col-sm-6">
-            <x-widget style="6" link="{{ route('admin.reviews.index') }}" title="Pending Reviews" icon="las la-star"
+            <x-widget style="6" link="{{ route('admin.reviews.pending') }}" title="Pending Reviews" icon="las la-star"
                 value="{{ $metrics['pending_reviews'] }}" bg="17" />
         </div>
         <div class="col-xxl-3 col-sm-6">
@@ -198,7 +198,7 @@
                         show: false
                     }
                 },
-                colors: ['#4634ff', '#28c76f'],
+                colors: ['#0071e3', '#6e6e73'],
                 dataLabels: {
                     enabled: false
                 },
