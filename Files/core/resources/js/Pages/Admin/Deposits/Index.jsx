@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminFilterBar from '@/Components/Admin/AdminFilterBar';
 import Pagination from '@/Components/Shared/Pagination';
 
 export default function Index({ pageTitle, deposits }) {
@@ -8,6 +9,7 @@ export default function Index({ pageTitle, deposits }) {
 
     return (
         <AdminLayout pageTitle={pageTitle}>
+            <AdminFilterBar actionUrl="/admin/deposit/all" searchPlaceholder="Search deposits…" />
             {summary && (
                 <div className="row gy-3 mb-4">
                     {[

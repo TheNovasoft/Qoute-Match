@@ -29,14 +29,14 @@ export default function Detail({ pageTitle, job }) {
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="mb-3">
-                <Link href={job.indexUrl} className="btn btn-sm btn-outline--dark">← All requests</Link>
+                <Link href={job.indexUrl} className="btn btn-sm btn-outline--dark">← Back to list</Link>
             </div>
 
-            <div className="row gy-4">
+            <div className="row gy-4 admin-job-detail">
                 <div className="col-lg-8">
-                    <div className="card shadow-sm">
-                        <div className="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <h5 className="mb-0">{job.title}</h5>
+                    <div className="card shadow-sm border-0" style={{ borderRadius: 18, border: '1px solid #d2d2d7' }}>
+                        <div className="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2" style={{ borderBottom: '1px solid #d2d2d7' }}>
+                            <h5 className="mb-0" style={{ fontWeight: 600, letterSpacing: '-0.02em', color: '#1d1d1f' }}>{job.title}</h5>
                             <div className="d-flex gap-2">
                                 <span className={job.status.class}>{job.status.label}</span>
                                 <span className={job.approval.class}>{job.approval.label}</span>

@@ -57,6 +57,14 @@ class ReviewModerationController extends Controller
                 Status::REVIEW_INVESTIGATION_ACTIVE,
             ]))
             ->when(request()->filled('user_id'), fn ($query) => $query->where('user_id', request()->integer('user_id')))
+            ->when(request()->filled('search'), function ($query) {
+                $term = '%' . request('search') . '%';
+                $query->where(function ($q) use ($term) {
+                    $q->whereHas('user', fn ($u) => $u->where('username', 'like', $term))
+                        ->orWhereHas('buyer', fn ($b) => $b->where('username', 'like', $term))
+                        ->orWhereHas('project.job', fn ($j) => $j->where('title', 'like', $term));
+                });
+            })
             ->latest('id')
             ->paginate(getPaginate());
 

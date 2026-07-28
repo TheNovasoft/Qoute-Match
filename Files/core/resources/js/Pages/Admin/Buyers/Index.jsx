@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminFilterBar from '@/Components/Admin/AdminFilterBar';
 import Pagination from '@/Components/Shared/Pagination';
 
 export default function Index({ pageTitle, buyers }) {
@@ -7,6 +8,7 @@ export default function Index({ pageTitle, buyers }) {
 
     return (
         <AdminLayout pageTitle={pageTitle}>
+            <AdminFilterBar actionUrl="/admin/buyers" searchPlaceholder="Search customer…" />
             <div className="card shadow-sm">
                 <div className="table-responsive">
                     <table className="table table--light mb-0">

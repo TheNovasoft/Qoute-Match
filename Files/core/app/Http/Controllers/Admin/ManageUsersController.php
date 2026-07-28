@@ -38,17 +38,17 @@ class ManageUsersController extends Controller
 
     public function allUsers()
     {
-        return $this->renderUserList('All Users', $this->userData());
+        return $this->renderUserList('All Users', 'all', $this->userData());
     }
 
     public function activeUsers()
     {
-        return $this->renderUserList('Active Users', $this->userData('active'));
+        return $this->renderUserList('Active Users', 'active', $this->userData('active'));
     }
 
     public function incompleteProfileUsers()
     {
-        return $this->renderUserList('Incomplete Profile Users', $this->userData('incompleteProfile'));
+        return $this->renderUserList('Incomplete Profile Users', 'incomplete', $this->userData('incompleteProfile'));
     }
 
     public function pendingProviderApproval()
@@ -80,53 +80,53 @@ class ManageUsersController extends Controller
 
     public function bannedUsers()
     {
-        return $this->renderUserList('Banned Users', $this->userData('banned'));
+        return $this->renderUserList('Banned Users', 'banned', $this->userData('banned'));
     }
 
     public function emailUnverifiedUsers()
     {
-        return $this->renderUserList('Email Unverified Users', $this->userData('emailUnverified'));
+        return $this->renderUserList('Email Unverified Users', 'email_unverified', $this->userData('emailUnverified'));
     }
 
     public function kycUnverifiedUsers()
     {
-        return $this->renderUserList('KYC Unverified Users', $this->userData('kycUnverified'));
+        return $this->renderUserList('KYC Unverified Users', 'kyc_unverified', $this->userData('kycUnverified'));
     }
 
     public function kycPendingUsers()
     {
-        return $this->renderUserList('KYC Pending Users', $this->userData('kycPending'));
+        return $this->renderUserList('KYC Pending Users', 'kyc_pending', $this->userData('kycPending'));
     }
 
     public function emailVerifiedUsers()
     {
-        return $this->renderUserList('Email Verified Users', $this->userData('emailVerified'));
+        return $this->renderUserList('Email Verified Users', 'email_verified', $this->userData('emailVerified'));
     }
 
 
     public function mobileUnverifiedUsers()
     {
-        return $this->renderUserList('Mobile Unverified Users', $this->userData('mobileUnverified'));
+        return $this->renderUserList('Mobile Unverified Users', 'mobile_unverified', $this->userData('mobileUnverified'));
     }
 
 
     public function mobileVerifiedUsers()
     {
-        return $this->renderUserList('Mobile Verified Users', $this->userData('mobileVerified'));
+        return $this->renderUserList('Mobile Verified Users', 'mobile_verified', $this->userData('mobileVerified'));
     }
 
 
     public function usersWithBalance()
     {
-        return $this->renderUserList('Users with Balance', $this->userData('withBalance'));
+        return $this->renderUserList('Users with Balance', 'with_balance', $this->userData('withBalance'));
     }
 
 
-    protected function renderUserList(string $pageTitle, $users)
+    protected function renderUserList(string $pageTitle, string $scope, $users)
     {
         return Inertia::render('Admin/Users/Index', [
             'pageTitle' => $pageTitle,
-            'users' => AdminResource::users($users),
+            'users' => AdminResource::users($users, $scope),
         ]);
     }
 
