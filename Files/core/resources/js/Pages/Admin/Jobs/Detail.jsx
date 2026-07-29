@@ -29,14 +29,14 @@ export default function Detail({ pageTitle, job }) {
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="mb-3">
-                <Link href={job.indexUrl} className="btn btn-sm btn-outline--dark">← All requests</Link>
+                <Link href={job.indexUrl} className="btn btn-sm btn-outline--dark">← Back to list</Link>
             </div>
 
-            <div className="row gy-4">
+            <div className="row gy-4 admin-job-detail">
                 <div className="col-lg-8">
-                    <div className="card shadow-sm">
-                        <div className="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <h5 className="mb-0">{job.title}</h5>
+                    <div className="card shadow-sm border-0" style={{ borderRadius: 18, border: '1px solid #d2d2d7' }}>
+                        <div className="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2" style={{ borderBottom: '1px solid #d2d2d7' }}>
+                            <h5 className="mb-0" style={{ fontWeight: 600, letterSpacing: '-0.02em', color: '#1d1d1f' }}>{job.title}</h5>
                             <div className="d-flex gap-2">
                                 <span className={job.status.class}>{job.status.label}</span>
                                 <span className={job.approval.class}>{job.approval.label}</span>
@@ -88,7 +88,39 @@ export default function Detail({ pageTitle, job }) {
                             <h6 className="mb-0">Actions</h6>
                         </div>
                         <div className="card-body admin-job-actions__body">
-                            <Link href={job.actions.bidsUrl} className="btn btn--primary btn-sm admin-job-actions__btn admin-job-actions__btn--primary">
+                            <Link
+                                href={job.actions.bidsUrl}
+                                className="btn btn-sm admin-job-actions__btn"
+                                style={{
+                                    background: '#0071e3',
+                                    border: '2px solid #000',
+                                    color: '#fff',
+                                    borderRadius: 10,
+                                    fontWeight: 600,
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: 8,
+                                    minHeight: 42,
+                                    padding: '10px 14px',
+                                    width: '100%',
+                                    transition: 'all 0.15s ease',
+                                }}
+                                onMouseEnter={e => {
+                                    const s = e.currentTarget.style;
+                                    s.setProperty('background', '#fff', 'important');
+                                    s.setProperty('border-color', '#0071e3', 'important');
+                                    s.setProperty('color', '#0071e3', 'important');
+                                    e.currentTarget.querySelector('i').style.setProperty('color', '#0071e3', 'important');
+                                }}
+                                onMouseLeave={e => {
+                                    const s = e.currentTarget.style;
+                                    s.setProperty('background', '#0071e3', 'important');
+                                    s.setProperty('border-color', '#000', 'important');
+                                    s.setProperty('color', '#fff', 'important');
+                                    e.currentTarget.querySelector('i').style.setProperty('color', '#fff', 'important');
+                                }}
+                            >
                                 <i className="las la-file-invoice" aria-hidden="true" />
                                 View quotes
                             </Link>

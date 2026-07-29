@@ -7,7 +7,13 @@ export default function Reply({ pageTitle, ticket }) {
 
     const submitReply = (e) => {
         e.preventDefault();
-        replyForm.post(ticket.actions.replyUrl, { forceFormData: true });
+        replyForm.post(ticket.actions.replyUrl, {
+            forceFormData: true,
+            preserveScroll: false,
+            onSuccess: () => {
+                window.location.reload();
+            },
+        });
     };
 
     return (
@@ -16,7 +22,7 @@ export default function Reply({ pageTitle, ticket }) {
                 <Link href={ticket.indexUrl} className="btn btn-sm btn-outline--dark">← Tickets</Link>
             </div>
 
-            <div className="card shadow-sm mb-4">
+            <div className="card shadow-sm mb-4 admin-support-reply">
                 <div className="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
                         <span className={ticket.status.class}>{ticket.status.label}</span>
@@ -33,16 +39,26 @@ export default function Reply({ pageTitle, ticket }) {
                     <div className="text-muted small mb-3">{ticket.name} · {ticket.email}</div>
 
                     {!ticket.isClosed && (
-                        <form onSubmit={submitReply} className="mb-4">
+                        <form onSubmit={submitReply} className="mb-4" encType="multipart/form-data">
                             <div className="form-group mb-3">
                                 <textarea className="form-control" rows={4} required placeholder="Enter reply..."
                                     value={replyForm.data.message} onChange={(e) => replyForm.setData('message', e.target.value)} />
                             </div>
                             <div className="form-group mb-3">
-                                <input type="file" className="form-control" multiple
-                                    onChange={(e) => replyForm.setData('attachments', Array.from(e.target.files))} />
+                                <input
+                                    type="file"
+                                    className="form-control"
+                                    multiple
+                                    accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                                    onChange={(e) => replyForm.setData('attachments', Array.from(e.target.files || []))}
+                                />
+                                {!!replyForm.data.attachments?.length && (
+                                    <div className="small text-muted mt-1">{replyForm.data.attachments.length} file(s) selected</div>
+                                )}
                             </div>
-                            <button type="submit" className="btn btn--primary" disabled={replyForm.processing}>Reply</button>
+                            <button type="submit" className="btn btn--primary" disabled={replyForm.processing}>
+                                {replyForm.processing ? 'Sending…' : 'Reply'}
+                            </button>
                         </form>
                     )}
 
@@ -70,7 +86,23 @@ function MessageRow({ msg }) {
                         onClick={() => { if (window.confirm('Delete message?')) deleteForm.post(msg.deleteUrl); }}>Delete</button>
                 </div>
             </div>
-            <p className="mb-0">{msg.message}</p>
+            <p className="mb-0" style={{ whiteSpace: 'pre-wrap' }}>{msg.message}</p>
+            {!!(msg.attachments?.length) && (
+                <div className="d-flex flex-wrap gap-2 mt-3">
+                    {msg.attachments.map((file) => (
+                        <a
+                            key={file.id}
+                            href={file.downloadUrl}
+                            className="btn btn-sm btn-outline--primary d-inline-flex align-items-center gap-2"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <img src={file.previewImage} alt="" width="20" height="20" style={{ objectFit: 'cover', borderRadius: 4 }} />
+                            <span>Download{file.size ? ` (${file.size})` : ''}</span>
+                        </a>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

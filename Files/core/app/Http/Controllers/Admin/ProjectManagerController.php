@@ -25,42 +25,42 @@ class ProjectManagerController extends Controller
 {
     public function index()
     {
-        return $this->renderProjectList('All Projects', $this->projectData());
+        return $this->renderProjectList('All Projects', 'all', $this->projectData());
     }
     public function reported()
     {
-        return $this->renderProjectList('Reported Projects', $this->projectData('reported'));
+        return $this->renderProjectList('Reported Projects', 'reported', $this->projectData('reported'));
     }
     public function running()
     {
-        return $this->renderProjectList('Running Projects', $this->projectData('running'));
+        return $this->renderProjectList('Running Projects', 'running', $this->projectData('running'));
     }
     public function reviewing()
     {
-        return $this->renderProjectList('Reviewing Projects', $this->projectData('reviewing'));
+        return $this->renderProjectList('Reviewing Projects', 'reviewing', $this->projectData('reviewing'));
     }
     public function rejected()
     {
-        return $this->renderProjectList('Rejected Projects', $this->projectData('rejected'));
+        return $this->renderProjectList('Rejected Projects', 'rejected', $this->projectData('rejected'));
     }
 
     public function completed()
     {
-        return $this->renderProjectList('Completed Projects', $this->projectData('completed'));
+        return $this->renderProjectList('Completed Projects', 'completed', $this->projectData('completed'));
     }
     
     public function partialCompleted()
     {
-        return $this->renderProjectList('Partial Completed Projects', $this->projectData('partial'));
+        return $this->renderProjectList('Partial Completed Projects', 'partial', $this->projectData('partial'));
     }
 
-    protected function renderProjectList(string $pageTitle, $projects)
+    protected function renderProjectList(string $pageTitle, string $scope, $projects)
     {
         $projects->load(['job', 'user', 'buyer', 'bid']);
 
         return Inertia::render('Admin/Projects/Index', [
             'pageTitle' => $pageTitle,
-            'projects' => AdminResource::projects($projects),
+            'projects' => AdminResource::projects($projects, $scope),
         ]);
     }
 

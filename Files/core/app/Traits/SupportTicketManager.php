@@ -205,6 +205,13 @@ trait SupportTicketManager
             }
             abort(404);
         }
+        if (($this->userType == 'buyer') && ($userId != $ticket->buyer_id)) {
+            if ($this->apiRequest) {
+                $notify[] = 'Unauthorized user';
+                return responseError('unauthorized', $notify);
+            }
+            abort(404);
+        }
         $message = new SupportMessage();
 
         $request->merge(['ticket_reply' => 1]);
@@ -243,19 +250,27 @@ trait SupportTicketManager
 
         if ($this->userType == 'admin') {
             $createLog = false;
-            $user = $ticket;
+            $notifyUser = $ticket;
             $sendVia = ['email', 'sms'];
-            if ($ticket->user_id != 0) {
+            $ticketLink = route('ticket.view', $ticket->ticket);
+
+            if ((int) $ticket->user_id !== 0 && $ticket->user) {
                 $createLog = true;
-                $user = $ticket->user;
+                $notifyUser = $ticket->user;
                 $sendVia = null;
+                $ticketLink = route('ticket.view', $ticket->ticket);
+            } elseif ((int) ($ticket->buyer_id ?? 0) !== 0 && $ticket->buyer) {
+                $createLog = true;
+                $notifyUser = $ticket->buyer;
+                $sendVia = null;
+                $ticketLink = route('buyer.ticket.view', $ticket->ticket);
             }
 
-            notify($user, 'ADMIN_SUPPORT_REPLY', [
+            notify($notifyUser, 'ADMIN_SUPPORT_REPLY', [
                 'ticket_id' => $ticket->ticket,
                 'ticket_subject' => $ticket->subject,
                 'reply' => $request->message,
-                'link' => route('ticket.view', $ticket->ticket),
+                'link' => $ticketLink,
             ], $sendVia, $createLog);
         }
 
@@ -276,10 +291,20 @@ trait SupportTicketManager
 
     protected function storeSupportAttachments($messageId)
     {
-        $path = getFilePath('ticket');
+        $path = public_path(getFilePath('ticket'));
+        $files = $this->files;
+        if (!$files) {
+            return 200;
+        }
+        if (!is_array($files)) {
+            $files = [$files];
+        }
 
         try {
-            foreach ($this->files as  $file) {
+            foreach ($files as $file) {
+                if (!$file) {
+                    continue;
+                }
                 $attachment = new SupportAttachment();
                 $attachment->support_message_id = $messageId;
                 $attachment->attachment = fileUploader($file, $path);
@@ -295,15 +320,29 @@ trait SupportTicketManager
 
     protected function validation($request)
     {
-        $this->files = $request->file('attachments');
+        $files = $request->file('attachments');
+        if ($files && !is_array($files)) {
+            $files = [$files];
+        }
+        $this->files = $files ?: [];
 
         return [
             'attachments' => [
+                'nullable',
                 function ($attribute, $value, $fail) {
+                    if (!$this->files || count($this->files) === 0) {
+                        return;
+                    }
                     foreach ($this->files as $file) {
+                        if (!$file) {
+                            continue;
+                        }
                         $ext = strtolower($file->getClientOriginalExtension());
-                        if (!in_array($ext, $this->allowedExtension)) {
+                        if (!in_array($ext, $this->allowedExtension, true)) {
                             return $fail("Only png, jpg, jpeg, pdf, doc, docx files are allowed");
+                        }
+                        if ($file->getSize() > 5 * 1024 * 1024) {
+                            return $fail("Each attachment must be 5MB or smaller");
                         }
                     }
                     if (count($this->files) > 5) {
@@ -378,9 +417,8 @@ trait SupportTicketManager
             abort(404);
         }
         $file = $attachment->attachment;
-        $path = getFilePath('ticket');
-        $fullPath = $path . '/' . $file;
-        if (!file_exists($fullPath)) {
+        $fullPath = public_path(getFilePath('ticket') . '/' . $file);
+        if (!is_file($fullPath)) {
             if ($this->apiRequest) {
                 $notify[] = 'Attachment not found';
                 return responseError('attachment_not_found', $notify);
@@ -388,17 +426,10 @@ trait SupportTicketManager
             $notify[] = ['error', 'Attachment not found'];
             return back()->withNotify($notify);
         }
-        $title = slug($attachment->supportMessage->ticket->subject);
+        $title = slug(optional(optional($attachment->supportMessage)->ticket)->subject ?: 'attachment');
         $ext = pathinfo($file, PATHINFO_EXTENSION);
-        $mimetype = mime_content_type($fullPath);
-        if (!headers_sent()) {
-            header('Access-Control-Allow-Origin: *');
-            header('Access-Control-Allow-Methods: GET,');
-            header('Access-Control-Allow-Headers: Content-Type');
-        }
-        header('Content-Disposition: attachment; filename="' . $title . '.' . $ext . '";');
-        header("Content-Type: " . $mimetype);
-        return readfile($fullPath);
+
+        return response()->download($fullPath, $title . '.' . $ext);
     }
 
     protected function accountPage(string $page): string

@@ -62,7 +62,7 @@
 
 <script src="{{ asset('assets/global/js/nicEdit.js') }}"></script>
 <script src="{{asset('assets/global/js/select2.min.js')}}"></script>
-<script src="{{asset('assets/admin/js/app.js')}}"></script>
+<script src="{{ asset('assets/admin/js/app.js') }}?v={{ @filemtime(base_path('../assets/admin/js/app.js')) ?: time() }}"></script>
 <script src="{{ asset('assets/admin/js/cu-modal.js') }}"></script>
 
 {{-- LOAD NIC EDIT --}}

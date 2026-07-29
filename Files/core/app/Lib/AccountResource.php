@@ -93,17 +93,19 @@ class AccountResource
             'senderName' => $senderName,
             'senderImage' => $senderImage,
             'createdAt' => showDateTime($message->created_at),
-            'attachments' => collect($message->attachments ?? [])->map(function ($attachment) {
-                $ext = pathinfo($attachment->attachment, PATHINFO_EXTENSION);
-                $isImage = in_array(strtolower($ext), ['jpg', 'jpeg', 'png'], true);
+            'attachments' => collect($message->attachments ?? [])->map(function ($attachment) use ($downloadRoute) {
+                $ext = strtolower((string) pathinfo($attachment->attachment, PATHINFO_EXTENSION));
+                $isImage = in_array($ext, ['jpg', 'jpeg', 'png'], true);
+                $diskPath = public_path(getFilePath('ticket') . '/' . $attachment->attachment);
 
                 return [
                     'id' => (int) $attachment->id,
+                    'name' => $attachment->attachment,
                     'downloadUrl' => route($downloadRoute, encrypt($attachment->id)),
                     'previewImage' => getImage(
                         getFilePath('ticket') . '/' . ($isImage ? $attachment->attachment : 'doc_type.png')
                     ),
-                    'size' => fileSizeInB(getFilePath('ticket') . '/' . $attachment->attachment),
+                    'size' => fileSizeInB($diskPath),
                 ];
             })->values()->all(),
         ];

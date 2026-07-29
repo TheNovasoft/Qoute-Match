@@ -1,12 +1,43 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminFilterBar from '@/Components/Admin/AdminFilterBar';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
+
+const JOB_TABS = [
+    { key: 'approved', label: 'Approved', href: '/admin/jobs/approved' },
+    { key: 'pending', label: 'Pending', href: '/admin/jobs/pending' },
+    { key: 'rejected', label: 'Rejected', href: '/admin/jobs/rejected' },
+    { key: 'published', label: 'Published', href: '/admin/jobs/published' },
+    { key: 'drafted', label: 'Drafted', href: '/admin/jobs/drafted' },
+    { key: 'processing', label: 'Processing', href: '/admin/jobs/processing' },
+    { key: 'completed', label: 'Completed', href: '/admin/jobs/completed' },
+    { key: 'all', label: 'All Jobs', href: '/admin/jobs/list' },
+];
 
 export default function Index({ pageTitle, jobs }) {
     const rows = jobs?.data ?? [];
+    const scope = jobs?.scope || 'all';
+    const filterUrl = {
+        approved: '/admin/jobs/approved',
+        pending: '/admin/jobs/pending',
+        rejected: '/admin/jobs/rejected',
+        published: '/admin/jobs/published',
+        drafted: '/admin/jobs/drafted',
+        processing: '/admin/jobs/processing',
+        completed: '/admin/jobs/completed',
+        all: '/admin/jobs/list',
+    }[scope] || '/admin/jobs/list';
 
     return (
         <AdminLayout pageTitle={pageTitle}>
+            <AdminStatusTabs tabs={JOB_TABS} active={scope} />
+
+            <AdminFilterBar
+                actionUrl={filterUrl}
+                searchPlaceholder="Search title, customer, category…"
+            />
+
             <div className="card shadow-sm admin-jobs-card">
                 <div className="admin-mobile-cards d-lg-none">
                     {rows.length === 0 ? (

@@ -118,9 +118,7 @@
         "title": "Manage Categories",
         "icon": "las la-layer-group",
         "menu_active": [
-            "admin.category.index",
-            "admin.category.subcategories",
-            "admin.category.skills",
+            "admin.category*",
             "admin.marketplace.forms*"
         ],
         "submenu": [
@@ -1007,6 +1005,7 @@
         "menu_active": "admin.subscriber.*"
     },
     "notification_channels": {
+        "hide": true,
         "keyword": [
             "Notification Channels",
             "Email notification",
@@ -1032,6 +1031,7 @@
         ]
     },
     "system_setting": {
+        "hide": true,
         "keyword": [
             "System Setting",
             "setting",
@@ -1087,6 +1087,7 @@
         ]
     },
     "extra": {
+        "hide": true,
         "title": "Extra",
         "icon": "la la-server",
         "menu_active": "admin.system*",

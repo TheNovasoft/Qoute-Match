@@ -1,12 +1,41 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminFilterBar from '@/Components/Admin/AdminFilterBar';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
+
+const PROJECT_TABS = [
+    { key: 'running', label: 'Running', href: '/admin/project/running' },
+    { key: 'reviewing', label: 'Reviewing', href: '/admin/project/reviewing' },
+    { key: 'reported', label: 'Reported', href: '/admin/project/reported' },
+    { key: 'completed', label: 'Completed', href: '/admin/project/completed' },
+    { key: 'rejected', label: 'Rejected', href: '/admin/project/rejected' },
+    { key: 'partial', label: 'Partial Complete', href: '/admin/project/partial/completed' },
+    { key: 'all', label: 'All Projects', href: '/admin/project/all' },
+];
 
 export default function Index({ pageTitle, projects }) {
     const rows = projects?.data ?? [];
+    const scope = projects?.scope || 'all';
+    const filterUrl = {
+        running: '/admin/project/running',
+        reviewing: '/admin/project/reviewing',
+        reported: '/admin/project/reported',
+        completed: '/admin/project/completed',
+        rejected: '/admin/project/rejected',
+        partial: '/admin/project/partial/completed',
+        all: '/admin/project/all',
+    }[scope] || '/admin/project/all';
 
     return (
         <AdminLayout pageTitle={pageTitle}>
+            <AdminStatusTabs tabs={PROJECT_TABS} active={scope} />
+
+            <AdminFilterBar
+                actionUrl={filterUrl}
+                searchPlaceholder="Search projects…"
+            />
+
             <div className="card shadow-sm">
                 <div className="table-responsive">
                     <table className="table table--light mb-0">
@@ -32,14 +61,18 @@ export default function Index({ pageTitle, projects }) {
                                     <td>{row.amount}</td>
                                     <td><span className={row.status.class}>{row.status.label}</span></td>
                                     <td>{row.createdAt}</td>
-                                    <td><Link href={row.detailUrl} className="btn btn-sm btn-outline--primary">Details</Link></td>
+                                    <td>
+                                        <Link href={row.detailUrl} className="btn btn-sm btn-outline--primary">Details</Link>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
                 {projects?.links?.length > 3 && (
-                    <div className="card-footer"><Pagination links={projects.links} /></div>
+                    <div className="card-footer">
+                        <Pagination links={projects.links} />
+                    </div>
                 )}
             </div>
         </AdminLayout>

@@ -1,5 +1,7 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminFilterBar from '@/Components/Admin/AdminFilterBar';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
 
 const STATUS_TABS = [
@@ -12,20 +14,17 @@ const STATUS_TABS = [
 
 export default function Index({ pageTitle, reviews }) {
     const rows = reviews?.data ?? [];
+    const status = reviews?.status || 'pending';
+    const filterUrl = `/admin/reviews/${status}`;
 
     return (
         <AdminLayout pageTitle={pageTitle}>
-            <div className="btn-group flex-wrap mb-3">
-                {STATUS_TABS.map((tab) => (
-                    <Link
-                        key={tab.key}
-                        href={tab.href}
-                        className={`btn btn-sm ${reviews.status === tab.key ? 'btn--primary' : 'btn-outline--primary'} mb-1`}
-                    >
-                        {tab.label}
-                    </Link>
-                ))}
-            </div>
+            <AdminStatusTabs tabs={STATUS_TABS} active={status} />
+
+            <AdminFilterBar
+                actionUrl={filterUrl}
+                searchPlaceholder="Search provider / customer…"
+            />
 
             <div className="card shadow-sm">
                 <div className="table-responsive">
@@ -52,7 +51,7 @@ export default function Index({ pageTitle, reviews }) {
                                     <td>{row.buyerUsername}</td>
                                     <td>{row.jobTitle}</td>
                                     <td>{row.createdAt}</td>
-                                    <td><span className={row.status.class}>{row.status.label}</span></td>
+                                    <td><span className={row.status?.class}>{row.status?.label}</span></td>
                                     <td className="small">
                                         {row.isVerified && <span className="badge badge--success me-1">Verified</span>}
                                         {row.investigation?.status > 0 && (

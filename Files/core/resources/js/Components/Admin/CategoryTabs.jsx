@@ -1,34 +1,34 @@
 import { Link, usePage } from '@inertiajs/react';
 
 const TABS = [
-    { key: 'categories', label: 'Categories', href: '/admin/category/index', match: ['/admin/category/index'] },
+    { key: 'categories', label: 'Categories', href: '/admin/category/index', match: ['/admin/category/index', '/admin/category'] },
     { key: 'subcategories', label: 'Subcategories', href: '/admin/category/subcategories', match: ['/admin/category/subcategories'] },
     { key: 'skills', label: 'Skills', href: '/admin/category/skills', match: ['/admin/category/skills'] },
     { key: 'forms', label: 'Form Builder', href: '/admin/marketplace-forms', match: ['/admin/marketplace-forms'] },
 ];
 
 export default function CategoryTabs({ active }) {
-    const url = usePage().url || '';
+    const rawUrl = usePage().url || '';
+    const url = rawUrl.split('?')[0];
 
     return (
-        <ul className="nav nav-tabs mb-4 admin-categories__tabs" role="tablist">
+        <div className="admin-status-tabs btn-group flex-wrap mb-4" role="tablist">
             {TABS.map((tab) => {
                 const isActive = active
                     ? active === tab.key
-                    : tab.match.some((path) => url.startsWith(path));
+                    : tab.match.some((path) => url === path || url.startsWith(`${path}/`) || url.startsWith(path));
 
                 return (
-                    <li key={tab.key} className={`nav-item ${isActive ? 'active' : ''}`} role="presentation">
-                        <Link
-                            href={tab.href}
-                            className={`nav-link text-dark ${isActive ? 'active' : ''}`}
-                            preserveScroll
-                        >
-                            {tab.label}
-                        </Link>
-                    </li>
+                    <Link
+                        key={tab.key}
+                        href={tab.href}
+                        className={`btn btn-sm ${isActive ? 'btn--primary' : 'btn-outline--primary'} mb-1`}
+                        preserveScroll
+                    >
+                        {tab.label}
+                    </Link>
                 );
             })}
-        </ul>
+        </div>
     );
 }
