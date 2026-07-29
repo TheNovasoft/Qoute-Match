@@ -192,14 +192,17 @@ class AdminResource
     {
         return [
             'scope' => $scope,
-            'data' => collect($paginator->items())->map(fn (Job $job) => self::jobRow($job))->values()->all(),
+            'data' => collect($paginator->items())->map(fn (Job $job) => self::jobRow($job, $scope))->values()->all(),
             'links' => $paginator->linkCollection()->toArray(),
             'meta' => self::paginationMeta($paginator),
         ];
     }
 
-    public static function jobRow(Job $job): array
+    public static function jobRow(Job $job, string $scope = 'all'): array
     {
+        $allowedScopes = ['all', 'approved', 'pending', 'rejected', 'published', 'drafted', 'processing', 'completed'];
+        $scope = in_array($scope, $allowedScopes, true) ? $scope : 'all';
+
         return [
             'id' => (int) $job->id,
             'title' => strLimit($job->title, 50),
@@ -210,7 +213,7 @@ class AdminResource
             'status' => self::jobStatus((int) $job->status),
             'approval' => self::jobApproval((int) $job->is_approved),
             'createdAt' => showDateTime($job->created_at),
-            'detailUrl' => route('admin.jobs.details', $job->id),
+            'detailUrl' => route('admin.jobs.details', $job->id) . '?scope=' . urlencode($scope),
             'bidsUrl' => route('admin.bids.index', $job->id),
         ];
     }
@@ -218,6 +221,12 @@ class AdminResource
     public static function jobDetail(Job $job, array $widget, array $requestFields): array
     {
         $canModerate = (int) $job->is_approved === Status::JOB_PENDING;
+        $allowedScopes = ['all', 'approved', 'pending', 'rejected', 'published', 'drafted', 'processing', 'completed'];
+        $scope = request()->get('scope', 'all');
+        $scope = in_array($scope, $allowedScopes, true) ? $scope : 'all';
+        $indexUrl = $scope === 'all'
+            ? route('admin.jobs.index')
+            : route('admin.jobs.' . $scope);
 
         return [
             'id' => (int) $job->id,
@@ -252,7 +261,7 @@ class AdminResource
                 'deleteUrl' => route('admin.jobs.delete', $job->id),
                 'bidsUrl' => route('admin.bids.index', $job->id),
             ],
-            'indexUrl' => route('admin.jobs.index'),
+            'indexUrl' => $indexUrl,
             'dashboardUrl' => route('admin.marketplace.dashboard'),
         ];
     }
@@ -325,14 +334,17 @@ class AdminResource
     {
         return [
             'status' => $status,
-            'data' => collect($paginator->items())->map(fn (Review $review) => self::reviewRow($review))->values()->all(),
+            'data' => collect($paginator->items())->map(fn (Review $review) => self::reviewRow($review, $status))->values()->all(),
             'links' => $paginator->linkCollection()->toArray(),
             'meta' => self::paginationMeta($paginator),
         ];
     }
 
-    public static function reviewRow(Review $review): array
+    public static function reviewRow(Review $review, string $status = 'pending'): array
     {
+        $allowedStatuses = ['pending', 'approved', 'hidden', 'verified', 'disputed'];
+        $status = in_array($status, $allowedStatuses, true) ? $status : 'pending';
+
         return [
             'id' => (int) $review->id,
             'rating' => (int) $review->rating,
@@ -346,7 +358,7 @@ class AdminResource
                 'label' => StructuredReviewService::investigationLabel((int) $review->investigation_status),
             ],
             'createdAt' => showDateTime($review->created_at),
-            'detailUrl' => route('admin.reviews.detail', $review->id),
+            'detailUrl' => route('admin.reviews.detail', $review->id) . '?status=' . urlencode($status),
         ];
     }
 
@@ -356,6 +368,9 @@ class AdminResource
         $isPending = (int) $review->status === Status::REVIEW_PENDING;
         $isHidden = (int) $review->status === Status::REVIEW_HIDDEN;
         $isVerified = (bool) $review->is_verified;
+        $status = request()->get('status', 'approved');
+        $allowedStatuses = ['pending', 'approved', 'hidden', 'verified', 'disputed'];
+        $status = in_array($status, $allowedStatuses, true) ? $status : 'approved';
 
         return [
             'id' => (int) $review->id,
@@ -393,7 +408,7 @@ class AdminResource
                 'investigateUrl' => route('admin.reviews.investigate', $review->id),
                 'replyUrl' => route('admin.reviews.reply', $review->id),
             ],
-            'indexUrl' => route('admin.reviews.pending'),
+            'indexUrl' => route('admin.reviews.' . $status),
             'dashboardUrl' => route('admin.marketplace.dashboard'),
         ];
     }

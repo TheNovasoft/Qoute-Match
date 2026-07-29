@@ -1,4 +1,5 @@
-import { Link, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 
 const TABS = [
     { key: 'categories', label: 'Categories', href: '/admin/category/index', match: ['/admin/category/index'] },
@@ -10,25 +11,15 @@ const TABS = [
 export default function CategoryTabs({ active }) {
     const url = usePage().url || '';
 
-    return (
-        <ul className="nav nav-tabs mb-4 admin-categories__tabs" role="tablist">
-            {TABS.map((tab) => {
-                const isActive = active
-                    ? active === tab.key
-                    : tab.match.some((path) => url.startsWith(path));
+    const resolvedActive = active
+        || TABS.find((tab) => tab.match.some((path) => url.startsWith(path)))?.key
+        || 'categories';
 
-                return (
-                    <li key={tab.key} className={`nav-item ${isActive ? 'active' : ''}`} role="presentation">
-                        <Link
-                            href={tab.href}
-                            className={`nav-link text-dark ${isActive ? 'active' : ''}`}
-                            preserveScroll
-                        >
-                            {tab.label}
-                        </Link>
-                    </li>
-                );
-            })}
-        </ul>
+    return (
+        <AdminStatusTabs
+            className="mb-4"
+            active={resolvedActive}
+            tabs={TABS.map(({ key, label, href }) => ({ key, label, href }))}
+        />
     );
 }

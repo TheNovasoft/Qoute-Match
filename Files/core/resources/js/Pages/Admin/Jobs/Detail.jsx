@@ -1,4 +1,4 @@
-import { Link, useForm } from '@inertiajs/react';
+import { Link, router, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
 
 function FieldList({ fields }) {
@@ -26,10 +26,19 @@ export default function Detail({ pageTitle, job }) {
     const rejectForm = useForm({ reason: '' });
     const deleteForm = useForm({});
 
+    const goBack = (e) => {
+        e.preventDefault();
+        if (window.history.length > 1) {
+            window.history.back();
+            return;
+        }
+        router.visit(job.indexUrl);
+    };
+
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="mb-3">
-                <Link href={job.indexUrl} className="btn btn-sm btn-outline--dark">← All requests</Link>
+                <Link href={job.indexUrl} onClick={goBack} className="btn btn-sm btn-outline--dark admin-back-btn">← Back</Link>
             </div>
 
             <div className="row gy-4">
@@ -88,8 +97,42 @@ export default function Detail({ pageTitle, job }) {
                             <h6 className="mb-0">Actions</h6>
                         </div>
                         <div className="card-body admin-job-actions__body">
-                            <Link href={job.actions.bidsUrl} className="btn btn--primary btn-sm admin-job-actions__btn admin-job-actions__btn--primary">
-                                <i className="las la-file-invoice" aria-hidden="true" />
+                            <Link
+                                href={job.actions.bidsUrl}
+                                className="btn btn-sm admin-job-actions__btn"
+                                style={{
+                                    background: '#0071e3',
+                                    border: '2px solid #000',
+                                    color: '#fff',
+                                    borderRadius: 10,
+                                    fontWeight: 600,
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: 8,
+                                    minHeight: 42,
+                                    padding: '10px 14px',
+                                    width: '100%',
+                                    transition: 'all 0.15s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                    const s = e.currentTarget.style;
+                                    s.setProperty('background', '#005bb5', 'important');
+                                    s.setProperty('border-color', '#000', 'important');
+                                    s.setProperty('color', '#fff', 'important');
+                                    const icon = e.currentTarget.querySelector('i');
+                                    if (icon) icon.style.setProperty('color', '#fff', 'important');
+                                }}
+                                onMouseLeave={(e) => {
+                                    const s = e.currentTarget.style;
+                                    s.setProperty('background', '#0071e3', 'important');
+                                    s.setProperty('border-color', '#000', 'important');
+                                    s.setProperty('color', '#fff', 'important');
+                                    const icon = e.currentTarget.querySelector('i');
+                                    if (icon) icon.style.setProperty('color', '#fff', 'important');
+                                }}
+                            >
+                                <i className="las la-file-invoice" aria-hidden="true" style={{ color: '#fff' }} />
                                 View quotes
                             </Link>
 

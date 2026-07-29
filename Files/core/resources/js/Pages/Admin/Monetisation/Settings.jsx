@@ -1,5 +1,12 @@
 import { Link, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
+
+const MONETISATION_TABS = [
+    { key: 'settings', label: 'Settings', href: '/admin/monetisation/settings' },
+    { key: 'packages', label: 'Credit Packages', href: '/admin/monetisation/packages' },
+    { key: 'plans', label: 'Subscription Plans', href: '/admin/monetisation/plans' },
+];
 
 export default function Settings({ pageTitle, settings }) {
     const form = useForm({
@@ -11,6 +18,8 @@ export default function Settings({ pageTitle, settings }) {
 
     return (
         <AdminLayout pageTitle={pageTitle}>
+            <AdminStatusTabs tabs={MONETISATION_TABS} className="mb-3" />
+
             <div className="row gy-4">
                 <div className="col-lg-8">
                     <div className="card shadow-sm">

@@ -4,9 +4,6 @@ import AdminLayout from '@/Components/Layout/AdminLayout';
 import CategoryTabs from '@/Components/Admin/CategoryTabs';
 import Pagination from '@/Components/Shared/Pagination';
 
-/**
- * Subcategories under one parent category (WordPress-style children).
- */
 export default function Subcategories({ pageTitle, subcategories }) {
     const rows = subcategories?.data ?? [];
     const parent = subcategories?.parent ?? null;

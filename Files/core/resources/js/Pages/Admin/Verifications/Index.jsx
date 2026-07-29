@@ -1,11 +1,12 @@
 import { Link, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
 
 const STATUS_TABS = [
-    { key: 'pending', label: 'Pending' },
-    { key: 'approved', label: 'Approved' },
-    { key: 'rejected', label: 'Rejected' },
+    { key: 'pending', label: 'Pending', href: '/admin/provider-verifications?status=pending' },
+    { key: 'approved', label: 'Approved', href: '/admin/provider-verifications?status=approved' },
+    { key: 'rejected', label: 'Rejected', href: '/admin/provider-verifications?status=rejected' },
 ];
 
 function QuickApproveButton({ url, label = 'Approve' }) {
@@ -33,6 +34,10 @@ export default function Index({ pageTitle, verifications }) {
 
     return (
         <AdminLayout pageTitle={pageTitle}>
+            <div className="mb-3">
+                <Link href="/admin/freelancers/active" className="btn btn-sm btn-outline--dark admin-back-btn">← Back</Link>
+            </div>
+
             {pendingCount > 0 && verifications.status !== 'pending' && (
                 <div className="alert alert-warning d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                     <span>
@@ -44,20 +49,14 @@ export default function Index({ pageTitle, verifications }) {
                 </div>
             )}
 
-            <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-                <div className="btn-group flex-wrap">
-                    {STATUS_TABS.map((tab) => (
-                        <Link
-                            key={tab.key}
-                            href={`/admin/provider-verifications?status=${tab.key}`}
-                            className={`btn btn-sm ${verifications.status === tab.key ? 'btn--primary' : 'btn-outline--primary'} mb-1`}
-                        >
-                            {tab.label}
-                            {tab.key === 'pending' && pendingCount > 0 ? ` (${pendingCount})` : ''}
-                        </Link>
-                    ))}
-                </div>
-            </div>
+            <AdminStatusTabs
+                className="mb-3"
+                active={verifications.status}
+                tabs={STATUS_TABS.map((tab) => ({
+                    ...tab,
+                    badge: tab.key === 'pending' && pendingCount > 0 ? pendingCount : null,
+                }))}
+            />
 
             <div className="card shadow-sm">
                 <div className="card-header bg-white">

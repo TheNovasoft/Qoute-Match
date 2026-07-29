@@ -12,6 +12,9 @@
         <div class="sidebar__menu-wrapper">
             <ul class="sidebar__menu">
                 @foreach ($sideBarLinks as $key => $data)
+                    @if (!empty($data->hide))
+                        @continue
+                    @endif
                     @if (isset($data->header))
                         <li class="sidebar__menu-header">{{ __($data->header) }}</li>
                     @endif
@@ -36,6 +39,9 @@
                                 class="sidebar-submenu {{ isset($data->menu_active) ? menuActive($data->menu_active, 2) : '' }} ">
                                 <ul>
                                     @foreach ($data->submenu as $menu)
+                                        @if (!empty($menu->hide))
+                                            @continue
+                                        @endif
                                         @php
                                             $submenuParams = null;
                                             if (isset($menu->params)) {

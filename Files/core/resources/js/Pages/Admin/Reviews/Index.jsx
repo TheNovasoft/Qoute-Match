@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
 
 const STATUS_TABS = [
@@ -15,17 +16,7 @@ export default function Index({ pageTitle, reviews }) {
 
     return (
         <AdminLayout pageTitle={pageTitle}>
-            <div className="btn-group flex-wrap mb-3">
-                {STATUS_TABS.map((tab) => (
-                    <Link
-                        key={tab.key}
-                        href={tab.href}
-                        className={`btn btn-sm ${reviews.status === tab.key ? 'btn--primary' : 'btn-outline--primary'} mb-1`}
-                    >
-                        {tab.label}
-                    </Link>
-                ))}
-            </div>
+            <AdminStatusTabs tabs={STATUS_TABS} active={reviews.status} className="mb-3" />
 
             <div className="card shadow-sm">
                 <div className="table-responsive">

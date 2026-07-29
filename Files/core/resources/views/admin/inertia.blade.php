@@ -27,6 +27,4 @@
             </div>
         </div>
     </div>
-
-    <x-config-process />
 @endsection

@@ -1,12 +1,26 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
+
+const STATUS_TABS = [
+    { key: 'approved', label: 'Approved', href: '/admin/jobs/approved' },
+    { key: 'pending', label: 'Pending', href: '/admin/jobs/pending' },
+    { key: 'rejected', label: 'Rejected', href: '/admin/jobs/rejected' },
+    { key: 'published', label: 'Published', href: '/admin/jobs/published' },
+    { key: 'drafted', label: 'Drafted', href: '/admin/jobs/drafted' },
+    { key: 'processing', label: 'Processing', href: '/admin/jobs/processing' },
+    { key: 'completed', label: 'Completed', href: '/admin/jobs/completed' },
+    { key: 'all', label: 'All', href: '/admin/jobs/list' },
+];
 
 export default function Index({ pageTitle, jobs }) {
     const rows = jobs?.data ?? [];
 
     return (
         <AdminLayout pageTitle={pageTitle}>
+            <AdminStatusTabs tabs={STATUS_TABS} active={jobs.scope} className="mb-3" />
+
             <div className="card shadow-sm admin-jobs-card">
                 <div className="admin-mobile-cards d-lg-none">
                     {rows.length === 0 ? (

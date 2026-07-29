@@ -2,6 +2,7 @@ import { createInertiaApp, Head, Link, router } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import InertiaErrorBoundary from '@/Components/Shared/InertiaErrorBoundary';
+import { bindAdminSidebarSync } from '@/utils/adminSidebar';
 import './bootstrap';
 
 const appName = 'QuoteMatch';
@@ -18,6 +19,8 @@ router.on('finish', hidePreloader);
 router.on('error', (errors) => {
     console.error('Inertia navigation error:', errors);
 });
+
+bindAdminSidebarSync(router);
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),

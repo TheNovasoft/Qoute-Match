@@ -1,12 +1,22 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
+
+const STATUS_TABS = [
+    { key: 'pending', label: 'Pending Ticket', href: '/admin/ticket/pending' },
+    { key: 'closed', label: 'Closed Ticket', href: '/admin/ticket/closed' },
+    { key: 'answered', label: 'Answered Ticket', href: '/admin/ticket/answered' },
+    { key: 'all', label: 'All Ticket', href: '/admin/ticket' },
+];
 
 export default function Index({ pageTitle, tickets }) {
     const rows = tickets?.data ?? [];
 
     return (
         <AdminLayout pageTitle={pageTitle}>
+            <AdminStatusTabs tabs={STATUS_TABS} className="mb-3" />
+
             <div className="card shadow-sm">
                 <div className="table-responsive">
                     <table className="table table--light mb-0">

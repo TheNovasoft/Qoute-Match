@@ -157,10 +157,10 @@ class ManageJobController extends Controller
             $bid->delete();
         }
 
-        $job->conversations()->each(function ($conversation) {
+        foreach ($job->conversations()->get() as $conversation) {
             $conversation->messages()->delete();
             $conversation->delete();
-        });
+        }
 
         if ($job->project) {
             $job->project->delete();
@@ -170,6 +170,13 @@ class ManageJobController extends Controller
         $job->delete();
 
         $notify[] = ['success', 'Request deleted successfully.'];
-        return to_route('admin.jobs.index')->withNotify($notify);
+
+        $fallback = route('admin.jobs.approved');
+        $previous = url()->previous();
+        if ($previous && ! str_contains($previous, '/admin/jobs/details/')) {
+            return redirect()->to($previous)->withNotify($notify);
+        }
+
+        return redirect()->to($fallback)->withNotify($notify);
     }
 }

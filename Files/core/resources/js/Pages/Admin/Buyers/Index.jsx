@@ -1,12 +1,26 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
+
+const STATUS_TABS = [
+    { key: 'active', label: 'Active Buyers', href: '/admin/buyers/active' },
+    { key: 'banned', label: 'Banned Buyers', href: '/admin/buyers/banned' },
+    { key: 'email_unverified', label: 'Email Unverified', href: '/admin/buyers/email-unverified' },
+    { key: 'mobile_unverified', label: 'Mobile Unverified', href: '/admin/buyers/mobile-unverified' },
+    { key: 'kyc_unverified', label: 'KYC Unverified', href: '/admin/buyers/kyc-unverified' },
+    { key: 'kyc_pending', label: 'KYC Pending', href: '/admin/buyers/kyc-pending' },
+    { key: 'with_balance', label: 'With Balance', href: '/admin/buyers/with-balance' },
+    { key: 'all', label: 'All Buyers', href: '/admin/buyers' },
+];
 
 export default function Index({ pageTitle, buyers }) {
     const rows = buyers?.data ?? [];
 
     return (
         <AdminLayout pageTitle={pageTitle}>
+            <AdminStatusTabs tabs={STATUS_TABS} className="mb-3" />
+
             <div className="card shadow-sm">
                 <div className="table-responsive">
                     <table className="table table--light mb-0">

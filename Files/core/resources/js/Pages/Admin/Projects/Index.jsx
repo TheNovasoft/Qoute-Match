@@ -1,12 +1,25 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
+
+const STATUS_TABS = [
+    { key: 'running', label: 'Running', href: '/admin/project/running' },
+    { key: 'reviewing', label: 'Reviewing', href: '/admin/project/reviewing' },
+    { key: 'reported', label: 'Reported', href: '/admin/project/reported' },
+    { key: 'completed', label: 'Completed', href: '/admin/project/completed' },
+    { key: 'rejected', label: 'Rejected', href: '/admin/project/rejected' },
+    { key: 'partial', label: 'Partial Complete', href: '/admin/project/partial/completed' },
+    { key: 'all', label: 'All Projects', href: '/admin/project/all' },
+];
 
 export default function Index({ pageTitle, projects }) {
     const rows = projects?.data ?? [];
 
     return (
         <AdminLayout pageTitle={pageTitle}>
+            <AdminStatusTabs tabs={STATUS_TABS} className="mb-3" />
+
             <div className="card shadow-sm">
                 <div className="table-responsive">
                     <table className="table table--light mb-0">

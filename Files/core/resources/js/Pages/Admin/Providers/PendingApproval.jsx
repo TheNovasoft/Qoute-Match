@@ -1,12 +1,17 @@
 import { Link, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
+import { FREELANCER_TABS, FreelancerSearch } from '@/Pages/Admin/Users/Index';
 
 export default function PendingApproval({ pageTitle, providers }) {
     const rows = providers?.data ?? [];
 
     return (
         <AdminLayout pageTitle={pageTitle}>
+            <AdminStatusTabs tabs={FREELANCER_TABS} className="mb-3" />
+            <FreelancerSearch />
+
             <div className="card shadow-sm">
                 <div className="table-responsive">
                     <table className="table table--light mb-0">

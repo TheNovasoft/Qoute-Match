@@ -13,7 +13,7 @@
     </div>
 
     <div class="submitRequired bg--warning form-change-alert d-none">
-        <i class="fas fa-exclamation-triangle"></i> @lang('You\'ve to click on the submit button to apply the changes')
+        <i class="fas fa-exclamation-triangle"></i> @lang('Click "Save Fields" to apply your changes.')
     </div>
 
     <div class="row mb-none-30">

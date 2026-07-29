@@ -4,10 +4,6 @@ import AdminLayout from '@/Components/Layout/AdminLayout';
 import CategoryTabs from '@/Components/Admin/CategoryTabs';
 import Pagination from '@/Components/Shared/Pagination';
 
-/**
- * WordPress-style categories:
- * Main category list → Edit Subcategories opens that parent's children.
- */
 export default function Index({ pageTitle, categories }) {
     const rows = categories?.data ?? [];
     const [editing, setEditing] = useState(null);
@@ -17,7 +13,7 @@ export default function Index({ pageTitle, categories }) {
             <div className="admin-categories admin-categories--wp">
                 <CategoryTabs active="categories" />
                 <p className="text-muted small mb-3">
-                    Add a main category, then use <strong>Edit Subcategories</strong> to manage its children — same idea as WordPress.
+                    Add a main category, then use <strong>Edit Subcategories</strong> to manage its children.
                     Use <strong>Form Builder</strong> to create request/quote forms, then assign them here.
                 </p>
 
@@ -245,11 +241,12 @@ function CategoryForm({ categories, editing, onCancel }) {
                         </select>
                     </div>
                     <div className="form-group mb-3">
-                        <label>Image{editing ? ' (optional)' : ''}</label>
+                        <label>Image{editing ? ' (optional)' : ' *'}</label>
                         <input
                             type="file"
                             className="form-control"
                             accept="image/*"
+                            required={!editing}
                             onChange={(e) => form.setData('image', e.target.files[0])}
                         />
                     </div>

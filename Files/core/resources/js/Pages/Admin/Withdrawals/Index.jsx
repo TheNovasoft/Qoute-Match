@@ -1,6 +1,14 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
+
+const STATUS_TABS = [
+    { key: 'pending', label: 'Pending', href: '/admin/withdraw/pending' },
+    { key: 'approved', label: 'Approved', href: '/admin/withdraw/approved' },
+    { key: 'rejected', label: 'Rejected', href: '/admin/withdraw/rejected' },
+    { key: 'all', label: 'All Withdrawals', href: '/admin/withdraw/all' },
+];
 
 export default function Index({ pageTitle, withdrawals }) {
     const rows = withdrawals?.data ?? [];
@@ -8,6 +16,8 @@ export default function Index({ pageTitle, withdrawals }) {
 
     return (
         <AdminLayout pageTitle={pageTitle}>
+            <AdminStatusTabs tabs={STATUS_TABS} className="mb-3" />
+
             {summary && (
                 <div className="row gy-3 mb-4">
                     {[
