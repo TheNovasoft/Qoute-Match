@@ -1519,11 +1519,20 @@ a {
   border-radius: 3.2px;
 }
 
-.btn:hover:hover,
-.btn:hover:active,
-.btn:hover:focus,
-.btn:hover:focus-visible {
+.btn:not(.admin-job-actions__btn):hover:hover,
+.btn:not(.admin-job-actions__btn):hover:active,
+.btn:not(.admin-job-actions__btn):hover:focus,
+.btn:not(.admin-job-actions__btn):hover:focus-visible {
   color: var(--btn-color) !important;
+}
+
+.btn.admin-job-actions__btn--primary:hover,
+.btn.admin-job-actions__btn--primary:hover:hover,
+.btn.admin-job-actions__btn--primary:hover:active,
+.btn.admin-job-actions__btn--primary:hover:focus,
+.btn.admin-job-actions__btn--primary:hover:focus-visible {
+  --btn-color: #0071e3 !important;
+  color: #0071e3 !important;
 }
 
 .btn i {
@@ -1561,6 +1570,20 @@ a {
 .btn--primary:focus,
 .btn--primary:focus-visible {
   --color: #1801ff;
+}
+
+.btn.btn--primary.btn-sm.admin-job-actions__btn.admin-job-actions__btn--primary:hover,
+.btn.btn--primary.btn-sm.admin-job-actions__btn.admin-job-actions__btn--primary:active,
+.btn.btn--primary.btn-sm.admin-job-actions__btn.admin-job-actions__btn--primary:focus,
+.btn.btn--primary.btn-sm.admin-job-actions__btn.admin-job-actions__btn--primary:focus-visible,
+.btn.btn--primary.btn-sm.admin-job-actions__btn.admin-job-actions__btn--primary:hover:focus,
+.btn.btn--primary.btn-sm.admin-job-actions__btn.admin-job-actions__btn--primary:hover:focus-visible {
+  --btn-color: #0071e3 !important;
+  --color: #0071e3 !important;
+  background-color: #fff !important;
+  border: 2px solid #0071e3 !important;
+  color: #0071e3 !important;
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
 }
 
 .btn-outline--primary {
@@ -9275,26 +9298,32 @@ body.admin-panel .admin-react-panel .table .avatar.avatar--sm img {
 a.btn.btn--primary.btn-sm.admin-job-actions__btn,
 .admin-job-actions__btn.admin-job-actions__btn--primary {
   border-width: 2px !important;
-  background-color: #4634ff !important;
-  border-color: #000000 !important;
+  background-color: #0071e3 !important;
+  border-color: #0071e3 !important;
   color: #fff !important;
 }
 
 a.btn.btn--primary.btn-sm.admin-job-actions__btn:hover,
 a.btn.btn--primary.btn-sm.admin-job-actions__btn:focus-visible,
+a.btn.btn--primary.btn-sm.admin-job-actions__btn:hover:focus,
+a.btn.btn--primary.btn-sm.admin-job-actions__btn:hover:focus-visible,
 .admin-job-actions__btn.admin-job-actions__btn--primary:hover,
-.admin-job-actions__btn.admin-job-actions__btn--primary:focus-visible {
+.admin-job-actions__btn.admin-job-actions__btn--primary:focus-visible,
+.admin-job-actions__btn.admin-job-actions__btn--primary:hover:focus,
+.admin-job-actions__btn.admin-job-actions__btn--primary:hover:focus-visible {
+  --btn-color: #0071e3 !important;
+  --color: #0071e3 !important;
   background-color: #fff !important;
-  border-color: #4634ff !important;
-  color: #4634ff !important;
-  box-shadow: 0 0 0 3px rgba(70, 52, 255, 0.12);
+  border: 2px solid #0071e3 !important;
+  color: #0071e3 !important;
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
 }
 
 a.btn.btn--primary.btn-sm.admin-job-actions__btn:hover i,
 a.btn.btn--primary.btn-sm.admin-job-actions__btn:focus-visible i,
 .admin-job-actions__btn.admin-job-actions__btn--primary:hover i,
 .admin-job-actions__btn.admin-job-actions__btn--primary:focus-visible i {
-  color: #4634ff !important;
+  color: #0071e3 !important;
 }
 
 /* Approve — success */
