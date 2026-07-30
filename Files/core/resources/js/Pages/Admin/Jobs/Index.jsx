@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminFilterBar from '@/Components/Admin/AdminFilterBar';
 import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
 
@@ -16,10 +17,26 @@ const STATUS_TABS = [
 
 export default function Index({ pageTitle, jobs }) {
     const rows = jobs?.data ?? [];
+    const scope = jobs?.scope || 'all';
+    const filterUrl = {
+        approved: '/admin/jobs/approved',
+        pending: '/admin/jobs/pending',
+        rejected: '/admin/jobs/rejected',
+        published: '/admin/jobs/published',
+        drafted: '/admin/jobs/drafted',
+        processing: '/admin/jobs/processing',
+        completed: '/admin/jobs/completed',
+        all: '/admin/jobs/list',
+    }[scope] || '/admin/jobs/list';
 
     return (
         <AdminLayout pageTitle={pageTitle}>
-            <AdminStatusTabs tabs={STATUS_TABS} active={jobs.scope} className="mb-3" />
+            <AdminStatusTabs tabs={STATUS_TABS} active={scope} className="mb-3" />
+
+            <AdminFilterBar
+                actionUrl={filterUrl}
+                searchPlaceholder="Search title, customer, category…"
+            />
 
             <div className="card shadow-sm admin-jobs-card">
                 <div className="admin-mobile-cards d-lg-none">

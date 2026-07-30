@@ -246,12 +246,18 @@ class StructuredReviewService
     public static function reviewPayload(Review $review): array
     {
         $scores = is_array($review->scores) ? $review->scores : [];
+        $dimensions = [];
+        try {
+            $dimensions = ReviewDimension::all();
+        } catch (\Throwable $e) {
+            $dimensions = [];
+        }
 
         return [
             'id' => $review->id,
-            'rating' => (int) $review->rating,
-            'review' => __($review->review),
-            'scores' => collect(ReviewDimension::all())->mapWithKeys(function ($label, $key) use ($scores) {
+            'rating' => (int) ($review->rating ?? 0),
+            'review' => __($review->review ?? ''),
+            'scores' => collect($dimensions)->mapWithKeys(function ($label, $key) use ($scores) {
                 return [$key => [
                     'label' => $label,
                     'score' => (int) ($scores[$key] ?? 0),

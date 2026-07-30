@@ -33,11 +33,11 @@ export default function Detail({ pageTitle, job }) {
                 <AdminBackLink href={job.indexUrl} />
             </div>
 
-            <div className="row gy-4">
+            <div className="row gy-4 admin-job-detail">
                 <div className="col-lg-8">
-                    <div className="card shadow-sm">
-                        <div className="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <h5 className="mb-0">{job.title}</h5>
+                    <div className="card shadow-sm border-0" style={{ borderRadius: 18, border: '1px solid #d2d2d7' }}>
+                        <div className="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2" style={{ borderBottom: '1px solid #d2d2d7' }}>
+                            <h5 className="mb-0" style={{ fontWeight: 600, letterSpacing: '-0.02em', color: '#1d1d1f' }}>{job.title}</h5>
                             <div className="d-flex gap-2">
                                 <span className={job.status.class}>{job.status.label}</span>
                                 <span className={job.approval.class}>{job.approval.label}</span>
@@ -109,11 +109,11 @@ export default function Detail({ pageTitle, job }) {
                                 }}
                                 onMouseEnter={(e) => {
                                     const s = e.currentTarget.style;
-                                    s.setProperty('background', '#005bb5', 'important');
-                                    s.setProperty('border-color', '#000', 'important');
-                                    s.setProperty('color', '#fff', 'important');
+                                    s.setProperty('background', '#fff', 'important');
+                                    s.setProperty('border-color', '#0071e3', 'important');
+                                    s.setProperty('color', '#0071e3', 'important');
                                     const icon = e.currentTarget.querySelector('i');
-                                    if (icon) icon.style.setProperty('color', '#fff', 'important');
+                                    if (icon) icon.style.setProperty('color', '#0071e3', 'important');
                                 }}
                                 onMouseLeave={(e) => {
                                     const s = e.currentTarget.style;

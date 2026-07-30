@@ -286,6 +286,11 @@ class AdminResource
     {
         return [
             'jobId' => $jobId,
+            'filters' => [
+                'search' => request('search'),
+                'status' => request()->has('status') ? request('status') : null,
+                'date' => request('date'),
+            ],
             'data' => collect($paginator->items())->map(fn (Bid $bid) => self::bidRow($bid))->values()->all(),
             'links' => $paginator->linkCollection()->toArray(),
             'meta' => self::paginationMeta($paginator),
@@ -392,12 +397,12 @@ class AdminResource
             'id' => (int) $review->id,
             'rating' => $payload['rating'],
             'review' => $payload['review'],
-            'scores' => array_values($payload['scores']),
+            'scores' => array_values($payload['scores'] ?? []),
             'status' => self::reviewStatus((int) $review->status),
             'isVerified' => $isVerified,
             'investigation' => [
-                'status' => (int) $review->investigation_status,
-                'label' => StructuredReviewService::investigationLabel((int) $review->investigation_status),
+                'status' => (int) ($review->investigation_status ?? 0),
+                'label' => StructuredReviewService::investigationLabel((int) ($review->investigation_status ?? 0)),
             ],
             'adminNote' => $review->admin_note,
             'providerComplaint' => $review->provider_complaint,
@@ -1190,16 +1195,22 @@ class AdminResource
     {
         $routes = self::ticketScopeRoutes();
         $scope = isset($routes[$scope]) ? $scope : 'all';
+        $priorityMap = [1 => 'Low', 2 => 'Medium', 3 => 'High'];
 
         return [
             'scope' => $scope,
+            'filters' => [
+                'search' => request('search'),
+                'priority' => request('priority'),
+                'date' => request('date'),
+            ],
             'data' => collect($paginator->items())->map(fn (SupportTicket $ticket) => [
                 'id' => (int) $ticket->id,
                 'ticket' => $ticket->ticket,
                 'name' => $ticket->name,
                 'subject' => strLimit($ticket->subject, 50),
                 'status' => self::ticketStatus((int) $ticket->status),
-                'priority' => $ticket->priority,
+                'priority' => $priorityMap[(int) $ticket->priority] ?? $ticket->priority,
                 'createdAt' => showDateTime($ticket->created_at),
                 'detailUrl' => self::withScopeQuery(route('admin.ticket.view', $ticket->id), $scope),
             ])->values()->all(),
@@ -1219,13 +1230,28 @@ class AdminResource
             'status' => self::ticketStatus((int) $ticket->status),
             'name' => $ticket->name,
             'email' => $ticket->email,
-            'messages' => collect($messages)->map(fn (SupportMessage $msg) => [
-                'id' => (int) $msg->id,
-                'message' => $msg->message,
-                'isAdmin' => (bool) $msg->admin_id,
-                'createdAt' => showDateTime($msg->created_at),
-                'deleteUrl' => route('admin.ticket.delete', $msg->id),
-            ])->values()->all(),
+            'messages' => collect($messages)->map(function (SupportMessage $msg) {
+                return [
+                    'id' => (int) $msg->id,
+                    'message' => $msg->message,
+                    'isAdmin' => (bool) $msg->admin_id,
+                    'createdAt' => showDateTime($msg->created_at),
+                    'deleteUrl' => route('admin.ticket.delete', $msg->id),
+                    'attachments' => collect($msg->attachments ?? [])->map(function ($attachment) {
+                        $ext = strtolower((string) pathinfo($attachment->attachment, PATHINFO_EXTENSION));
+                        $isImage = in_array($ext, ['jpg', 'jpeg', 'png'], true);
+                        $relative = getFilePath('ticket') . '/' . ($isImage ? $attachment->attachment : 'doc_type.png');
+
+                        return [
+                            'id' => (int) $attachment->id,
+                            'name' => $attachment->attachment,
+                            'downloadUrl' => route('admin.ticket.download', encrypt($attachment->id)),
+                            'previewImage' => getImage($relative),
+                            'size' => fileSizeInB(public_path(getFilePath('ticket') . '/' . $attachment->attachment)),
+                        ];
+                    })->values()->all(),
+                ];
+            })->values()->all(),
             'isClosed' => (int) $ticket->status === Status::TICKET_CLOSE,
             'actions' => [
                 'replyUrl' => route('admin.ticket.reply', $ticket->id),

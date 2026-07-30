@@ -69,9 +69,20 @@ export function syncAdminSidebar(pathname = window.location.pathname) {
 }
 
 export function bindAdminSidebarSync(router) {
-    const run = () => syncAdminSidebar(window.location.pathname);
+    const run = (event) => {
+        const url = event?.detail?.page?.url || window.location.href;
+        let path = window.location.pathname;
+        try {
+            path = new URL(url, window.location.origin).pathname;
+        } catch (_) {
+            // keep pathname fallback
+        }
+        requestAnimationFrame(() => syncAdminSidebar(path));
+    };
+
     run();
     if (!router?.on) return;
     router.on('navigate', run);
+    router.on('success', run);
     router.on('finish', run);
 }

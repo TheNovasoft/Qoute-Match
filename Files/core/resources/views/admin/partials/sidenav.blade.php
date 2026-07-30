@@ -102,10 +102,13 @@
 
 @push('script')
     <script>
-        if ($('li').hasClass('active')) {
-            $('.sidebar__menu-wrapper').animate({
-                scrollTop: eval($(".active").offset().top - 320)
-            }, 500);
-        }
+        // Keep active item visible without animated jump
+        (function () {
+            var active = document.querySelector('.sidebar .sidebar-menu-item.active');
+            var wrap = document.querySelector('.sidebar__menu-wrapper');
+            if (!active || !wrap) return;
+            var top = active.offsetTop - 120;
+            if (top > 0) wrap.scrollTop = top;
+        })();
     </script>
 @endpush

@@ -20,6 +20,7 @@ router.on('error', (errors) => {
     console.error('Inertia navigation error:', errors);
 });
 
+// Sync Blade sidebar active state with Inertia top-nav / sidebar clicks
 bindAdminSidebarSync(router);
 
 createInertiaApp({

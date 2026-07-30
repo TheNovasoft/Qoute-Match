@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminFilterBar from '@/Components/Admin/AdminFilterBar';
 import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
 
@@ -13,10 +14,17 @@ const STATUS_TABS = [
 
 export default function Index({ pageTitle, reviews }) {
     const rows = reviews?.data ?? [];
+    const status = reviews?.status || 'pending';
+    const filterUrl = `/admin/reviews/${status}`;
 
     return (
         <AdminLayout pageTitle={pageTitle}>
-            <AdminStatusTabs tabs={STATUS_TABS} active={reviews.status} className="mb-3" />
+            <AdminStatusTabs tabs={STATUS_TABS} active={status} className="mb-3" />
+
+            <AdminFilterBar
+                actionUrl={filterUrl}
+                searchPlaceholder="Search provider / customer…"
+            />
 
             <div className="card shadow-sm">
                 <div className="table-responsive">
@@ -43,7 +51,7 @@ export default function Index({ pageTitle, reviews }) {
                                     <td>{row.buyerUsername}</td>
                                     <td>{row.jobTitle}</td>
                                     <td>{row.createdAt}</td>
-                                    <td><span className={row.status.class}>{row.status.label}</span></td>
+                                    <td><span className={row.status?.class}>{row.status?.label}</span></td>
                                     <td className="small">
                                         {row.isVerified && <span className="badge badge--success me-1">Verified</span>}
                                         {row.investigation?.status > 0 && (

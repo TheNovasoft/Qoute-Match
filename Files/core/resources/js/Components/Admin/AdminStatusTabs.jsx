@@ -83,6 +83,8 @@ export default function AdminStatusTabs({ tabs = [], active, className = '' }) {
                         {tab.label}
                         {tab.badge != null && tab.badge !== '' ? (
                             <span className="admin-status-tabs__badge">{tab.badge}</span>
+                        ) : tab.count != null && Number(tab.count) > 0 ? (
+                            <span className="admin-status-tabs__badge">{tab.count}</span>
                         ) : null}
                     </Link>
                 );

@@ -1526,6 +1526,15 @@ a {
   color: var(--btn-color) !important;
 }
 
+.btn.admin-job-actions__btn--primary:hover,
+.btn.admin-job-actions__btn--primary:hover:hover,
+.btn.admin-job-actions__btn--primary:hover:active,
+.btn.admin-job-actions__btn--primary:hover:focus,
+.btn.admin-job-actions__btn--primary:hover:focus-visible {
+  --btn-color: #0071e3 !important;
+  color: #0071e3 !important;
+}
+
 .btn i {
   margin-right: 5px;
 }
@@ -1561,6 +1570,20 @@ a {
 .btn--primary:focus,
 .btn--primary:focus-visible {
   --color: #1801ff;
+}
+
+.btn.btn--primary.btn-sm.admin-job-actions__btn.admin-job-actions__btn--primary:hover,
+.btn.btn--primary.btn-sm.admin-job-actions__btn.admin-job-actions__btn--primary:active,
+.btn.btn--primary.btn-sm.admin-job-actions__btn.admin-job-actions__btn--primary:focus,
+.btn.btn--primary.btn-sm.admin-job-actions__btn.admin-job-actions__btn--primary:focus-visible,
+.btn.btn--primary.btn-sm.admin-job-actions__btn.admin-job-actions__btn--primary:hover:focus,
+.btn.btn--primary.btn-sm.admin-job-actions__btn.admin-job-actions__btn--primary:hover:focus-visible {
+  --btn-color: #0071e3 !important;
+  --color: #0071e3 !important;
+  background-color: #fff !important;
+  border: 2px solid #0071e3 !important;
+  color: #0071e3 !important;
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
 }
 
 .btn-outline--primary {
@@ -9299,34 +9322,35 @@ body.admin-panel .admin-react-panel .table .avatar.avatar--sm img {
 a.btn.admin-job-actions__btn,
 .admin-job-actions__btn.admin-job-actions__btn--primary,
 a.btn.btn--primary.btn-sm.admin-job-actions__btn,
-a.btn.btn--primary.btn-sm.admin-job-actions__btn:hover,
-a.btn.btn--primary.btn-sm.admin-job-actions__btn:focus,
-a.btn.btn--primary.btn-sm.admin-job-actions__btn:focus-visible,
-a.btn.btn--primary.btn-sm.admin-job-actions__btn:hover:hover,
-.admin-job-actions__btn.admin-job-actions__btn--primary:hover,
-.admin-job-actions__btn.admin-job-actions__btn--primary:focus,
-.admin-job-actions__btn.admin-job-actions__btn--primary:focus-visible {
-  --btn-color: #fff !important;
-  --color: #0071e3 !important;
+.admin-job-actions__btn.admin-job-actions__btn--primary {
+  border-width: 2px !important;
   background-color: #0071e3 !important;
-  border: 2px solid #000 !important;
+  border-color: #0071e3 !important;
   color: #fff !important;
   box-shadow: none;
 }
 
 a.btn.btn--primary.btn-sm.admin-job-actions__btn:hover,
-.admin-job-actions__btn.admin-job-actions__btn--primary:hover {
-  background-color: #005bb5 !important;
-  color: #fff !important;
+a.btn.btn--primary.btn-sm.admin-job-actions__btn:focus-visible,
+a.btn.btn--primary.btn-sm.admin-job-actions__btn:hover:focus,
+a.btn.btn--primary.btn-sm.admin-job-actions__btn:hover:focus-visible,
+.admin-job-actions__btn.admin-job-actions__btn--primary:hover,
+.admin-job-actions__btn.admin-job-actions__btn--primary:focus-visible,
+.admin-job-actions__btn.admin-job-actions__btn--primary:hover:focus,
+.admin-job-actions__btn.admin-job-actions__btn--primary:hover:focus-visible {
+  --btn-color: #0071e3 !important;
+  --color: #0071e3 !important;
+  background-color: #fff !important;
+  border: 2px solid #0071e3 !important;
+  color: #0071e3 !important;
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
 }
 
 a.btn.btn--primary.btn-sm.admin-job-actions__btn:hover i,
 a.btn.btn--primary.btn-sm.admin-job-actions__btn:focus-visible i,
 .admin-job-actions__btn.admin-job-actions__btn--primary:hover i,
-.admin-job-actions__btn.admin-job-actions__btn--primary:focus-visible i,
-a.btn.btn--primary.btn-sm.admin-job-actions__btn:hover i::before,
-.admin-job-actions__btn.admin-job-actions__btn--primary:hover i::before {
-  color: #fff !important;
+.admin-job-actions__btn.admin-job-actions__btn--primary:focus-visible i {
+  color: #0071e3 !important;
 }
 
 /* Back buttons — stay readable on hover */

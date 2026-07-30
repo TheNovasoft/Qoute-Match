@@ -23,26 +23,34 @@ class SupportTicketController extends Controller
 
     public function tickets()
     {
-        return $this->renderTicketList('Support Tickets', SupportTicket::searchable(['name','subject','ticket'])->orderBy('id','desc')->with('user')->paginate(getPaginate()), 'all');
+        return $this->renderTicketList('Support Tickets', 'all', SupportTicket::query());
     }
 
     public function pendingTicket()
     {
-        return $this->renderTicketList('Pending Tickets', SupportTicket::searchable(['name','subject','ticket'])->pending()->orderBy('id','desc')->with('user')->paginate(getPaginate()), 'pending');
+        return $this->renderTicketList('Pending Tickets', 'pending', SupportTicket::pending());
     }
 
     public function closedTicket()
     {
-        return $this->renderTicketList('Closed Tickets', SupportTicket::searchable(['name','subject','ticket'])->closed()->orderBy('id','desc')->with('user')->paginate(getPaginate()), 'closed');
+        return $this->renderTicketList('Closed Tickets', 'closed', SupportTicket::closed());
     }
 
     public function answeredTicket()
     {
-        return $this->renderTicketList('Answered Tickets', SupportTicket::searchable(['name','subject','ticket'])->orderBy('id','desc')->with('user')->answered()->paginate(getPaginate()), 'answered');
+        return $this->renderTicketList('Answered Tickets', 'answered', SupportTicket::answered());
     }
 
-    protected function renderTicketList(string $pageTitle, $items, string $scope = 'all')
+    protected function renderTicketList(string $pageTitle, string $scope, $query)
     {
+        $items = $query
+            ->searchable(['name', 'subject', 'ticket'])
+            ->filter(['priority', 'status'])
+            ->dateFilter()
+            ->orderBy('id', 'desc')
+            ->with('user')
+            ->paginate(getPaginate());
+
         return Inertia::render('Admin/Support/Index', [
             'pageTitle' => $pageTitle,
             'tickets' => AdminResource::supportTickets($items, $scope),
@@ -51,7 +59,7 @@ class SupportTicketController extends Controller
 
     public function ticketReply($id)
     {
-        $ticket = SupportTicket::with('user')->where('id', $id)->firstOrFail();
+        $ticket = SupportTicket::with(['user', 'buyer'])->where('id', $id)->firstOrFail();
         $pageTitle = 'Reply Ticket';
         $messages = SupportMessage::with('ticket','admin','attachments')->where('support_ticket_id', $ticket->id)->orderBy('id','desc')->get();
 
@@ -64,7 +72,7 @@ class SupportTicketController extends Controller
     public function ticketDelete($id)
     {
         $message = SupportMessage::findOrFail($id);
-        $path = getFilePath('ticket');
+        $path = public_path(getFilePath('ticket'));
         if ($message->attachments()->count() > 0) {
             foreach ($message->attachments as $attachment) {
                 fileManager()->removeFile($path.'/'.$attachment->attachment);

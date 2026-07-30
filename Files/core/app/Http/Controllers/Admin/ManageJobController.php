@@ -86,7 +86,7 @@ class ManageJobController extends Controller
     public function detail($id)
     {
         $job = Job::with(['skills', 'buyer', 'category', 'subcategory'])->findOrFail($id);
-        $pageTitle = 'Job Detail of Buyer - ' . $job->buyer->fullname;
+        $pageTitle = 'Job Detail' . ($job->buyer?->fullname ? ' — ' . $job->buyer->fullname : '');
 
         $widget['total_bid'] = (clone $job)->bids()->count();
         $widget['total_interview'] = (clone $job)->interviews;

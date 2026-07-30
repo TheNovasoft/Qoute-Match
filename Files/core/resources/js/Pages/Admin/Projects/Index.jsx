@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminFilterBar from '@/Components/Admin/AdminFilterBar';
 import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
 
@@ -15,10 +16,25 @@ const STATUS_TABS = [
 
 export default function Index({ pageTitle, projects }) {
     const rows = projects?.data ?? [];
+    const scope = projects?.scope || 'all';
+    const filterUrl = {
+        running: '/admin/project/running',
+        reviewing: '/admin/project/reviewing',
+        reported: '/admin/project/reported',
+        completed: '/admin/project/completed',
+        rejected: '/admin/project/rejected',
+        partial: '/admin/project/partial/completed',
+        all: '/admin/project/all',
+    }[scope] || '/admin/project/all';
 
     return (
         <AdminLayout pageTitle={pageTitle}>
-            <AdminStatusTabs tabs={STATUS_TABS} className="mb-3" />
+            <AdminStatusTabs tabs={STATUS_TABS} active={scope} className="mb-3" />
+
+            <AdminFilterBar
+                actionUrl={filterUrl}
+                searchPlaceholder="Search projects…"
+            />
 
             <div className="card shadow-sm">
                 <div className="table-responsive">
@@ -45,14 +61,18 @@ export default function Index({ pageTitle, projects }) {
                                     <td>{row.amount}</td>
                                     <td><span className={row.status.class}>{row.status.label}</span></td>
                                     <td>{row.createdAt}</td>
-                                    <td><Link href={row.detailUrl} className="btn btn-sm btn-outline--primary">Details</Link></td>
+                                    <td>
+                                        <Link href={row.detailUrl} className="btn btn-sm btn-outline--primary">Details</Link>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
                 {projects?.links?.length > 3 && (
-                    <div className="card-footer"><Pagination links={projects.links} /></div>
+                    <div className="card-footer">
+                        <Pagination links={projects.links} />
+                    </div>
                 )}
             </div>
         </AdminLayout>

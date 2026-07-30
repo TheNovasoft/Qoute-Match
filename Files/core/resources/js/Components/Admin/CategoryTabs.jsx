@@ -2,14 +2,15 @@ import { usePage } from '@inertiajs/react';
 import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 
 const TABS = [
-    { key: 'categories', label: 'Categories', href: '/admin/category/index', match: ['/admin/category/index'] },
+    { key: 'categories', label: 'Categories', href: '/admin/category/index', match: ['/admin/category/index', '/admin/category'] },
     { key: 'subcategories', label: 'Subcategories', href: '/admin/category/subcategories', match: ['/admin/category/subcategories'] },
     { key: 'skills', label: 'Skills', href: '/admin/category/skills', match: ['/admin/category/skills'] },
     { key: 'forms', label: 'Form Builder', href: '/admin/marketplace-forms', match: ['/admin/marketplace-forms'] },
 ];
 
 export default function CategoryTabs({ active }) {
-    const url = usePage().url || '';
+    const rawUrl = usePage().url || '';
+    const url = rawUrl.split('?')[0];
 
     const resolvedActive = active
         || TABS.find((tab) => tab.match.some((path) => url.startsWith(path)))?.key
