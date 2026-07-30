@@ -1,5 +1,6 @@
 import { Link, router, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminBackLink from '@/Components/Admin/AdminBackLink';
 
 export default function Detail({ pageTitle, review }) {
     const approveForm = useForm({});
@@ -12,19 +13,10 @@ export default function Detail({ pageTitle, review }) {
     });
     const replyForm = useForm({ admin_reply: review.adminReply ?? '' });
 
-    const goBack = (e) => {
-        e.preventDefault();
-        if (window.history.length > 1) {
-            window.history.back();
-            return;
-        }
-        router.visit(review.indexUrl);
-    };
-
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="mb-3">
-                <Link href={review.indexUrl} onClick={goBack} className="btn btn-sm btn-outline--dark admin-back-btn">← Back</Link>
+                <AdminBackLink href={review.indexUrl} />
             </div>
 
             <div className="row gy-4">

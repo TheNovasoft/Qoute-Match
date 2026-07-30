@@ -103,9 +103,12 @@ class AdminResource
 
     public static function disputes(LengthAwarePaginator $paginator, string $status): array
     {
+        $routes = self::disputeScopeRoutes();
+        $status = isset($routes[$status]) ? $status : 'active';
+
         return [
             'status' => $status,
-            'data' => collect($paginator->items())->map(fn (Dispute $dispute) => self::disputeRow($dispute))->values()->all(),
+            'data' => collect($paginator->items())->map(fn (Dispute $dispute) => self::disputeRow($dispute, $status))->values()->all(),
             'links' => $paginator->linkCollection()->toArray(),
             'meta' => [
                 'current_page' => $paginator->currentPage(),
@@ -116,8 +119,11 @@ class AdminResource
         ];
     }
 
-    public static function disputeRow(Dispute $dispute): array
+    public static function disputeRow(Dispute $dispute, string $status = 'active'): array
     {
+        $routes = self::disputeScopeRoutes();
+        $status = isset($routes[$status]) ? $status : 'active';
+
         return [
             'id' => (int) $dispute->id,
             'subject' => strLimit($dispute->subject, 45),
@@ -128,12 +134,14 @@ class AdminResource
             'raisedBy' => ucfirst($dispute->raised_by),
             'createdAt' => showDateTime($dispute->created_at),
             'status' => self::disputeStatus((int) $dispute->status),
-            'detailUrl' => route('admin.disputes.detail', $dispute->id),
+            'detailUrl' => self::withScopeQuery(route('admin.disputes.detail', $dispute->id), $status, 'status'),
         ];
     }
 
     public static function disputeDetail(Dispute $dispute): array
     {
+        $routes = self::disputeScopeRoutes();
+
         return [
             'id' => (int) $dispute->id,
             'subject' => $dispute->subject,
@@ -172,7 +180,7 @@ class AdminResource
                 'resolveUrl' => route('admin.disputes.resolve', $dispute->id),
                 'rejectUrl' => route('admin.disputes.reject', $dispute->id),
             ],
-            'indexUrl' => route('admin.disputes.index'),
+            'indexUrl' => self::listReturnUrl($routes, $routes['active'], 'status'),
             'dashboardUrl' => route('admin.marketplace.dashboard'),
         ];
     }
@@ -224,9 +232,17 @@ class AdminResource
         $allowedScopes = ['all', 'approved', 'pending', 'rejected', 'published', 'drafted', 'processing', 'completed'];
         $scope = request()->get('scope', 'all');
         $scope = in_array($scope, $allowedScopes, true) ? $scope : 'all';
-        $indexUrl = $scope === 'all'
-            ? route('admin.jobs.index')
-            : route('admin.jobs.' . $scope);
+        $scopeRoutes = [
+            'all' => route('admin.jobs.index'),
+            'approved' => route('admin.jobs.approved'),
+            'pending' => route('admin.jobs.pending'),
+            'rejected' => route('admin.jobs.rejected'),
+            'published' => route('admin.jobs.published'),
+            'drafted' => route('admin.jobs.drafted'),
+            'processing' => route('admin.jobs.processing'),
+            'completed' => route('admin.jobs.completed'),
+        ];
+        $indexUrl = self::listReturnUrl($scopeRoutes, $scopeRoutes['all']);
 
         return [
             'id' => (int) $job->id,
@@ -486,9 +502,9 @@ class AdminResource
             'username' => $user->username,
             'email' => $user->email,
             'country' => $user->country_name,
-            'profileComplete' => (bool) $user->work_profile_complete,
+            'profileComplete' => (int) $user->work_profile_complete === Status::YES,
             'joinedAt' => showDateTime($user->created_at),
-            'detailUrl' => route('admin.users.detail', $user->id),
+            'detailUrl' => self::withScopeQuery(route('admin.users.detail', $user->id), 'pending_approval'),
             'approveUrl' => route('admin.users.approve.provider', $user->id),
         ];
     }
@@ -500,6 +516,129 @@ class AdminResource
             'last_page' => $paginator->lastPage(),
             'per_page' => $paginator->perPage(),
             'total' => $paginator->total(),
+        ];
+    }
+
+    /**
+     * Resolve the list URL for a detail "Back" action.
+     * Prefer ?scope= from the detail URL, else a matching previous list URL, else $default.
+     *
+     * @param  array<string, string>  $scopeRoutes
+     */
+    protected static function listReturnUrl(array $scopeRoutes, string $default, string $queryKey = 'scope'): string
+    {
+        $scope = (string) request()->query($queryKey, '');
+        if ($scope !== '' && isset($scopeRoutes[$scope])) {
+            return $scopeRoutes[$scope];
+        }
+
+        $previous = url()->previous();
+        $current = url()->current();
+        if ($previous && $previous !== $current) {
+            $prevPath = rtrim((string) (parse_url($previous, PHP_URL_PATH) ?: ''), '/');
+            foreach ($scopeRoutes as $url) {
+                $listPath = rtrim((string) (parse_url($url, PHP_URL_PATH) ?: ''), '/');
+                if ($listPath !== '' && $prevPath === $listPath) {
+                    return $previous;
+                }
+            }
+        }
+
+        return $default;
+    }
+
+    protected static function withScopeQuery(string $url, string $scope, string $queryKey = 'scope'): string
+    {
+        if ($scope === '') {
+            return $url;
+        }
+
+        return $url . (str_contains($url, '?') ? '&' : '?') . $queryKey . '=' . urlencode($scope);
+    }
+
+    protected static function projectScopeRoutes(): array
+    {
+        return [
+            'running' => route('admin.project.running'),
+            'reviewing' => route('admin.project.reviewing'),
+            'reported' => route('admin.project.reported'),
+            'completed' => route('admin.project.completed'),
+            'rejected' => route('admin.project.rejected'),
+            'partial' => route('admin.project.partial.complete.list'),
+            'all' => route('admin.project.index'),
+        ];
+    }
+
+    protected static function depositScopeRoutes(): array
+    {
+        return [
+            'pending' => route('admin.deposit.pending'),
+            'approved' => route('admin.deposit.approved'),
+            'successful' => route('admin.deposit.successful'),
+            'rejected' => route('admin.deposit.rejected'),
+            'initiated' => route('admin.deposit.initiated'),
+            'all' => route('admin.deposit.list'),
+        ];
+    }
+
+    protected static function withdrawalScopeRoutes(): array
+    {
+        return [
+            'pending' => route('admin.withdraw.data.pending'),
+            'approved' => route('admin.withdraw.data.approved'),
+            'rejected' => route('admin.withdraw.data.rejected'),
+            'all' => route('admin.withdraw.data.all'),
+        ];
+    }
+
+    protected static function buyerScopeRoutes(): array
+    {
+        return [
+            'active' => route('admin.buyers.active'),
+            'banned' => route('admin.buyers.banned'),
+            'email_unverified' => route('admin.buyers.email.unverified'),
+            'mobile_unverified' => route('admin.buyers.mobile.unverified'),
+            'kyc_unverified' => route('admin.buyers.kyc.unverified'),
+            'kyc_pending' => route('admin.buyers.kyc.pending'),
+            'with_balance' => route('admin.buyers.with.balance'),
+            'all' => route('admin.buyers.index'),
+        ];
+    }
+
+    protected static function freelancerScopeRoutes(): array
+    {
+        return [
+            'active' => route('admin.users.active'),
+            'incomplete' => route('admin.users.incomplete.profile'),
+            'pending_approval' => route('admin.users.pending.approval'),
+            'banned' => route('admin.users.banned'),
+            'email_unverified' => route('admin.users.email.unverified'),
+            'mobile_unverified' => route('admin.users.mobile.unverified'),
+            'kyc_unverified' => route('admin.users.kyc.unverified'),
+            'kyc_pending' => route('admin.users.kyc.pending'),
+            'with_balance' => route('admin.users.with.balance'),
+            'all' => route('admin.users.all'),
+        ];
+    }
+
+    protected static function ticketScopeRoutes(): array
+    {
+        return [
+            'pending' => route('admin.ticket.pending'),
+            'closed' => route('admin.ticket.closed'),
+            'answered' => route('admin.ticket.answered'),
+            'all' => route('admin.ticket.index'),
+        ];
+    }
+
+    protected static function disputeScopeRoutes(): array
+    {
+        return [
+            'active' => route('admin.disputes.index', ['status' => 'active']),
+            'open' => route('admin.disputes.index', ['status' => 'open']),
+            'in_review' => route('admin.disputes.index', ['status' => 'in_review']),
+            'resolved' => route('admin.disputes.index', ['status' => 'resolved']),
+            'rejected' => route('admin.disputes.index', ['status' => 'rejected']),
         ];
     }
 
@@ -650,32 +789,41 @@ class AdminResource
         ];
     }
 
-    public static function users(LengthAwarePaginator $paginator): array
+    public static function users(LengthAwarePaginator $paginator, string $scope = 'all'): array
     {
+        $routes = self::freelancerScopeRoutes();
+        $scope = isset($routes[$scope]) ? $scope : 'all';
+
         return [
-            'data' => collect($paginator->items())->map(fn (User $user) => self::userRow($user))->values()->all(),
+            'scope' => $scope,
+            'data' => collect($paginator->items())->map(fn (User $user) => self::userRow($user, $scope))->values()->all(),
             'links' => $paginator->linkCollection()->toArray(),
             'meta' => self::paginationMeta($paginator),
         ];
     }
 
-    public static function userRow(User $user): array
+    public static function userRow(User $user, string $scope = 'all'): array
     {
+        $routes = self::freelancerScopeRoutes();
+        $scope = isset($routes[$scope]) ? $scope : 'all';
+
         return [
             'id' => (int) $user->id,
             'fullname' => $user->fullname,
             'username' => $user->username,
             'email' => $user->email,
             'balance' => showAmount($user->balance),
-            'providerApproved' => (bool) $user->provider_approved,
-            'profileComplete' => (bool) $user->work_profile_complete,
+            'providerApproved' => (int) $user->provider_approved === 1 || $user->provider_approved === true,
+            'profileComplete' => (int) $user->work_profile_complete === Status::YES,
             'joinedAt' => showDateTime($user->created_at),
-            'detailUrl' => route('admin.users.detail', $user->id),
+            'detailUrl' => self::withScopeQuery(route('admin.users.detail', $user->id), $scope),
         ];
     }
 
     public static function userDetail(User $user, array $stats): array
     {
+        $routes = self::freelancerScopeRoutes();
+
         return [
             'id' => (int) $user->id,
             'fullname' => $user->fullname,
@@ -685,8 +833,8 @@ class AdminResource
             'country' => $user->country_name,
             'balance' => showAmount($user->balance),
             'leadCredits' => (int) ($user->lead_credits ?? 0),
-            'providerApproved' => (bool) $user->provider_approved,
-            'profileComplete' => (bool) $user->work_profile_complete,
+            'providerApproved' => (int) $user->provider_approved === 1 || $user->provider_approved === true,
+            'profileComplete' => (int) $user->work_profile_complete === Status::YES,
             'kycStatus' => self::kycStatus((int) $user->kv),
             'joinedAt' => showDateTime($user->created_at),
             'stats' => [
@@ -705,21 +853,28 @@ class AdminResource
             'pendingVerifications' => $user->providerVerifications
                 ? $user->providerVerifications->where('status', Status::VERIFICATION_PENDING)->count()
                 : 0,
-            'indexUrl' => route('admin.users.all'),
+            'indexUrl' => self::listReturnUrl($routes, $routes['all']),
         ];
     }
 
-    public static function buyers(LengthAwarePaginator $paginator): array
+    public static function buyers(LengthAwarePaginator $paginator, string $scope = 'all'): array
     {
+        $routes = self::buyerScopeRoutes();
+        $scope = isset($routes[$scope]) ? $scope : 'all';
+
         return [
-            'data' => collect($paginator->items())->map(fn (Buyer $buyer) => self::buyerRow($buyer))->values()->all(),
+            'scope' => $scope,
+            'data' => collect($paginator->items())->map(fn (Buyer $buyer) => self::buyerRow($buyer, $scope))->values()->all(),
             'links' => $paginator->linkCollection()->toArray(),
             'meta' => self::paginationMeta($paginator),
         ];
     }
 
-    public static function buyerRow(Buyer $buyer): array
+    public static function buyerRow(Buyer $buyer, string $scope = 'all'): array
     {
+        $routes = self::buyerScopeRoutes();
+        $scope = isset($routes[$scope]) ? $scope : 'all';
+
         return [
             'id' => (int) $buyer->id,
             'fullname' => $buyer->fullname,
@@ -728,12 +883,14 @@ class AdminResource
             'balance' => showAmount($buyer->balance),
             'jobsCount' => (int) ($buyer->jobs_count ?? 0),
             'joinedAt' => showDateTime($buyer->created_at),
-            'detailUrl' => route('admin.buyers.detail', $buyer->id),
+            'detailUrl' => self::withScopeQuery(route('admin.buyers.detail', $buyer->id), $scope),
         ];
     }
 
     public static function buyerDetail(Buyer $buyer, array $stats): array
     {
+        $routes = self::buyerScopeRoutes();
+
         return [
             'id' => (int) $buyer->id,
             'fullname' => $buyer->fullname,
@@ -752,7 +909,7 @@ class AdminResource
             'actions' => [
                 'kycUrl' => route('admin.buyers.kyc.details', $buyer->id),
             ],
-            'indexUrl' => route('admin.buyers.index'),
+            'indexUrl' => self::listReturnUrl($routes, $routes['all']),
         ];
     }
 
@@ -814,10 +971,14 @@ class AdminResource
         ];
     }
 
-    public static function deposits(LengthAwarePaginator $paginator, ?array $summary = null): array
+    public static function deposits(LengthAwarePaginator $paginator, ?array $summary = null, string $scope = 'all'): array
     {
+        $routes = self::depositScopeRoutes();
+        $scope = isset($routes[$scope]) ? $scope : 'all';
+
         return [
-            'data' => collect($paginator->items())->map(fn (Deposit $dep) => self::depositRow($dep))->values()->all(),
+            'scope' => $scope,
+            'data' => collect($paginator->items())->map(fn (Deposit $dep) => self::depositRow($dep, $scope))->values()->all(),
             'links' => $paginator->linkCollection()->toArray(),
             'meta' => self::paginationMeta($paginator),
             'summary' => $summary ? [
@@ -829,8 +990,10 @@ class AdminResource
         ];
     }
 
-    public static function depositRow(Deposit $deposit): array
+    public static function depositRow(Deposit $deposit, string $scope = 'all'): array
     {
+        $routes = self::depositScopeRoutes();
+        $scope = isset($routes[$scope]) ? $scope : 'all';
         $owner = $deposit->buyer?->username ?? $deposit->user?->username ?? '—';
 
         return [
@@ -842,12 +1005,14 @@ class AdminResource
             'charge' => showAmount($deposit->charge),
             'status' => self::paymentStatus((int) $deposit->status),
             'createdAt' => showDateTime($deposit->created_at),
-            'detailUrl' => route('admin.deposit.details', $deposit->id),
+            'detailUrl' => self::withScopeQuery(route('admin.deposit.details', $deposit->id), $scope),
         ];
     }
 
     public static function depositDetail(Deposit $deposit, ?string $details): array
     {
+        $routes = self::depositScopeRoutes();
+
         return [
             'id' => (int) $deposit->id,
             'trx' => $deposit->trx,
@@ -864,14 +1029,18 @@ class AdminResource
                 'approveUrl' => (int) $deposit->status === Status::PAYMENT_PENDING ? route('admin.deposit.approve', $deposit->id) : null,
                 'rejectUrl' => (int) $deposit->status === Status::PAYMENT_PENDING ? route('admin.deposit.reject') : null,
             ],
-            'indexUrl' => route('admin.deposit.list'),
+            'indexUrl' => self::listReturnUrl($routes, $routes['all']),
         ];
     }
 
-    public static function withdrawals(LengthAwarePaginator $paginator, ?array $summary = null): array
+    public static function withdrawals(LengthAwarePaginator $paginator, ?array $summary = null, string $scope = 'all'): array
     {
+        $routes = self::withdrawalScopeRoutes();
+        $scope = isset($routes[$scope]) ? $scope : 'all';
+
         return [
-            'data' => collect($paginator->items())->map(fn (Withdrawal $w) => self::withdrawalRow($w))->values()->all(),
+            'scope' => $scope,
+            'data' => collect($paginator->items())->map(fn (Withdrawal $w) => self::withdrawalRow($w, $scope))->values()->all(),
             'links' => $paginator->linkCollection()->toArray(),
             'meta' => self::paginationMeta($paginator),
             'summary' => $summary ? [
@@ -882,8 +1051,11 @@ class AdminResource
         ];
     }
 
-    public static function withdrawalRow(Withdrawal $withdrawal): array
+    public static function withdrawalRow(Withdrawal $withdrawal, string $scope = 'all'): array
     {
+        $routes = self::withdrawalScopeRoutes();
+        $scope = isset($routes[$scope]) ? $scope : 'all';
+
         return [
             'id' => (int) $withdrawal->id,
             'trx' => $withdrawal->trx,
@@ -893,12 +1065,14 @@ class AdminResource
             'charge' => showAmount($withdrawal->charge),
             'status' => self::paymentStatus((int) $withdrawal->status),
             'createdAt' => showDateTime($withdrawal->created_at),
-            'detailUrl' => route('admin.withdraw.data.details', $withdrawal->id),
+            'detailUrl' => self::withScopeQuery(route('admin.withdraw.data.details', $withdrawal->id), $scope),
         ];
     }
 
     public static function withdrawalDetail(Withdrawal $withdrawal, ?string $details): array
     {
+        $routes = self::withdrawalScopeRoutes();
+
         return [
             'id' => (int) $withdrawal->id,
             'trx' => $withdrawal->trx,
@@ -915,21 +1089,28 @@ class AdminResource
                 'approveUrl' => (int) $withdrawal->status === Status::PAYMENT_PENDING ? route('admin.withdraw.data.approve') : null,
                 'rejectUrl' => (int) $withdrawal->status === Status::PAYMENT_PENDING ? route('admin.withdraw.data.reject') : null,
             ],
-            'indexUrl' => route('admin.withdraw.data.all'),
+            'indexUrl' => self::listReturnUrl($routes, $routes['all']),
         ];
     }
 
-    public static function projects(LengthAwarePaginator $paginator): array
+    public static function projects(LengthAwarePaginator $paginator, string $scope = 'all'): array
     {
+        $routes = self::projectScopeRoutes();
+        $scope = isset($routes[$scope]) ? $scope : 'all';
+
         return [
-            'data' => collect($paginator->items())->map(fn (Project $project) => self::projectRow($project))->values()->all(),
+            'scope' => $scope,
+            'data' => collect($paginator->items())->map(fn (Project $project) => self::projectRow($project, $scope))->values()->all(),
             'links' => $paginator->linkCollection()->toArray(),
             'meta' => self::paginationMeta($paginator),
         ];
     }
 
-    public static function projectRow(Project $project): array
+    public static function projectRow(Project $project, string $scope = 'all'): array
     {
+        $routes = self::projectScopeRoutes();
+        $scope = isset($routes[$scope]) ? $scope : 'all';
+
         return [
             'id' => (int) $project->id,
             'jobTitle' => strLimit($project->job?->title ?? '—', 40),
@@ -938,12 +1119,14 @@ class AdminResource
             'amount' => showAmount($project->bid?->bid_amount ?? 0),
             'status' => self::projectStatus((int) $project->status),
             'createdAt' => showDateTime($project->created_at),
-            'detailUrl' => route('admin.project.details', $project->id),
+            'detailUrl' => self::withScopeQuery(route('admin.project.details', $project->id), $scope),
         ];
     }
 
     public static function projectDetail(Project $project, $convId): array
     {
+        $routes = self::projectScopeRoutes();
+
         return [
             'id' => (int) $project->id,
             'status' => self::projectStatus((int) $project->status),
@@ -966,7 +1149,7 @@ class AdminResource
                 'detailUrl' => route('admin.bids.detail', $project->bid_id),
             ] : null,
             'conversationId' => $convId?->id,
-            'indexUrl' => route('admin.project.index'),
+            'indexUrl' => self::listReturnUrl($routes, $routes['all']),
         ];
     }
 
@@ -989,9 +1172,13 @@ class AdminResource
         ];
     }
 
-    public static function supportTickets(LengthAwarePaginator $paginator): array
+    public static function supportTickets(LengthAwarePaginator $paginator, string $scope = 'all'): array
     {
+        $routes = self::ticketScopeRoutes();
+        $scope = isset($routes[$scope]) ? $scope : 'all';
+
         return [
+            'scope' => $scope,
             'data' => collect($paginator->items())->map(fn (SupportTicket $ticket) => [
                 'id' => (int) $ticket->id,
                 'ticket' => $ticket->ticket,
@@ -1000,7 +1187,7 @@ class AdminResource
                 'status' => self::ticketStatus((int) $ticket->status),
                 'priority' => $ticket->priority,
                 'createdAt' => showDateTime($ticket->created_at),
-                'detailUrl' => route('admin.ticket.view', $ticket->id),
+                'detailUrl' => self::withScopeQuery(route('admin.ticket.view', $ticket->id), $scope),
             ])->values()->all(),
             'links' => $paginator->linkCollection()->toArray(),
             'meta' => self::paginationMeta($paginator),
@@ -1009,6 +1196,8 @@ class AdminResource
 
     public static function supportTicketDetail(SupportTicket $ticket, $messages): array
     {
+        $routes = self::ticketScopeRoutes();
+
         return [
             'id' => (int) $ticket->id,
             'ticket' => $ticket->ticket,
@@ -1028,7 +1217,7 @@ class AdminResource
                 'replyUrl' => route('admin.ticket.reply', $ticket->id),
                 'closeUrl' => route('admin.ticket.close', $ticket->id),
             ],
-            'indexUrl' => route('admin.ticket.index'),
+            'indexUrl' => self::listReturnUrl($routes, $routes['all']),
         ];
     }
 

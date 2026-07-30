@@ -23,29 +23,29 @@ class SupportTicketController extends Controller
 
     public function tickets()
     {
-        return $this->renderTicketList('Support Tickets', SupportTicket::searchable(['name','subject','ticket'])->orderBy('id','desc')->with('user')->paginate(getPaginate()));
+        return $this->renderTicketList('Support Tickets', SupportTicket::searchable(['name','subject','ticket'])->orderBy('id','desc')->with('user')->paginate(getPaginate()), 'all');
     }
 
     public function pendingTicket()
     {
-        return $this->renderTicketList('Pending Tickets', SupportTicket::searchable(['name','subject','ticket'])->pending()->orderBy('id','desc')->with('user')->paginate(getPaginate()));
+        return $this->renderTicketList('Pending Tickets', SupportTicket::searchable(['name','subject','ticket'])->pending()->orderBy('id','desc')->with('user')->paginate(getPaginate()), 'pending');
     }
 
     public function closedTicket()
     {
-        return $this->renderTicketList('Closed Tickets', SupportTicket::searchable(['name','subject','ticket'])->closed()->orderBy('id','desc')->with('user')->paginate(getPaginate()));
+        return $this->renderTicketList('Closed Tickets', SupportTicket::searchable(['name','subject','ticket'])->closed()->orderBy('id','desc')->with('user')->paginate(getPaginate()), 'closed');
     }
 
     public function answeredTicket()
     {
-        return $this->renderTicketList('Answered Tickets', SupportTicket::searchable(['name','subject','ticket'])->orderBy('id','desc')->with('user')->answered()->paginate(getPaginate()));
+        return $this->renderTicketList('Answered Tickets', SupportTicket::searchable(['name','subject','ticket'])->orderBy('id','desc')->with('user')->answered()->paginate(getPaginate()), 'answered');
     }
 
-    protected function renderTicketList(string $pageTitle, $items)
+    protected function renderTicketList(string $pageTitle, $items, string $scope = 'all')
     {
         return Inertia::render('Admin/Support/Index', [
             'pageTitle' => $pageTitle,
-            'tickets' => AdminResource::supportTickets($items),
+            'tickets' => AdminResource::supportTickets($items, $scope),
         ]);
     }
 

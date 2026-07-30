@@ -4,14 +4,6 @@
         @include('admin.config_category.top_bar')
     @endpush
 
-    <div class="row mb-3">
-        <div class="col-12">
-            <a href="{{ route('admin.marketplace.forms.index') }}" class="btn btn-sm btn-outline--primary">
-                <i class="las la-arrow-left"></i> @lang('Back to forms')
-            </a>
-        </div>
-    </div>
-
     <div class="submitRequired bg--warning form-change-alert d-none">
         <i class="fas fa-exclamation-triangle"></i> @lang('Click "Save Fields" to apply your changes.')
     </div>

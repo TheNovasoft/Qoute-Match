@@ -1,5 +1,6 @@
 /**
  * Keep Blade admin sidebar active state in sync with Inertia tab/nav clicks.
+ * Avoid re-toggling already-open submenus (prevents jump/flash).
  */
 export function syncAdminSidebar(pathname = window.location.pathname) {
     const path = String(pathname || '').replace(/\/+$/, '') || '/';
@@ -49,19 +50,21 @@ export function syncAdminSidebar(pathname = window.location.pathname) {
     if (item) item.classList.add('active');
 
     const dropdown = best.link.closest('li.sidebar-dropdown');
-    if (dropdown) {
-        dropdown.classList.add('active');
-        const trigger = dropdown.querySelector(':scope > a');
-        const submenu = dropdown.querySelector(':scope > .sidebar-submenu');
-        if (trigger) {
-            trigger.classList.add('side-menu--open');
-            const icon = trigger.querySelector('.side-menu__sub-icon');
-            if (icon) icon.classList.add('transform', 'rotate-180');
-        }
-        if (submenu) {
-            submenu.classList.add('sidebar-submenu__open');
-            submenu.style.display = 'block';
-        }
+    if (!dropdown) return;
+
+    dropdown.classList.add('active');
+    const trigger = dropdown.querySelector(':scope > a');
+    const submenu = dropdown.querySelector(':scope > .sidebar-submenu');
+
+    if (trigger) {
+        trigger.classList.add('side-menu--open');
+        const icon = trigger.querySelector('.side-menu__sub-icon');
+        if (icon) icon.classList.add('transform', 'rotate-180');
+    }
+
+    if (submenu && !submenu.classList.contains('sidebar-submenu__open')) {
+        submenu.classList.add('sidebar-submenu__open');
+        submenu.style.display = 'block';
     }
 }
 

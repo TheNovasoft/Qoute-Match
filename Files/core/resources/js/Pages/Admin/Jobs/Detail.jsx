@@ -1,5 +1,6 @@
 import { Link, router, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminBackLink from '@/Components/Admin/AdminBackLink';
 
 function FieldList({ fields }) {
     if (!fields?.length) return <p className="text-muted mb-0">No fields.</p>;
@@ -26,19 +27,10 @@ export default function Detail({ pageTitle, job }) {
     const rejectForm = useForm({ reason: '' });
     const deleteForm = useForm({});
 
-    const goBack = (e) => {
-        e.preventDefault();
-        if (window.history.length > 1) {
-            window.history.back();
-            return;
-        }
-        router.visit(job.indexUrl);
-    };
-
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="mb-3">
-                <Link href={job.indexUrl} onClick={goBack} className="btn btn-sm btn-outline--dark admin-back-btn">← Back</Link>
+                <AdminBackLink href={job.indexUrl} />
             </div>
 
             <div className="row gy-4">

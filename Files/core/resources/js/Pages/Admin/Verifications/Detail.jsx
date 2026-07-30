@@ -1,29 +1,15 @@
-import { Link, router, useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminBackLink from '@/Components/Admin/AdminBackLink';
 
 export default function Detail({ pageTitle, verification }) {
     const approveForm = useForm({});
     const rejectForm = useForm({ admin_note: '' });
 
-    const goBack = (e) => {
-        e.preventDefault();
-        if (window.history.length > 1) {
-            window.history.back();
-            return;
-        }
-        router.visit(verification.indexUrl || '/admin/provider-verifications');
-    };
-
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="mb-3">
-                <Link
-                    href={verification.indexUrl || '/admin/provider-verifications'}
-                    onClick={goBack}
-                    className="btn btn-sm btn-outline--dark admin-back-btn"
-                >
-                    ← Back
-                </Link>
+                <AdminBackLink href={verification.indexUrl || '/admin/provider-verifications'} />
             </div>
 
             <div className="row gy-4">

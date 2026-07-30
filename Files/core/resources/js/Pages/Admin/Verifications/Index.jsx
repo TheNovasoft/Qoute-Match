@@ -34,10 +34,6 @@ export default function Index({ pageTitle, verifications }) {
 
     return (
         <AdminLayout pageTitle={pageTitle}>
-            <div className="mb-3">
-                <Link href="/admin/freelancers/active" className="btn btn-sm btn-outline--dark admin-back-btn">← Back</Link>
-            </div>
-
             {pendingCount > 0 && verifications.status !== 'pending' && (
                 <div className="alert alert-warning d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                     <span>

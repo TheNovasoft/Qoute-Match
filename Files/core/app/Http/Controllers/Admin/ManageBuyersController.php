@@ -22,63 +22,63 @@ class ManageBuyersController extends Controller
 
     public function allBuyers()
     {
-        return $this->renderBuyerList('All Buyers', $this->BuyerData());
+        return $this->renderBuyerList('All Buyers', $this->BuyerData(), 'all');
     }
 
     public function activeBuyers()
     {
-        return $this->renderBuyerList('Active Buyers', $this->BuyerData('active'));
+        return $this->renderBuyerList('Active Buyers', $this->BuyerData('active'), 'active');
     }
 
     public function bannedBuyers()
     {
-        return $this->renderBuyerList('Banned Buyers', $this->BuyerData('banned'));
+        return $this->renderBuyerList('Banned Buyers', $this->BuyerData('banned'), 'banned');
     }
 
     public function emailUnverifiedBuyers()
     {
-        return $this->renderBuyerList('Email Unverified Buyers', $this->BuyerData('emailUnverified'));
+        return $this->renderBuyerList('Email Unverified Buyers', $this->BuyerData('emailUnverified'), 'email_unverified');
     }
 
     public function kycUnverifiedBuyers()
     {
-        return $this->renderBuyerList('KYC Unverified Buyers', $this->BuyerData('kycUnverified'));
+        return $this->renderBuyerList('KYC Unverified Buyers', $this->BuyerData('kycUnverified'), 'kyc_unverified');
     }
 
     public function kycPendingBuyers()
     {
-        return $this->renderBuyerList('KYC Pending Buyers', $this->BuyerData('kycPending'));
+        return $this->renderBuyerList('KYC Pending Buyers', $this->BuyerData('kycPending'), 'kyc_pending');
     }
 
     public function emailVerifiedBuyers()
     {
-        return $this->renderBuyerList('Email Verified Buyers', $this->BuyerData('emailVerified'));
+        return $this->renderBuyerList('Email Verified Buyers', $this->BuyerData('emailVerified'), 'all');
     }
 
 
     public function mobileUnverifiedBuyers()
     {
-        return $this->renderBuyerList('Mobile Unverified Buyers', $this->BuyerData('mobileUnverified'));
+        return $this->renderBuyerList('Mobile Unverified Buyers', $this->BuyerData('mobileUnverified'), 'mobile_unverified');
     }
 
 
     public function mobileVerifiedBuyers()
     {
-        return $this->renderBuyerList('Mobile Verified Buyers', $this->BuyerData('mobileVerified'));
+        return $this->renderBuyerList('Mobile Verified Buyers', $this->BuyerData('mobileVerified'), 'all');
     }
 
 
     public function BuyersWithBalance()
     {
-        return $this->renderBuyerList('Buyers with Balance', $this->BuyerData('withBalance'));
+        return $this->renderBuyerList('Buyers with Balance', $this->BuyerData('withBalance'), 'with_balance');
     }
 
 
-    protected function renderBuyerList(string $pageTitle, $buyers)
+    protected function renderBuyerList(string $pageTitle, $buyers, string $scope = 'all')
     {
         return Inertia::render('Admin/Buyers/Index', [
             'pageTitle' => $pageTitle,
-            'buyers' => AdminResource::buyers($buyers),
+            'buyers' => AdminResource::buyers($buyers, $scope),
         ]);
     }
 

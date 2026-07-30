@@ -6,7 +6,7 @@ class Searchable{
     public function searchable(){
         return function($params, $like = true) {
             $search = request()->search;
-            if (!$search) {
+            if (!$search && $search !== '0') {
                 return $this;
             }
 
@@ -14,8 +14,14 @@ class Searchable{
                 throw new \Exception("Search parameters should be an array");
             }
 
-            $search = $like ? "%$search%" : $search;
-            $this->where(function ($q) use ($params, $search) {
+            $term = mb_strtolower(trim((string) $search));
+            if ($term === '') {
+                return $this;
+            }
+
+            $pattern = $like ? '%'.$term.'%' : $term;
+
+            $this->where(function ($q) use ($params, $pattern, $like) {
                 foreach ($params as $param) {
                     $relationData = explode(':', $param);
                     if (@$relationData[1]) {
@@ -23,13 +29,27 @@ class Searchable{
                             if(!$relationData[0]){
                                 continue;
                             }
-                            $q->orWhereHas($relationData[0], function ($q) use ($column, $search) {
-                                $q->where($column, 'like', $search);
+                            if (!preg_match('/^[A-Za-z0-9_.]+$/', $column)) {
+                                continue;
+                            }
+                            $q->orWhereHas($relationData[0], function ($q) use ($column, $pattern, $like) {
+                                if ($like) {
+                                    $q->whereRaw('LOWER('.$column.') LIKE ?', [$pattern]);
+                                } else {
+                                    $q->whereRaw('LOWER('.$column.') = ?', [$pattern]);
+                                }
                             });
                         }
                     } else {
                         $column = $param;
-                        $q->orWhere($column, 'LIKE', $search);
+                        if (!preg_match('/^[A-Za-z0-9_.]+$/', $column)) {
+                            continue;
+                        }
+                        if ($like) {
+                            $q->orWhereRaw('LOWER('.$column.') LIKE ?', [$pattern]);
+                        } else {
+                            $q->orWhereRaw('LOWER('.$column.') = ?', [$pattern]);
+                        }
                     }
                 }
             });

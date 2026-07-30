@@ -1,11 +1,12 @@
-import { Link } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminBackLink from '@/Components/Admin/AdminBackLink';
 
 export default function Detail({ pageTitle, project }) {
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="mb-3">
-                <Link href={project.indexUrl} className="btn btn-sm btn-outline--dark">← Projects</Link>
+                <AdminBackLink href={project.indexUrl} label="← Back" />
             </div>
 
             <div className="card shadow-sm">

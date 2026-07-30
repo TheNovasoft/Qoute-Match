@@ -1,5 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
 import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
@@ -21,12 +21,18 @@ export function FreelancerSearch() {
     const pageUrl = usePage().url || '';
     const path = pageUrl.split('?')[0];
     const params = new URLSearchParams(pageUrl.includes('?') ? pageUrl.split('?')[1] : '');
-    const [search, setSearch] = useState(params.get('search') || '');
+    const urlSearch = params.get('search') || '';
+    const [search, setSearch] = useState(urlSearch);
+
+    useEffect(() => {
+        setSearch(urlSearch);
+    }, [urlSearch, path]);
 
     const submit = (e) => {
         e.preventDefault();
         router.get(path, search.trim() ? { search: search.trim() } : {}, {
             preserveState: true,
+            preserveScroll: true,
             replace: true,
         });
     };
@@ -45,14 +51,18 @@ export function FreelancerSearch() {
             <div className="col-auto">
                 <button type="submit" className="btn btn--primary btn-sm">Search</button>
             </div>
-            {params.get('search') && (
+            {urlSearch && (
                 <div className="col-auto">
                     <button
                         type="button"
                         className="btn btn-outline--dark btn-sm"
                         onClick={() => {
                             setSearch('');
-                            router.get(path, {}, { preserveState: true, replace: true });
+                            router.get(path, {}, {
+                                preserveState: true,
+                                preserveScroll: true,
+                                replace: true,
+                            });
                         }}
                     >
                         Clear

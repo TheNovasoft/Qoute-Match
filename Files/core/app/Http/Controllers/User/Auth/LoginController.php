@@ -6,10 +6,13 @@ use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Lib\Intended;
 use Inertia\Inertia;
+use App\Models\Buyer;
+use App\Models\User;
 use App\Models\UserLogin;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -73,6 +76,34 @@ class LoginController extends Controller
         Intended::reAssignSession();
 
         return $this->sendFailedLoginResponse($request);
+    }
+
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        $login = (string) $request->input('username', $request->input($this->username(), ''));
+        $isEmail = filter_var($login, FILTER_VALIDATE_EMAIL) !== false;
+
+        if ($login !== '') {
+            $existsHere = $isEmail
+                ? User::where('email', $login)->exists()
+                : User::where('username', $login)->exists();
+
+            if (!$existsHere) {
+                $existsAsCustomer = $isEmail
+                    ? Buyer::where('email', $login)->exists()
+                    : Buyer::where('username', $login)->exists();
+
+                if ($existsAsCustomer) {
+                    throw ValidationException::withMessages([
+                        $this->username() => ['This account is a Customer account. Please use Customer Login.'],
+                    ]);
+                }
+            }
+        }
+
+        throw ValidationException::withMessages([
+            $this->username() => [trans('auth.failed')],
+        ]);
     }
 
     public function findUsername()

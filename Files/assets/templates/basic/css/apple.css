@@ -2701,8 +2701,29 @@ body.admin-panel .navbar-wrapper .notification-count {
     -webkit-text-fill-color: #ffffff !important;
 }
 
-/* Admin notification dropdown — hug content, no fixed empty height */
-body.admin-panel .admin-notification-dropdown {
+/* Admin notification dropdown — solid panel above all content */
+body.admin-panel .navbar-wrapper {
+    z-index: 1100 !important;
+    position: relative !important;
+}
+
+body.admin-panel .navbar__action-list > li.dropdown {
+    position: relative !important;
+    z-index: 1110 !important;
+}
+
+/* Tooltips must sit above navbar (z-index 1100); otherwise only a black strip shows under the header */
+body.admin-panel .tooltip,
+body.admin-panel .popover {
+    z-index: 2000 !important;
+}
+
+body.admin-panel .navbar-wrapper .dropdown-menu:not(.show) {
+    display: none !important;
+}
+
+body.admin-panel .admin-notification-dropdown,
+body.admin-panel .navbar__action-list .dropdown-menu.admin-notification-dropdown.show {
     width: 320px !important;
     min-width: 320px !important;
     border-radius: 12px !important;
@@ -2710,6 +2731,12 @@ body.admin-panel .admin-notification-dropdown {
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12) !important;
     overflow: hidden !important;
     padding: 0 !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    opacity: 1 !important;
+    z-index: 1200 !important;
 }
 
 body.admin-panel .admin-notification-dropdown .dropdown-menu__header {
@@ -2747,6 +2774,7 @@ body.admin-panel .admin-notification-dropdown .dropdown-menu__body {
     overflow-x: hidden !important;
     overflow-y: auto !important;
     padding: 0 !important;
+    background: #ffffff !important;
 }
 
 body.admin-panel .admin-notification-dropdown .dropdown-menu__body.is-empty {
