@@ -1,5 +1,6 @@
-import { Link, useForm } from '@inertiajs/react';
+import { Link, router, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminBackLink from '@/Components/Admin/AdminBackLink';
 
 export default function Detail({ pageTitle, review }) {
     const approveForm = useForm({});
@@ -15,7 +16,7 @@ export default function Detail({ pageTitle, review }) {
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="mb-3">
-                <Link href={review.indexUrl} className="btn btn-sm btn-outline--dark">← Reviews</Link>
+                <AdminBackLink href={review.indexUrl} />
             </div>
 
             <div className="row gy-4">

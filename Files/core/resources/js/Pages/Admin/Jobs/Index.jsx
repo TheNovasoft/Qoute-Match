@@ -4,7 +4,7 @@ import AdminFilterBar from '@/Components/Admin/AdminFilterBar';
 import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
 
-const JOB_TABS = [
+const STATUS_TABS = [
     { key: 'approved', label: 'Approved', href: '/admin/jobs/approved' },
     { key: 'pending', label: 'Pending', href: '/admin/jobs/pending' },
     { key: 'rejected', label: 'Rejected', href: '/admin/jobs/rejected' },
@@ -12,7 +12,7 @@ const JOB_TABS = [
     { key: 'drafted', label: 'Drafted', href: '/admin/jobs/drafted' },
     { key: 'processing', label: 'Processing', href: '/admin/jobs/processing' },
     { key: 'completed', label: 'Completed', href: '/admin/jobs/completed' },
-    { key: 'all', label: 'All Jobs', href: '/admin/jobs/list' },
+    { key: 'all', label: 'All', href: '/admin/jobs/list' },
 ];
 
 export default function Index({ pageTitle, jobs }) {
@@ -31,7 +31,7 @@ export default function Index({ pageTitle, jobs }) {
 
     return (
         <AdminLayout pageTitle={pageTitle}>
-            <AdminStatusTabs tabs={JOB_TABS} active={scope} />
+            <AdminStatusTabs tabs={STATUS_TABS} active={scope} className="mb-3" />
 
             <AdminFilterBar
                 actionUrl={filterUrl}

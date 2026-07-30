@@ -15,28 +15,28 @@ class DepositController extends Controller
 {
     public function pending($userId = null)
     {
-        return $this->renderDepositList('Pending Deposits', $this->depositData('pending', userId: $userId));
+        return $this->renderDepositList('Pending Deposits', $this->depositData('pending', userId: $userId), 'pending');
     }
 
 
     public function approved($userId = null)
     {
-        return $this->renderDepositList('Approved Deposits', $this->depositData('approved', userId: $userId));
+        return $this->renderDepositList('Approved Deposits', $this->depositData('approved', userId: $userId), 'approved');
     }
 
     public function successful($userId = null)
     {
-        return $this->renderDepositList('Successful Deposits', $this->depositData('successful', userId: $userId));
+        return $this->renderDepositList('Successful Deposits', $this->depositData('successful', userId: $userId), 'successful');
     }
 
     public function rejected($userId = null)
     {
-        return $this->renderDepositList('Rejected Deposits', $this->depositData('rejected', userId: $userId));
+        return $this->renderDepositList('Rejected Deposits', $this->depositData('rejected', userId: $userId), 'rejected');
     }
 
     public function initiated($userId = null)
     {
-        return $this->renderDepositList('Initiated Deposits', $this->depositData('initiated', userId: $userId));
+        return $this->renderDepositList('Initiated Deposits', $this->depositData('initiated', userId: $userId), 'initiated');
     }
 
     public function deposit($userId = null)
@@ -45,15 +45,15 @@ class DepositController extends Controller
 
         return Inertia::render('Admin/Deposits/Index', [
             'pageTitle' => 'Deposit History',
-            'deposits' => AdminResource::deposits($depositData['data'], $depositData['summary']),
+            'deposits' => AdminResource::deposits($depositData['data'], $depositData['summary'], 'all'),
         ]);
     }
 
-    protected function renderDepositList(string $pageTitle, $deposits)
+    protected function renderDepositList(string $pageTitle, $deposits, string $scope = 'all')
     {
         return Inertia::render('Admin/Deposits/Index', [
             'pageTitle' => $pageTitle,
-            'deposits' => AdminResource::deposits($deposits),
+            'deposits' => AdminResource::deposits($deposits, null, $scope),
         ]);
     }
 

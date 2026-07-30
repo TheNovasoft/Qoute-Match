@@ -35,7 +35,9 @@ export default function Login({ pageTitle, authContent }) {
                                             <label htmlFor="username" className="form--label">Username or Email</label>
                                             <input type="text" id="username" className="form-control form--control"
                                                 value={data.username} onChange={(e) => setData('username', e.target.value)} required />
-                                            {errors.username && <small className="text-danger">{errors.username}</small>}
+                                            {(errors.username || errors.email) && (
+                                                <small className="text-danger">{errors.username || errors.email}</small>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="col-12">

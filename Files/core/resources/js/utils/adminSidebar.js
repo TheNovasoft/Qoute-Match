@@ -1,91 +1,88 @@
 /**
- * Keep Blade admin sidebar in sync with Inertia navigations.
- * The sidebar lives outside the Inertia root, so server-rendered
- * "active" classes never update on XHR page swaps unless we do it here.
+ * Keep Blade admin sidebar active state in sync with Inertia tab/nav clicks.
+ * Avoid re-toggling already-open submenus (prevents jump/flash).
  */
-export function syncAdminSidebar(url = window.location.href) {
+export function syncAdminSidebar(pathname = window.location.pathname) {
+    const path = String(pathname || '').replace(/\/+$/, '') || '/';
     const sidebar = document.querySelector('.sidebar');
     if (!sidebar) return;
 
-    let path;
-    try {
-        path = new URL(url, window.location.origin).pathname.replace(/\/+$/, '') || '/';
-    } catch {
-        return;
-    }
+    const items = Array.from(sidebar.querySelectorAll('li.sidebar-menu-item'));
+    items.forEach((item) => item.classList.remove('active'));
 
-    const links = Array.from(sidebar.querySelectorAll('a.nav-link[href]'));
+    const submenuLinks = Array.from(
+        sidebar.querySelectorAll('.sidebar-submenu a.nav-link[href]')
+    );
+
     let best = null;
-    let bestScore = -1;
-
-    links.forEach((link) => {
-        const href = link.getAttribute('href');
-        if (!href || href === '#' || href.startsWith('javascript:')) return;
-
-        let linkPath;
+    submenuLinks.forEach((link) => {
         try {
-            linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '') || '/';
-        } catch {
-            return;
-        }
-
-        let score = -1;
-        if (path === linkPath) {
-            score = linkPath.length + 1000; // exact match wins
-        } else if (linkPath !== '/' && path.startsWith(`${linkPath}/`)) {
-            score = linkPath.length;
-        }
-
-        if (score > bestScore) {
-            bestScore = score;
-            best = link;
+            const hrefPath = new URL(link.href, window.location.origin).pathname.replace(/\/+$/, '') || '/';
+            if (path === hrefPath || path.startsWith(`${hrefPath}/`)) {
+                if (!best || hrefPath.length > best.hrefPath.length) {
+                    best = { link, hrefPath };
+                }
+            }
+        } catch (_) {
+            // ignore invalid href
         }
     });
 
-    // Clear previous highlights (no animated close — avoids jump)
-    sidebar.querySelectorAll('.sidebar-menu-item').forEach((el) => el.classList.remove('active'));
-    sidebar.querySelectorAll('.sidebar-dropdown > a').forEach((el) => {
-        el.classList.remove('side-menu--open');
-        el.querySelector('.side-menu__sub-icon')?.classList.remove('transform', 'rotate-180');
-    });
-    sidebar.querySelectorAll('.sidebar-submenu').forEach((el) => {
-        el.classList.remove('sidebar-submenu__open');
-        el.style.display = 'none';
-    });
+    if (!best) {
+        const topLinks = Array.from(sidebar.querySelectorAll('li.sidebar-menu-item:not(.sidebar-dropdown) > a.nav-link[href]'));
+        topLinks.forEach((link) => {
+            try {
+                const hrefPath = new URL(link.href, window.location.origin).pathname.replace(/\/+$/, '') || '/';
+                if (path === hrefPath || path.startsWith(`${hrefPath}/`)) {
+                    if (!best || hrefPath.length > best.hrefPath.length) {
+                        best = { link, hrefPath };
+                    }
+                }
+            } catch (_) {
+                // ignore
+            }
+        });
+    }
 
     if (!best) return;
 
-    const item = best.closest('.sidebar-menu-item');
-    item?.classList.add('active');
+    const item = best.link.closest('li.sidebar-menu-item');
+    if (item) item.classList.add('active');
 
-    const submenu = best.closest('.sidebar-submenu');
-    if (submenu) {
+    const dropdown = best.link.closest('li.sidebar-dropdown');
+    if (!dropdown) return;
+
+    dropdown.classList.add('active');
+    const trigger = dropdown.querySelector(':scope > a');
+    const submenu = dropdown.querySelector(':scope > .sidebar-submenu');
+
+    if (trigger) {
+        trigger.classList.add('side-menu--open');
+        const icon = trigger.querySelector('.side-menu__sub-icon');
+        if (icon) icon.classList.add('transform', 'rotate-180');
+    }
+
+    if (submenu && !submenu.classList.contains('sidebar-submenu__open')) {
         submenu.classList.add('sidebar-submenu__open');
         submenu.style.display = 'block';
-
-        const dropdown = submenu.closest('.sidebar-dropdown');
-        const trigger = dropdown
-            ? Array.from(dropdown.children).find((el) => el.tagName === 'A')
-            : null;
-        trigger?.classList.add('side-menu--open');
-        trigger?.querySelector('.side-menu__sub-icon')?.classList.add('transform', 'rotate-180');
     }
 }
 
 export function bindAdminSidebarSync(router) {
     const run = (event) => {
         const url = event?.detail?.page?.url || window.location.href;
-        // next frame so DOM/content settle without scroll animation jump
-        requestAnimationFrame(() => syncAdminSidebar(url));
+        let path = window.location.pathname;
+        try {
+            path = new URL(url, window.location.origin).pathname;
+        } catch (_) {
+            // keep pathname fallback
+        }
+        requestAnimationFrame(() => syncAdminSidebar(path));
     };
 
+    run();
+    if (!router?.on) return;
     router.on('navigate', run);
     router.on('success', run);
     router.on('finish', run);
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => syncAdminSidebar());
-    } else {
-        syncAdminSidebar();
-    }
 }

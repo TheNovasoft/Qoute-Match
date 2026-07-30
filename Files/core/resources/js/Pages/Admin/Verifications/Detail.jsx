@@ -1,5 +1,6 @@
 import { Link, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminBackLink from '@/Components/Admin/AdminBackLink';
 
 export default function Detail({ pageTitle, verification }) {
     const approveForm = useForm({});
@@ -8,7 +9,7 @@ export default function Detail({ pageTitle, verification }) {
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="mb-3">
-                <Link href={verification.indexUrl} className="btn btn-sm btn-outline--dark">← Verification Badges</Link>
+                <AdminBackLink href={verification.indexUrl || '/admin/provider-verifications'} />
             </div>
 
             <div className="row gy-4">

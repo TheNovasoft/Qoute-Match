@@ -29,7 +29,7 @@ export default function Index({ pageTitle, tickets }) {
 
     return (
         <AdminLayout pageTitle={pageTitle}>
-            <AdminStatusTabs tabs={TICKET_TABS} active={scope} />
+            <AdminStatusTabs tabs={TICKET_TABS} active={scope} className="mb-3" />
 
             <AdminFilterBar
                 actionUrl={filterUrl}

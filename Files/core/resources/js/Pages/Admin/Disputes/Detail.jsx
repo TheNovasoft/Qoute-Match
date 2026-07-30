@@ -1,5 +1,6 @@
 import { Link, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminBackLink from '@/Components/Admin/AdminBackLink';
 
 export default function Detail({ pageTitle, dispute }) {
     const reviewForm = useForm({ admin_note: dispute.adminNote ?? '' });
@@ -8,6 +9,9 @@ export default function Detail({ pageTitle, dispute }) {
 
     return (
         <AdminLayout pageTitle={pageTitle}>
+            <div className="mb-3">
+                <AdminBackLink href={dispute.indexUrl} />
+            </div>
             <div className="row gy-4">
                 <div className="col-lg-8">
                     <div className="card shadow-sm">
@@ -118,7 +122,7 @@ export default function Detail({ pageTitle, dispute }) {
                     <div className="card shadow-sm">
                         <div className="card-header bg-white"><h6 className="mb-0">Quick Links</h6></div>
                         <div className="card-body d-grid gap-2">
-                            <Link href={dispute.indexUrl} className="btn btn-outline--primary btn-sm">All Disputes</Link>
+                            <AdminBackLink href={dispute.indexUrl} label="← Back to list" className="btn btn-outline--primary btn-sm" />
                             <Link href={dispute.dashboardUrl} className="btn btn-outline--primary btn-sm">Marketplace Dashboard</Link>
                             {dispute.project && (
                                 <a href={dispute.project.detailUrl} className="btn btn-outline--dark btn-sm">Project Details</a>

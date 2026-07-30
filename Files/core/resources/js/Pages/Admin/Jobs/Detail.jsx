@@ -1,5 +1,6 @@
-import { Link, useForm } from '@inertiajs/react';
+import { Link, router, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminBackLink from '@/Components/Admin/AdminBackLink';
 
 function FieldList({ fields }) {
     if (!fields?.length) return <p className="text-muted mb-0">No fields.</p>;
@@ -29,7 +30,7 @@ export default function Detail({ pageTitle, job }) {
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="mb-3">
-                <Link href={job.indexUrl} className="btn btn-sm btn-outline--dark">← Back to list</Link>
+                <AdminBackLink href={job.indexUrl} />
             </div>
 
             <div className="row gy-4 admin-job-detail">
@@ -106,22 +107,24 @@ export default function Detail({ pageTitle, job }) {
                                     width: '100%',
                                     transition: 'all 0.15s ease',
                                 }}
-                                onMouseEnter={e => {
+                                onMouseEnter={(e) => {
                                     const s = e.currentTarget.style;
                                     s.setProperty('background', '#fff', 'important');
                                     s.setProperty('border-color', '#0071e3', 'important');
                                     s.setProperty('color', '#0071e3', 'important');
-                                    e.currentTarget.querySelector('i').style.setProperty('color', '#0071e3', 'important');
+                                    const icon = e.currentTarget.querySelector('i');
+                                    if (icon) icon.style.setProperty('color', '#0071e3', 'important');
                                 }}
-                                onMouseLeave={e => {
+                                onMouseLeave={(e) => {
                                     const s = e.currentTarget.style;
                                     s.setProperty('background', '#0071e3', 'important');
                                     s.setProperty('border-color', '#000', 'important');
                                     s.setProperty('color', '#fff', 'important');
-                                    e.currentTarget.querySelector('i').style.setProperty('color', '#fff', 'important');
+                                    const icon = e.currentTarget.querySelector('i');
+                                    if (icon) icon.style.setProperty('color', '#fff', 'important');
                                 }}
                             >
-                                <i className="las la-file-invoice" aria-hidden="true" />
+                                <i className="las la-file-invoice" aria-hidden="true" style={{ color: '#fff' }} />
                                 View quotes
                             </Link>
 

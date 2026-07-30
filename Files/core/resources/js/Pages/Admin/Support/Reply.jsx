@@ -1,5 +1,6 @@
 import { Link, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminBackLink from '@/Components/Admin/AdminBackLink';
 
 export default function Reply({ pageTitle, ticket }) {
     const replyForm = useForm({ message: '', attachments: [] });
@@ -19,7 +20,7 @@ export default function Reply({ pageTitle, ticket }) {
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="mb-3">
-                <Link href={ticket.indexUrl} className="btn btn-sm btn-outline--dark">← Tickets</Link>
+                <AdminBackLink href={ticket.indexUrl} />
             </div>
 
             <div className="card shadow-sm mb-4 admin-support-reply">

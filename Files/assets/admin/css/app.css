@@ -1519,10 +1519,10 @@ a {
   border-radius: 3.2px;
 }
 
-.btn:not(.admin-job-actions__btn):hover:hover,
-.btn:not(.admin-job-actions__btn):hover:active,
-.btn:not(.admin-job-actions__btn):hover:focus,
-.btn:not(.admin-job-actions__btn):hover:focus-visible {
+.btn:not(.admin-job-actions__btn):not(.admin-categories__btn):hover:hover,
+.btn:not(.admin-job-actions__btn):not(.admin-categories__btn):hover:active,
+.btn:not(.admin-job-actions__btn):not(.admin-categories__btn):hover:focus,
+.btn:not(.admin-job-actions__btn):not(.admin-categories__btn):hover:focus-visible {
   color: var(--btn-color) !important;
 }
 
@@ -5854,17 +5854,51 @@ body.sidebar-open {
 }
 
 .dropdown-menu__header {
-  padding: 15px 15px;
+  padding: 14px 16px;
   border-bottom: 1px solid #e5e5e5;
+  gap: 12px;
 }
 
 .dropdown-menu__header .caption {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 700;
+  color: #1d1d1f;
+  display: block;
 }
 
 .dropdown-menu__header p {
   font-size: 0.75rem;
+  color: #6e6e73;
+  margin-top: 2px;
+}
+
+.dropdown-menu__body {
+  max-height: 280px;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow-y: auto;
+}
+
+.dropdown-menu__body.is-empty {
+  min-height: 120px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+.dropdown-menu__footer {
+  padding: 10px 16px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.dropdown-menu__footer .view-all-message {
+  display: block;
+  text-align: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #0071e3;
+  padding: 4px 0;
 }
 
 .dropdown-menu__item {
@@ -5898,21 +5932,8 @@ body.sidebar-open {
   opacity: 0.15 !important;
 }
 
-.dropdown-menu__footer {
-  border-top: 1px solid #e5e5e5;
-}
-
-.dropdown-menu__footer .view-all-message {
-  font-size: 0.75rem;
-  display: block;
-  padding: 15px 15px;
-  text-align: center;
-  color: #34495e;
-  font-weight: 600;
-}
-
 .dropdown-menu__footer .view-all-message:hover {
-  color: #4634ff;
+  color: #0077ed;
 }
 
 .message-notifi {
@@ -5973,7 +5994,7 @@ body.sidebar-open {
   display: flex;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  padding: 15px 15px;
+  padding: 10px 14px;
 }
 
 .navbar-notifi__left {
@@ -8395,7 +8416,7 @@ label.required:after {
 
 
 .iziToast {
-  font-family: 'Poppins', sans-serif !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif !important;
 }
 
 
@@ -8435,7 +8456,9 @@ label.required:after {
 }
 
 .dropdown-menu__body {
-  height: 270px;
+  max-height: 280px;
+  height: auto !important;
+  min-height: 0 !important;
   overflow-y: auto;
 }
 
@@ -8525,7 +8548,7 @@ label.required:after {
 @media (min-width: 992px) {
   .configure-card-handle {
     touch-action: none;
-    cursor: grab;
+  cursor: grab;
   }
 }
 
@@ -8915,6 +8938,7 @@ label.required:after {
 /* Admin portal layout — tighter spacing, no double padding */
 body.admin-panel {
   background: #f3f4f6;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif !important;
 }
 
 body.admin-panel .page-wrapper .container-fluid {
@@ -9155,8 +9179,8 @@ body.admin-panel .table-responsive > .table {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 12px;
-}
+    padding: 12px;
+  }
 
 .admin-mobile-card {
   border: 1px solid #e8ecf7;
@@ -9294,13 +9318,16 @@ body.admin-panel .admin-react-panel .table .avatar.avatar--sm img {
   transform: translateY(-1px);
 }
 
-/* View quotes — primary */
+/* View quotes — keep solid blue so text/icon never disappear on hover */
+a.btn.admin-job-actions__btn,
+.admin-job-actions__btn.admin-job-actions__btn--primary,
 a.btn.btn--primary.btn-sm.admin-job-actions__btn,
 .admin-job-actions__btn.admin-job-actions__btn--primary {
   border-width: 2px !important;
   background-color: #0071e3 !important;
   border-color: #0071e3 !important;
   color: #fff !important;
+  box-shadow: none;
 }
 
 a.btn.btn--primary.btn-sm.admin-job-actions__btn:hover,
@@ -9324,6 +9351,25 @@ a.btn.btn--primary.btn-sm.admin-job-actions__btn:focus-visible i,
 .admin-job-actions__btn.admin-job-actions__btn--primary:hover i,
 .admin-job-actions__btn.admin-job-actions__btn--primary:focus-visible i {
   color: #0071e3 !important;
+}
+
+/* Back buttons — stay readable on hover */
+.btn.admin-back-btn.btn-outline--dark,
+.btn.admin-back-btn.btn-outline--dark:hover,
+.btn.admin-back-btn.btn-outline--dark:active,
+.btn.admin-back-btn.btn-outline--dark:focus,
+.btn.admin-back-btn.btn-outline--dark:focus-visible,
+.btn.admin-back-btn.btn-outline--dark:hover:hover {
+  --btn-color: #1d1d1f !important;
+  background-color: #fff !important;
+  border: 1px solid #000 !important;
+  color: #1d1d1f !important;
+}
+
+.btn.admin-back-btn.btn-outline--dark:hover,
+.btn.admin-back-btn.btn-outline--dark:focus-visible {
+  background-color: #f5f5f7 !important;
+  color: #1d1d1f !important;
 }
 
 /* Approve — success */
@@ -9747,20 +9793,26 @@ h6.mb-2 {
   gap: 8px;
 }
 
-/* Save — primary filled */
-.admin-categories .admin-categories__btn--save.btn--primary {
-  background-color: #4634ff !important;
+/* Save — primary filled (keep solid on hover so text never disappears) */
+.admin-categories .admin-categories__btn--save.btn--primary,
+.admin-categories .admin-categories__btn--save.btn--primary:hover,
+.admin-categories .admin-categories__btn--save.btn--primary:active,
+.admin-categories .admin-categories__btn--save.btn--primary:focus,
+.admin-categories .admin-categories__btn--save.btn--primary:focus-visible {
+  --btn-color: #fff;
+  background-color: #0071e3 !important;
   border-color: #000 !important;
   color: #fff !important;
+  box-shadow: none;
 }
 
 .admin-categories .admin-categories__btn--save.btn--primary:hover,
+.admin-categories .admin-categories__btn--save.btn--primary:active,
 .admin-categories .admin-categories__btn--save.btn--primary:focus,
 .admin-categories .admin-categories__btn--save.btn--primary:focus-visible {
-  background-color: #fff !important;
-  border-color: #4634ff !important;
-  color: #4634ff !important;
-  box-shadow: 0 0 0 3px rgba(70, 52, 255, 0.12);
+  background-color: #005bb5 !important;
+  border-color: #000 !important;
+  color: #fff !important;
 }
 
 /* Edit / Cancel / Back — dark outline */
@@ -9771,6 +9823,7 @@ h6.mb-2 {
 }
 
 .admin-categories .admin-categories__btn--dark.btn-outline--dark:hover,
+.admin-categories .admin-categories__btn--dark.btn-outline--dark:active,
 .admin-categories .admin-categories__btn--dark.btn-outline--dark:focus,
 .admin-categories .admin-categories__btn--dark.btn-outline--dark:focus-visible {
   background-color: hsl(var(--heading-color)) !important;
@@ -9787,6 +9840,7 @@ h6.mb-2 {
 }
 
 .admin-categories .admin-categories__btn--toggle.btn-outline--warning:hover,
+.admin-categories .admin-categories__btn--toggle.btn-outline--warning:active,
 .admin-categories .admin-categories__btn--toggle.btn-outline--warning:focus,
 .admin-categories .admin-categories__btn--toggle.btn-outline--warning:focus-visible {
   background-color: hsl(var(--warning)) !important;
@@ -9885,6 +9939,99 @@ h6.mb-2 {
 
 .admin-categories--wp .admin-categories__tree-table tbody tr:hover {
   background: #f8fafc;
+}
+
+/* ============================================================
+   design.md "8a · Apple-Style" — admin pill tabs + SF Pro font
+   ============================================================ */
+.admin-panel,
+.admin-panel body,
+body.admin-panel,
+.admin-panel .page-wrapper,
+.admin-panel .body-wrapper,
+.admin-panel .main-wrapper,
+.admin-panel .dashboard-main {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif !important;
+}
+
+.admin-panel h1,
+.admin-panel h2,
+.admin-panel h3,
+.admin-panel h4,
+.admin-panel h5,
+.admin-panel h6,
+.admin-panel .btn,
+.admin-panel .form-control,
+.admin-panel .table,
+.admin-panel .nav-link,
+.admin-panel .sidebar,
+.admin-panel .page-title {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif !important;
+}
+
+.admin-status-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-status-tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid #d2d2d7;
+  background: #ffffff;
+  color: #1d1d1f !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.admin-status-tabs__tab:hover,
+.admin-status-tabs__tab:focus,
+.admin-status-tabs__tab:focus-visible {
+  background: #f5f5f7;
+  border-color: #c7c7cc;
+  color: #1d1d1f !important;
+  box-shadow: none;
+  outline: none;
+}
+
+.admin-status-tabs__tab.is-active,
+.admin-status-tabs__tab.is-active:hover,
+.admin-status-tabs__tab.is-active:focus,
+.admin-status-tabs__tab.is-active:focus-visible {
+  background: #0071e3 !important;
+  border-color: #0071e3 !important;
+  color: #ffffff !important;
+  box-shadow: none;
+}
+
+.admin-status-tabs__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.12);
+  color: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.admin-status-tabs__tab.is-active .admin-status-tabs__badge {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
 }
 
 @media (max-width: 991px) {

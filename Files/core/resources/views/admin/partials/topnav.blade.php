@@ -82,8 +82,8 @@
                     <span class="notification-count">{{ $adminNotificationCount <= 9 ? $adminNotificationCount : '9+'}}</span>
                     @endif
                 </button>
-                <div class="dropdown-menu dropdown-menu--md p-0 border-0 box--shadow1 dropdown-menu-right">
-                    <div class="dropdown-menu__header d-flex justify-content-between align-items-center gap-2">
+                <div class="dropdown-menu dropdown-menu--md p-0 border-0 box--shadow1 dropdown-menu-right admin-notification-dropdown">
+                    <div class="dropdown-menu__header d-flex justify-content-between align-items-start gap-2">
                         <div>
                             <span class="caption">@lang('Notification')</span>
                             @if($adminNotificationCount > 0)
@@ -91,12 +91,12 @@
                             @endif
                         </div>
                         @if($adminNotificationCount > 0)
-                            <a href="{{ route('admin.notifications.read.all') }}" class="btn btn-sm btn-outline--primary">
+                            <a href="{{ route('admin.notifications.read.all') }}" class="btn btn-sm btn-outline--primary flex-shrink-0">
                                 @lang('Read all')
                             </a>
                         @endif
                     </div>
-                    <div class="dropdown-menu__body @if(blank($adminNotifications)) d-flex justify-content-center align-items-center @endif">
+                    <div class="dropdown-menu__body @if(blank($adminNotifications)) is-empty @endif">
                         @forelse($adminNotifications as $notification)
                             <a href="{{ route('admin.notification.read',$notification->id) }}"
                                 class="dropdown-menu__item">
@@ -111,7 +111,7 @@
                         @empty
                         <div class="empty-notification text-center">
                             <img src="{{ getImage('assets/images/empty_list.png') }}" alt="empty">
-                            <p class="mt-3">@lang('No unread notification found')</p>
+                            <p class="mt-2 mb-0">@lang('No unread notification found')</p>
                         </div>
                         @endforelse
                     </div>
@@ -120,11 +120,6 @@
                             class="view-all-message">@lang('View all notifications')</a>
                     </div>
                 </div>
-            </li>
-            <li>
-                <button type="button" class="primary--layer" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@lang('System Setting')">
-                    <a href="{{ route('admin.setting.system') }}"><i class="las la-wrench"></i></a>
-                </button>
             </li>
             <li class="dropdown d-flex profile-dropdown">
                 <button type="button" data-bs-toggle="dropdown" data-display="static" aria-haspopup="true"

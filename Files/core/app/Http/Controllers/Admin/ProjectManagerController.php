@@ -25,36 +25,36 @@ class ProjectManagerController extends Controller
 {
     public function index()
     {
-        return $this->renderProjectList('All Projects', 'all', $this->projectData());
+        return $this->renderProjectList('All Projects', $this->projectData(), 'all');
     }
     public function reported()
     {
-        return $this->renderProjectList('Reported Projects', 'reported', $this->projectData('reported'));
+        return $this->renderProjectList('Reported Projects', $this->projectData('reported'), 'reported');
     }
     public function running()
     {
-        return $this->renderProjectList('Running Projects', 'running', $this->projectData('running'));
+        return $this->renderProjectList('Running Projects', $this->projectData('running'), 'running');
     }
     public function reviewing()
     {
-        return $this->renderProjectList('Reviewing Projects', 'reviewing', $this->projectData('reviewing'));
+        return $this->renderProjectList('Reviewing Projects', $this->projectData('reviewing'), 'reviewing');
     }
     public function rejected()
     {
-        return $this->renderProjectList('Rejected Projects', 'rejected', $this->projectData('rejected'));
+        return $this->renderProjectList('Rejected Projects', $this->projectData('rejected'), 'rejected');
     }
 
     public function completed()
     {
-        return $this->renderProjectList('Completed Projects', 'completed', $this->projectData('completed'));
+        return $this->renderProjectList('Completed Projects', $this->projectData('completed'), 'completed');
     }
     
     public function partialCompleted()
     {
-        return $this->renderProjectList('Partial Completed Projects', 'partial', $this->projectData('partial'));
+        return $this->renderProjectList('Partial Completed Projects', $this->projectData('partial'), 'partial');
     }
 
-    protected function renderProjectList(string $pageTitle, string $scope, $projects)
+    protected function renderProjectList(string $pageTitle, $projects, string $scope = 'all')
     {
         $projects->load(['job', 'user', 'buyer', 'bid']);
 

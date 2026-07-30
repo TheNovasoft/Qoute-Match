@@ -19,7 +19,7 @@ export default function Index({ pageTitle, reviews }) {
 
     return (
         <AdminLayout pageTitle={pageTitle}>
-            <AdminStatusTabs tabs={STATUS_TABS} active={status} />
+            <AdminStatusTabs tabs={STATUS_TABS} active={status} className="mb-3" />
 
             <AdminFilterBar
                 actionUrl={filterUrl}

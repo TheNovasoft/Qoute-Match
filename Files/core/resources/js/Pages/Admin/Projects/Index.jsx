@@ -4,7 +4,7 @@ import AdminFilterBar from '@/Components/Admin/AdminFilterBar';
 import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
 
-const PROJECT_TABS = [
+const STATUS_TABS = [
     { key: 'running', label: 'Running', href: '/admin/project/running' },
     { key: 'reviewing', label: 'Reviewing', href: '/admin/project/reviewing' },
     { key: 'reported', label: 'Reported', href: '/admin/project/reported' },
@@ -29,7 +29,7 @@ export default function Index({ pageTitle, projects }) {
 
     return (
         <AdminLayout pageTitle={pageTitle}>
-            <AdminStatusTabs tabs={PROJECT_TABS} active={scope} />
+            <AdminStatusTabs tabs={STATUS_TABS} active={scope} className="mb-3" />
 
             <AdminFilterBar
                 actionUrl={filterUrl}

@@ -1,11 +1,12 @@
-import { Link } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminBackLink from '@/Components/Admin/AdminBackLink';
 
 export default function Detail({ pageTitle, buyer }) {
     return (
         <AdminLayout pageTitle={pageTitle}>
             <div className="mb-3">
-                <Link href={buyer.indexUrl} className="btn btn-sm btn-outline--dark">← Customers</Link>
+                <AdminBackLink href={buyer.indexUrl} />
             </div>
 
             <div className="row gy-4">

@@ -14,17 +14,17 @@ class WithdrawalController extends Controller
 {
     public function pending($userId = null)
     {
-        return $this->renderWithdrawalList('Pending Withdrawals', $this->withdrawalData('pending', userId: $userId));
+        return $this->renderWithdrawalList('Pending Withdrawals', $this->withdrawalData('pending', userId: $userId), 'pending');
     }
 
     public function approved($userId = null)
     {
-        return $this->renderWithdrawalList('Approved Withdrawals', $this->withdrawalData('approved', userId: $userId));
+        return $this->renderWithdrawalList('Approved Withdrawals', $this->withdrawalData('approved', userId: $userId), 'approved');
     }
 
     public function rejected($userId = null)
     {
-        return $this->renderWithdrawalList('Rejected Withdrawals', $this->withdrawalData('rejected', userId: $userId));
+        return $this->renderWithdrawalList('Rejected Withdrawals', $this->withdrawalData('rejected', userId: $userId), 'rejected');
     }
 
 
@@ -35,15 +35,15 @@ class WithdrawalController extends Controller
 
         return Inertia::render('Admin/Withdrawals/Index', [
             'pageTitle' => 'All Withdrawals',
-            'withdrawals' => AdminResource::withdrawals($withdrawalData['data'], $withdrawalData['summary']),
+            'withdrawals' => AdminResource::withdrawals($withdrawalData['data'], $withdrawalData['summary'], 'all'),
         ]);
     }
 
-    protected function renderWithdrawalList(string $pageTitle, $withdrawals)
+    protected function renderWithdrawalList(string $pageTitle, $withdrawals, string $scope = 'all')
     {
         return Inertia::render('Admin/Withdrawals/Index', [
             'pageTitle' => $pageTitle,
-            'withdrawals' => AdminResource::withdrawals($withdrawals),
+            'withdrawals' => AdminResource::withdrawals($withdrawals, null, $scope),
         ]);
     }
 

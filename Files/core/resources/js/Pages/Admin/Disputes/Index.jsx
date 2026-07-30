@@ -1,13 +1,14 @@
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
 
 const STATUS_TABS = [
-    { key: 'active', label: 'Active' },
-    { key: 'open', label: 'Open' },
-    { key: 'in_review', label: 'In Review' },
-    { key: 'resolved', label: 'Resolved' },
-    { key: 'rejected', label: 'Rejected' },
+    { key: 'active', label: 'Active', href: '/admin/disputes?status=active' },
+    { key: 'open', label: 'Open', href: '/admin/disputes?status=open' },
+    { key: 'in_review', label: 'In Review', href: '/admin/disputes?status=in_review' },
+    { key: 'resolved', label: 'Resolved', href: '/admin/disputes?status=resolved' },
+    { key: 'rejected', label: 'Rejected', href: '/admin/disputes?status=rejected' },
 ];
 
 export default function Index({ pageTitle, disputes }) {
@@ -15,17 +16,7 @@ export default function Index({ pageTitle, disputes }) {
 
     return (
         <AdminLayout pageTitle={pageTitle}>
-            <div className="btn-group flex-wrap mb-3">
-                {STATUS_TABS.map((tab) => (
-                    <Link
-                        key={tab.key}
-                        href={`/admin/disputes?status=${tab.key}`}
-                        className={`btn btn-sm ${disputes.status === tab.key ? 'btn--primary' : 'btn-outline--primary'} mb-1`}
-                    >
-                        {tab.label}
-                    </Link>
-                ))}
-            </div>
+            <AdminStatusTabs tabs={STATUS_TABS} active={disputes.status} className="mb-3" />
 
             <div className="card shadow-sm">
                 <div className="table-responsive">

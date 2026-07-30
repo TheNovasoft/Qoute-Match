@@ -2701,6 +2701,160 @@ body.admin-panel .navbar-wrapper .notification-count {
     -webkit-text-fill-color: #ffffff !important;
 }
 
+/* Admin notification dropdown — solid panel above all content */
+body.admin-panel .navbar-wrapper {
+    z-index: 1100 !important;
+    position: relative !important;
+}
+
+body.admin-panel .navbar__action-list > li.dropdown {
+    position: relative !important;
+    z-index: 1110 !important;
+}
+
+/* Tooltips must sit above navbar (z-index 1100); otherwise only a black strip shows under the header */
+body.admin-panel .tooltip,
+body.admin-panel .popover {
+    z-index: 2000 !important;
+}
+
+body.admin-panel .navbar-wrapper .dropdown-menu:not(.show) {
+    display: none !important;
+}
+
+body.admin-panel .admin-notification-dropdown,
+body.admin-panel .navbar__action-list .dropdown-menu.admin-notification-dropdown.show {
+    width: 320px !important;
+    min-width: 320px !important;
+    border-radius: 12px !important;
+    border: 1px solid #e5e5e5 !important;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12) !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    opacity: 1 !important;
+    z-index: 1200 !important;
+}
+
+body.admin-panel .admin-notification-dropdown .dropdown-menu__header {
+    padding: 12px 14px !important;
+    border-bottom: 1px solid #e5e5e5 !important;
+    background: #fff !important;
+}
+
+body.admin-panel .admin-notification-dropdown .dropdown-menu__header .caption {
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    color: #1d1d1f !important;
+    line-height: 1.25 !important;
+}
+
+body.admin-panel .admin-notification-dropdown .dropdown-menu__header p {
+    font-size: 0.75rem !important;
+    color: #6e6e73 !important;
+    margin: 2px 0 0 !important;
+    line-height: 1.3 !important;
+}
+
+body.admin-panel .admin-notification-dropdown .dropdown-menu__header .btn {
+    padding: 4px 10px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    border-radius: 980px !important;
+    white-space: nowrap !important;
+}
+
+body.admin-panel .admin-notification-dropdown .dropdown-menu__body {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: 240px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+}
+
+body.admin-panel .admin-notification-dropdown .dropdown-menu__body.is-empty {
+    min-height: 110px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 16px !important;
+}
+
+body.admin-panel .admin-notification-dropdown .dropdown-menu__item {
+    border-bottom: 1px solid #f0f0f0 !important;
+    text-decoration: none !important;
+}
+
+body.admin-panel .admin-notification-dropdown .dropdown-menu__item:last-child {
+    border-bottom: none !important;
+}
+
+body.admin-panel .admin-notification-dropdown .dropdown-menu__item:hover {
+    background: #f5f5f7 !important;
+}
+
+body.admin-panel .admin-notification-dropdown .navbar-notifi {
+    padding: 10px 14px !important;
+    display: block !important;
+}
+
+body.admin-panel .admin-notification-dropdown .navbar-notifi__right {
+    width: 100% !important;
+}
+
+body.admin-panel .admin-notification-dropdown .notifi__title {
+    margin: 0 !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    color: #1d1d1f !important;
+    line-height: 1.35 !important;
+}
+
+body.admin-panel .admin-notification-dropdown .time {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    margin-top: 4px !important;
+    font-size: 0.6875rem !important;
+    font-weight: 500 !important;
+    color: #0071e3 !important;
+}
+
+body.admin-panel .admin-notification-dropdown .dropdown-menu__footer {
+    padding: 10px 14px !important;
+    border-top: 1px solid #e5e5e5 !important;
+    background: #fafafa !important;
+}
+
+body.admin-panel .admin-notification-dropdown .view-all-message {
+    display: block !important;
+    text-align: center !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    color: #0071e3 !important;
+    padding: 2px 0 !important;
+    text-decoration: none !important;
+}
+
+body.admin-panel .admin-notification-dropdown .view-all-message:hover {
+    color: #0077ed !important;
+}
+
+body.admin-panel .admin-notification-dropdown .empty-notification img {
+    width: 56px !important;
+    margin-bottom: 8px !important;
+}
+
+body.admin-panel .admin-notification-dropdown .empty-notification p {
+    font-size: 0.8125rem !important;
+    color: #6e6e73 !important;
+}
+
 body.admin-panel .navbar-wrapper .navbar-user__name,
 body.admin-panel .navbar-wrapper .navbar-user .icon i {
     color: var(--ink) !important;

@@ -51,11 +51,6 @@
                 "counter": "pendingProviderVerificationsCount"
             },
             {
-                "title": "All Quotes",
-                "route_name": "admin.bids.index",
-                "menu_active": "admin.bids.index"
-            },
-            {
                 "title": "Review Moderation",
                 "route_name": "admin.reviews.pending",
                 "menu_active": "admin.reviews*",
@@ -277,7 +272,8 @@
         "title": "Trial Task",
         "icon": "las la-tasks",
         "route_name": "admin.trial.task.index",
-        "menu_active": "admin.trial.task.*"
+        "menu_active": "admin.trial.task.*",
+        "hide": true
     },
 
     "manage_projects": {
@@ -1042,6 +1038,7 @@
         ],
         "title": "System Setting",
         "icon": "las la-life-ring",
+        "hide": true,
         "route_name": "admin.setting.system",
         "menu_active": [
             "admin.setting.system",
@@ -1090,6 +1087,7 @@
         "hide": true,
         "title": "Extra",
         "icon": "la la-server",
+        "hide": true,
         "menu_active": "admin.system*",
         "counters": ["updateAvailable"],
         "submenu": [

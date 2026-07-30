@@ -1,4 +1,5 @@
-import { Link, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 
 const TABS = [
     { key: 'categories', label: 'Categories', href: '/admin/category/index', match: ['/admin/category/index', '/admin/category'] },
@@ -11,24 +12,15 @@ export default function CategoryTabs({ active }) {
     const rawUrl = usePage().url || '';
     const url = rawUrl.split('?')[0];
 
-    return (
-        <div className="admin-status-tabs btn-group flex-wrap mb-4" role="tablist">
-            {TABS.map((tab) => {
-                const isActive = active
-                    ? active === tab.key
-                    : tab.match.some((path) => url === path || url.startsWith(`${path}/`) || url.startsWith(path));
+    const resolvedActive = active
+        || TABS.find((tab) => tab.match.some((path) => url.startsWith(path)))?.key
+        || 'categories';
 
-                return (
-                    <Link
-                        key={tab.key}
-                        href={tab.href}
-                        className={`btn btn-sm ${isActive ? 'btn--primary' : 'btn-outline--primary'} mb-1`}
-                        preserveScroll
-                    >
-                        {tab.label}
-                    </Link>
-                );
-            })}
-        </div>
+    return (
+        <AdminStatusTabs
+            className="mb-4"
+            active={resolvedActive}
+            tabs={TABS.map(({ key, label, href }) => ({ key, label, href }))}
+        />
     );
 }

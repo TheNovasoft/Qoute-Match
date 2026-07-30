@@ -1,7 +1,14 @@
-import { Link, useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import Pagination from '@/Components/Shared/Pagination';
+
+const MONETISATION_TABS = [
+    { key: 'settings', label: 'Settings', href: '/admin/monetisation/settings' },
+    { key: 'packages', label: 'Credit Packages', href: '/admin/monetisation/packages' },
+    { key: 'plans', label: 'Subscription Plans', href: '/admin/monetisation/plans' },
+];
 
 export default function Packages({ pageTitle, packages }) {
     const rows = packages?.data ?? [];
@@ -9,9 +16,7 @@ export default function Packages({ pageTitle, packages }) {
 
     return (
         <AdminLayout pageTitle={pageTitle}>
-            <div className="mb-3">
-                <Link href={packages.settingsUrl} className="btn btn-sm btn-outline--dark">← Settings</Link>
-            </div>
+            <AdminStatusTabs tabs={MONETISATION_TABS} className="mb-3" />
             <div className="row gy-4">
                 <div className="col-lg-4">
                     <PackageForm packages={packages} editing={editing} onCancel={() => setEditing(null)} />

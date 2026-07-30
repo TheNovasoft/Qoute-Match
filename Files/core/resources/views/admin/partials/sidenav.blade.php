@@ -39,6 +39,9 @@
                                 class="sidebar-submenu {{ isset($data->menu_active) ? menuActive($data->menu_active, 2) : '' }} ">
                                 <ul>
                                     @foreach ($data->submenu as $menu)
+                                        @if (!empty($menu->hide))
+                                            @continue
+                                        @endif
                                         @php
                                             $submenuParams = null;
                                             if (isset($menu->params)) {

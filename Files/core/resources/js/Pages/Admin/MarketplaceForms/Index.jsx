@@ -1,7 +1,14 @@
-import { Link, useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
+import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import CategoryTabs from '@/Components/Admin/CategoryTabs';
 import Pagination from '@/Components/Shared/Pagination';
+
+const TYPE_TABS = [
+    { key: 'all', label: 'All', href: '/admin/marketplace-forms' },
+    { key: 'request', label: 'Request', href: '/admin/marketplace-forms?type=request' },
+    { key: 'quote', label: 'Quote', href: '/admin/marketplace-forms?type=quote' },
+];
 
 export default function Index({ pageTitle, forms }) {
     const rows = forms?.data ?? [];
@@ -18,11 +25,10 @@ export default function Index({ pageTitle, forms }) {
 
             <div className="row g-3 align-items-end mb-4">
                 <div className="col-lg-5">
-                    <div className="btn-group flex-wrap">
-                        <Link href="/admin/marketplace-forms" className={`btn btn-sm ${!forms.type ? 'btn--primary' : 'btn-outline--primary'}`}>All</Link>
-                        <Link href="/admin/marketplace-forms?type=request" className={`btn btn-sm ${forms.type === 'request' ? 'btn--primary' : 'btn-outline--primary'}`}>Request</Link>
-                        <Link href="/admin/marketplace-forms?type=quote" className={`btn btn-sm ${forms.type === 'quote' ? 'btn--primary' : 'btn-outline--primary'}`}>Quote</Link>
-                    </div>
+                    <AdminStatusTabs
+                        tabs={TYPE_TABS}
+                        active={forms.type || 'all'}
+                    />
                 </div>
                 <div className="col-lg-7">
                     <form className="row g-2 align-items-center justify-content-lg-end" onSubmit={submitCreate}>

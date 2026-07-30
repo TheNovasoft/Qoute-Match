@@ -97,7 +97,7 @@ class MarketplaceFormController extends Controller
 
         $formProcessor->generate($form->act, true, 'id', $form->id);
 
-        $notify[] = ['success', 'Form fields updated successfully'];
+        $notify[] = ['success', 'Form fields saved successfully.'];
         return back()->withNotify($notify);
     }
 
