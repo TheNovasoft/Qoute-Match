@@ -431,17 +431,22 @@ class AdminResource
 
     public static function verifications(LengthAwarePaginator $paginator, string $status): array
     {
+        $allowedStatuses = ['pending', 'approved', 'rejected'];
+        $status = in_array($status, $allowedStatuses, true) ? $status : 'pending';
+
         return [
             'status' => $status,
             'pendingCount' => ProviderVerification::where('status', Status::VERIFICATION_PENDING)->count(),
-            'data' => collect($paginator->items())->map(fn (ProviderVerification $row) => self::verificationRow($row))->values()->all(),
+            'data' => collect($paginator->items())->map(fn (ProviderVerification $row) => self::verificationRow($row, $status))->values()->all(),
             'links' => $paginator->linkCollection()->toArray(),
             'meta' => self::paginationMeta($paginator),
         ];
     }
 
-    public static function verificationRow(ProviderVerification $verification): array
+    public static function verificationRow(ProviderVerification $verification, string $status = 'pending'): array
     {
+        $allowedStatuses = ['pending', 'approved', 'rejected'];
+        $status = in_array($status, $allowedStatuses, true) ? $status : 'pending';
         $isPending = (int) $verification->status === Status::VERIFICATION_PENDING;
 
         return [
@@ -451,7 +456,11 @@ class AdminResource
             'providerFullname' => $verification->user?->fullname ?? '—',
             'status' => self::verificationStatus((int) $verification->status),
             'submittedAt' => showDateTime($verification->created_at),
-            'detailUrl' => route('admin.provider.verifications.detail', $verification->id),
+            'detailUrl' => self::withScopeQuery(
+                route('admin.provider.verifications.detail', $verification->id),
+                $status,
+                'status'
+            ),
             'approveUrl' => $isPending ? route('admin.provider.verifications.approve', $verification->id) : null,
             'isPending' => $isPending,
         ];
@@ -460,6 +469,11 @@ class AdminResource
     public static function verificationDetail(ProviderVerification $verification): array
     {
         $isPending = (int) $verification->status === Status::VERIFICATION_PENDING;
+        $statusRoutes = [
+            'pending' => route('admin.provider.verifications.index', ['status' => 'pending']),
+            'approved' => route('admin.provider.verifications.index', ['status' => 'approved']),
+            'rejected' => route('admin.provider.verifications.index', ['status' => 'rejected']),
+        ];
 
         return [
             'id' => (int) $verification->id,
@@ -480,7 +494,7 @@ class AdminResource
                 'approveUrl' => $isPending ? route('admin.provider.verifications.approve', $verification->id) : null,
                 'rejectUrl' => $isPending ? route('admin.provider.verifications.reject', $verification->id) : null,
             ],
-            'indexUrl' => route('admin.provider.verifications.index'),
+            'indexUrl' => self::listReturnUrl($statusRoutes, $statusRoutes['pending'], 'status'),
             'dashboardUrl' => route('admin.marketplace.dashboard'),
         ];
     }

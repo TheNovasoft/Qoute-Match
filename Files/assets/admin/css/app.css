@@ -8525,7 +8525,7 @@ label.required:after {
 @media (min-width: 992px) {
   .configure-card-handle {
     touch-action: none;
-    cursor: grab;
+  cursor: grab;
   }
 }
 
@@ -9156,8 +9156,8 @@ body.admin-panel .table-responsive > .table {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 12px;
-}
+    padding: 12px;
+  }
 
 .admin-mobile-card {
   border: 1px solid #e8ecf7;

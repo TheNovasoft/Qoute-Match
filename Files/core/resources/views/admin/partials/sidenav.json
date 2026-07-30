@@ -51,11 +51,6 @@
                 "counter": "pendingProviderVerificationsCount"
             },
             {
-                "title": "All Quotes",
-                "route_name": "admin.bids.index",
-                "menu_active": "admin.bids.index"
-            },
-            {
                 "title": "Review Moderation",
                 "route_name": "admin.reviews.pending",
                 "menu_active": "admin.reviews*",
