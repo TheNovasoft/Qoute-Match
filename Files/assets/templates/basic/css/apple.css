@@ -191,7 +191,7 @@ body .section-heading.style-left .section-heading__desc {
     margin-right: 0 !important;
 }
 
-/* Card / sub headings — ink on light surfaces (never white) */
+/* Card / sub headings */
 body .category-item__title,
 body .choose-item__title,
 body .why-choose-item__title,
@@ -211,8 +211,8 @@ body .how-wowrk-section .how-work-item__title,
 body .how-work-section .how-work-item__title {
     font-size: 22px !important;
     font-weight: 600 !important;
-    color: #1d1d1f !important;
-    -webkit-text-fill-color: #1d1d1f !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
     background: none !important;
     letter-spacing: -0.02em !important;
 }
