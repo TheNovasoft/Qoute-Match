@@ -21,6 +21,12 @@ function loadScriptOnce(src) {
 function executeScripts(container) {
     if (!container) return;
     container.querySelectorAll('script').forEach((oldScript) => {
+        const src = oldScript.getAttribute('src');
+        // External libs are preloaded; skip re-injecting them so inline init runs immediately.
+        if (src) {
+            oldScript.remove();
+            return;
+        }
         const script = document.createElement('script');
         [...oldScript.attributes].forEach((attr) => script.setAttribute(attr.name, attr.value));
         script.text = oldScript.textContent;
@@ -40,8 +46,12 @@ export default function GatewayCheckout({ layout = 'buyer', html, pageTitle, dep
                 if (!window.jQuery) {
                     await loadScriptOnce(jquerySrc);
                 }
+                // Stripe.js must load before Elements init scripts in gateway HTML
+                if (typeof html === 'string' && html.includes('js.stripe.com') && !window.Stripe) {
+                    await loadScriptOnce('https://js.stripe.com/v3/');
+                }
             } catch {
-                // gateway views may not need jQuery
+                // gateway views may not need jQuery / Stripe.js
             }
             if (cancelled) return;
             executeScripts(ref.current);

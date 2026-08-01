@@ -1,4 +1,4 @@
-import { Link, useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
 import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 
@@ -21,7 +21,7 @@ export default function Settings({ pageTitle, settings }) {
             <AdminStatusTabs tabs={MONETISATION_TABS} className="mb-3" />
 
             <div className="row gy-4">
-                <div className="col-lg-8">
+                <div className="col-12">
                     <div className="card shadow-sm">
                         <div className="card-header bg-white"><h6 className="mb-0">Monetisation Settings</h6></div>
                         <div className="card-body">
@@ -54,14 +54,6 @@ export default function Settings({ pageTitle, settings }) {
                                 </div>
                                 <button type="submit" className="btn btn--primary" disabled={form.processing}>Save Settings</button>
                             </form>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-4">
-                    <div className="card shadow-sm">
-                        <div className="card-body d-grid gap-2">
-                            <Link href={settings.packagesUrl} className="btn btn-outline--primary">Credit Packages</Link>
-                            <Link href={settings.plansUrl} className="btn btn-outline--primary">Subscription Plans</Link>
                         </div>
                     </div>
                 </div>

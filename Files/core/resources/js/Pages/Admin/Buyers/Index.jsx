@@ -41,7 +41,7 @@ function BuyerSearch() {
                 <input
                     type="search"
                     className="form-control"
-                    placeholder="Search username or email…"
+                    placeholder="Search name, username or email…"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />

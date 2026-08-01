@@ -7,112 +7,138 @@ use App\Models\Deposit;
 use App\Http\Controllers\Gateway\PaymentController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Stripe\Charge;
+use Stripe\PaymentIntent;
 use Stripe\Stripe;
-use Stripe\Token;
 use Illuminate\Support\Facades\Session;
-
 
 class ProcessController extends Controller
 {
-
     /*
-     * Stripe Gateway
+     * Stripe Gateway — PaymentIntent + Elements (card entry on-site)
      */
     public static function process($deposit)
     {
         $alias = $deposit->gateway->alias;
+        $stripeAcc = json_decode($deposit->gatewayCurrency()->gateway_parameter);
+
+        if (empty($stripeAcc->secret_key) || empty($stripeAcc->publishable_key)) {
+            $send['error'] = true;
+            $send['message'] = 'Stripe keys are not configured.';
+            return json_encode($send);
+        }
+
+        Stripe::setApiKey($stripeAcc->secret_key);
+
+        $cents = (int) round($deposit->final_amount * 100);
+        if ($cents < 50) {
+            $send['error'] = true;
+            $send['message'] = 'Amount is below Stripe minimum.';
+            return json_encode($send);
+        }
+
+        try {
+            $intent = self::resolvePaymentIntent($deposit, $cents, $stripeAcc);
+        } catch (\Exception $e) {
+            $send['error'] = true;
+            $send['message'] = $e->getMessage();
+            return json_encode($send);
+        }
+
+        $deposit->btc_wallet = $intent->id;
+        $deposit->save();
 
         $send['track'] = $deposit->trx;
         $send['view'] = 'buyer.payment.' . $alias;
         $send['method'] = 'post';
         $send['url'] = route('ipn.' . $alias);
+        $send['client_secret'] = $intent->client_secret;
+        $send['publishable_key'] = $stripeAcc->publishable_key;
+        $send['success_url'] = $deposit->success_url;
+
         return json_encode($send);
+    }
+
+    protected static function resolvePaymentIntent(Deposit $deposit, int $cents, object $stripeAcc): PaymentIntent
+    {
+        if ($deposit->btc_wallet && str_starts_with((string) $deposit->btc_wallet, 'pi_')) {
+            try {
+                $existing = PaymentIntent::retrieve($deposit->btc_wallet);
+                $reusable = in_array($existing->status, [
+                    'requires_payment_method',
+                    'requires_confirmation',
+                    'requires_action',
+                ], true);
+
+                if (
+                    $reusable
+                    && (int) $existing->amount === $cents
+                    && strtolower((string) $existing->currency) === strtolower($deposit->method_currency)
+                ) {
+                    return $existing;
+                }
+            } catch (\Exception $e) {
+                // create a fresh intent below
+            }
+        }
+
+        return PaymentIntent::create([
+            'amount' => $cents,
+            'currency' => strtolower($deposit->method_currency),
+            'payment_method_types' => ['card'],
+            'description' => gs('site_name') . ' payment ' . $deposit->trx,
+            'metadata' => [
+                'trx' => $deposit->trx,
+                'deposit_id' => (string) $deposit->id,
+            ],
+        ]);
     }
 
     public function ipn(Request $request)
     {
-        $track = $request->trx ?? null;
-
-        if (!$track) {
-            $track = Session::get('Track');
-        }
+        $track = $request->trx ?? $request->track ?? Session::get('Track');
         $deposit = Deposit::where('trx', $track)->orderBy('id', 'DESC')->first();
 
-        $apiRequest = $deposit->is_web;
-
-        if ($deposit->status == Status::PAYMENT_SUCCESS) {
-            $notify[] = ['error', 'Invalid request.'];
-
-            if ($apiRequest) return responseError('invalid_request', $notify);
-
-            return redirect($deposit->failed_url)->withNotify($notify);
-        }
-
-        $request->validate([
-            'cardNumber' => 'required',
-            'cardExpiry' => 'required',
-            'cardCVC'    => 'required',
-        ]);
-
-        $cc  = $request->cardNumber;
-        $exp = $request->cardExpiry;
-        $cvc = $request->cardCVC;
-
-        $exp = explode("/", $request->cardExpiry);
-
-        if (!@$exp[1]) {
-            $notify[] = ['error', 'Invalid expiry date provided'];
-
-            if ($apiRequest) return responseError('invalid_expiry', $notify);
-
+        if (!$deposit) {
+            $notify[] = ['error', 'Invalid payment request.'];
             return back()->withNotify($notify);
         }
 
-        $emo   = trim($exp[0]);
-        $eyr   = trim($exp[1]);
-        $cents = round($deposit->final_amount, 2) * 100;
+        $failUrl = $deposit->failed_url ?: url('/');
+        $successUrl = $deposit->success_url ?: url('/');
 
-        $stripeAcc = json_decode($deposit->gatewayCurrency()->gateway_parameter);
-
-        Stripe::setApiKey($stripeAcc->secret_key);
-        Stripe::setApiVersion("2020-03-02");
-
-        try {
-            $token = Token::create(array(
-                "card" => array(
-                    "number" => "$cc",
-                    "exp_month" => $emo,
-                    "exp_year" => $eyr,
-                    "cvc" => "$cvc"
-                )
-            ));
-            try {
-                $charge = Charge::create(array(
-                    'card' => $token['id'],
-                    'currency' => $deposit->method_currency,
-                    'amount' => $cents,
-                    'description' => 'item',
-                ));
-
-                if ($charge['status'] == 'succeeded') {
-                    PaymentController::userDataUpdate($deposit);
-                    $notify[] = ['success', 'Payment captured successfully'];
-
-                    if ($apiRequest) return responseSuccess('payment_captured', $notify);
-
-                    return redirect($deposit->success_url)->withNotify($notify);
-                }
-            } catch (\Exception $e) {
-                $notify[] = ['error' => $e->getMessage()];
-            }
-        } catch (\Exception $e) {
-            $notify[] = ['error', $e->getMessage()];
+        if ($deposit->status == Status::PAYMENT_SUCCESS) {
+            return redirect($successUrl)->withNotify([['success', 'Payment already completed']]);
         }
 
+        $request->validate([
+            'payment_intent' => 'required|string',
+        ]);
 
-        if ($apiRequest) return responseError('payment_failed', $notify);
+        $stripeAcc = json_decode($deposit->gatewayCurrency()->gateway_parameter);
+        Stripe::setApiKey($stripeAcc->secret_key);
 
-        return back()->withNotify($notify);
+        try {
+            $intent = PaymentIntent::retrieve($request->payment_intent);
+        } catch (\Exception $e) {
+            $notify[] = ['error', $e->getMessage()];
+            return redirect($failUrl)->withNotify($notify);
+        }
+
+        $trxMatch = ($intent->metadata->trx ?? null) === $deposit->trx
+            || $deposit->btc_wallet === $intent->id;
+
+        if (!$trxMatch) {
+            $notify[] = ['error', 'Payment does not match this transaction.'];
+            return redirect($failUrl)->withNotify($notify);
+        }
+
+        if ($intent->status === 'succeeded') {
+            PaymentController::userDataUpdate($deposit);
+            $notify[] = ['success', 'Payment captured successfully'];
+            return redirect($successUrl)->withNotify($notify);
+        }
+
+        $notify[] = ['error', 'Payment was not completed. Status: ' . $intent->status];
+        return redirect($failUrl)->withNotify($notify);
     }
 }

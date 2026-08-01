@@ -90,7 +90,7 @@ class ManageBuyersController extends Controller
         } else {
             $buyers = Buyer::query();
         }
-        return $buyers->searchable(['username', 'email'])->withCount('jobs')->orderBy('id', 'desc')->paginate(getPaginate());
+        return $buyers->searchable(['username', 'email', 'firstname', 'lastname'])->withCount('jobs')->orderBy('id', 'desc')->paginate(getPaginate());
     }
 
 

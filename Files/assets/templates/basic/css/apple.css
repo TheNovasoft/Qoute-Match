@@ -424,7 +424,7 @@ body .header .nav-link:hover,
 body .header .login-registration-list__link:hover,
 body .header .job-link:hover {
     color: var(--blue) !important;
-    text-decoration: underline;
+    text-decoration: none;
     background: transparent !important;
 }
 
@@ -1647,7 +1647,7 @@ body .breadcrumb.bg-img {
 }
 
 body .breadcrumb__title {
-    color: var(--ink) !important;
+    color: #ffffff !important;
     font-weight: 600 !important;
     letter-spacing: -0.02em !important;
     font-size: clamp(28px, 4vw, 40px) !important;
@@ -1655,7 +1655,7 @@ body .breadcrumb__title {
 
 body .breadcrumb__link,
 body .breadcrumb__item-text {
-    color: var(--muted) !important;
+    color: #ffffff !important;
     font-size: 12px !important;
 }
 

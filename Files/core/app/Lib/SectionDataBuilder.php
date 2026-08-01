@@ -168,7 +168,6 @@ class SectionDataBuilder
     {
         $section = getContent('category.content', true);
         $categories = Category::active()
-            ->where('is_featured', Status::YES)
             ->orderBy('id', 'DESC')
             ->withCount(['jobs' => fn ($query) => $query->published()->approved()])
             ->get();
