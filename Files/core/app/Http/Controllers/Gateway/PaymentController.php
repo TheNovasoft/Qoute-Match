@@ -45,12 +45,12 @@ class PaymentController extends Controller
         })->where('method_code', $request->gateway)->where('currency', $request->currency)->first();
         if (!$gate) {
             $notify[] = ['error', 'Invalid gateway'];
-            return back()->withNotify($notify);
+            return back()->withNotify($notify)->withInput();
         }
 
         if ($gate->min_amount > $request->amount || $gate->max_amount < $request->amount) {
             $notify[] = ['error', 'Please follow deposit limit'];
-            return back()->withNotify($notify);
+            return back()->withNotify($notify)->withInput();
         }
 
         $charge = $gate->fixed_charge + ($request->amount * $gate->percent_charge / 100);
@@ -99,17 +99,26 @@ class PaymentController extends Controller
         if ($deposit->method_code >= 1000) {
             return to_route('buyer.deposit.manual.confirm');
         }
+
+        if (!$deposit->gateway) {
+            $notify[] = ['error', 'Payment gateway is not available for this deposit.'];
+            return to_route('buyer.deposit.index')->withNotify($notify);
+        }
+
         $dirName = $deposit->gateway->alias;
         $new = __NAMESPACE__ . '\\' . $dirName . '\\ProcessController';
-        
+
+        if (!class_exists($new)) {
+            $notify[] = ['error', 'Payment processor is not available.'];
+            return to_route('buyer.deposit.index')->withNotify($notify);
+        }
+
         $data = $new::process($deposit);
         $data = json_decode($data);
-        
-     
 
         if (isset($data->error)) {
-            $notify[] = ['error', $data->message];
-            return back()->withNotify($notify);
+            $notify[] = ['error', $data->message ?: 'Unable to start payment.'];
+            return to_route('buyer.deposit.index')->withNotify($notify);
         }
         if (isset($data->redirect)) {
             return redirect($data->redirect_url);
@@ -120,7 +129,7 @@ class PaymentController extends Controller
             $deposit->btc_wallet = $data->session->id;
             $deposit->save();
         }
-       
+
         $pageTitle = 'Payment Confirm';
 
         return PaymentResource::gatewayCheckout('buyer', $data, $deposit, $pageTitle);

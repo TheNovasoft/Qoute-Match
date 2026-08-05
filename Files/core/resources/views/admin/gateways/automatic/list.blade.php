@@ -77,9 +77,9 @@
 @endsection
 @push('breadcrumb-plugins')
     <div class="d-inline">
-        <div class="input-group justify-content-end">
-            <input type="text" name="search_table" class="form-control bg--white" placeholder="@lang('Search')...">
-            <button class="btn btn--primary input-group-text"><i class="fas fa-search"></i></button>
+        <div class="d-flex align-items-center justify-content-end gap-2">
+            <input type="text" name="search_table" class="form-control bg--white" placeholder="@lang('Search')..." style="min-width: 180px;">
+            <button type="button" class="btn btn--primary"><i class="fas fa-search"></i></button>
         </div>
     </div>
 @endpush

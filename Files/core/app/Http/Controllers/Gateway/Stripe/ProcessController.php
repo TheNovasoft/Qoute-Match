@@ -19,7 +19,14 @@ class ProcessController extends Controller
     public static function process($deposit)
     {
         $alias = $deposit->gateway->alias;
-        $stripeAcc = json_decode($deposit->gatewayCurrency()->gateway_parameter);
+        $gatewayCurrency = $deposit->gatewayCurrency();
+        if (!$gatewayCurrency) {
+            $send['error'] = true;
+            $send['message'] = 'Stripe currency is not configured.';
+            return json_encode($send);
+        }
+
+        $stripeAcc = json_decode($gatewayCurrency->gateway_parameter);
 
         if (empty($stripeAcc->secret_key) || empty($stripeAcc->publishable_key)) {
             $send['error'] = true;

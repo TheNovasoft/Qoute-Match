@@ -60,13 +60,13 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
         profileHref, passwordHref, twofactorHref,
     ]);
 
-    const [openId, setOpenId] = useState(sectionOpen ?? 'jobs');
+    const [openId, setOpenId] = useState(sectionOpen);
 
     useEffect(() => {
-        if (sectionOpen) setOpenId(sectionOpen);
+        setOpenId(sectionOpen);
     }, [sectionOpen]);
 
-    const currentOpenId = openId ?? sectionOpen;
+    const currentOpenId = openId;
 
     return (
         <div className={`sidebar-menu flex-between${open ? ' show-sidebar' : ''}`}>
