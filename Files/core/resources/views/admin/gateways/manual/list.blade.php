@@ -63,9 +63,11 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <div class="input-group w-auto search-form">
-        <input type="text" name="search_table" class="form-control bg--white" placeholder="@lang('Search')...">
-        <button class="btn btn--primary input-group-text"><i class="fas fa-search"></i></button>
+    <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+        <div class="d-flex align-items-center gap-2">
+            <input type="text" name="search_table" class="form-control bg--white" placeholder="@lang('Search')..." style="min-width: 180px;">
+            <button type="button" class="btn btn--primary"><i class="fas fa-search"></i></button>
+        </div>
+        <a class="btn btn-outline--primary" href="{{ route('admin.gateway.manual.create') }}"><i class="las la-plus"></i>@lang('Add New')</a>
     </div>
-    <a class="btn btn-outline--primary" href="{{ route('admin.gateway.manual.create') }}"><i class="las la-plus"></i>@lang('Add New')</a>
 @endpush

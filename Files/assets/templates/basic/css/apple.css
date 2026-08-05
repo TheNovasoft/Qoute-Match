@@ -2158,12 +2158,17 @@ body .dashboard .sidebar-menu-list__link .icon {
     font-size: 18px !important;
 }
 
-body .dashboard .sidebar-menu-list__link:hover,
-body .dashboard .sidebar-menu-list__link:hover .text,
-body .dashboard .sidebar-menu-list__link:hover .icon {
+/* Hover on the full row only — never paint .icon / .text boxes separately */
+body .dashboard .sidebar-menu-list__link:hover {
     color: #ffffff !important;
     background: rgba(255, 255, 255, 0.08) !important;
     text-decoration: none !important;
+}
+
+body .dashboard .sidebar-menu-list__link:hover .text,
+body .dashboard .sidebar-menu-list__link:hover .icon {
+    color: #ffffff !important;
+    background: transparent !important;
 }
 
 body .dashboard .sidebar-menu-list__item.active > .sidebar-menu-list__link,
@@ -2182,6 +2187,7 @@ body .dashboard .sidebar-menu-list__link.active .icon,
 body .dashboard .sidebar-menu-list__item.has-dropdown.active > .sidebar-menu-list__link .text,
 body .dashboard .sidebar-menu-list__item.has-dropdown.active > .sidebar-menu-list__link .icon {
     color: #ffffff !important;
+    background: transparent !important;
 }
 
 body .dashboard .sidebar-submenu {
@@ -2203,13 +2209,20 @@ body .dashboard .sidebar-submenu-list__link .text {
     font-weight: 400 !important;
 }
 
-body .dashboard .sidebar-submenu-list__item.active .sidebar-submenu-list__link,
-body .dashboard .sidebar-submenu-list__item.active .sidebar-submenu-list__link .text {
+body .dashboard .sidebar-submenu-list__item.active .sidebar-submenu-list__link {
     color: #ffffff !important;
     background: rgba(0, 113, 227, 0.22) !important;
 }
 
-body .dashboard .sidebar-menu-list__link.w-100 {
+body .dashboard .sidebar-submenu-list__item.active .sidebar-submenu-list__link .text,
+body .dashboard .sidebar-submenu-list__item.active .sidebar-submenu-list__link .icon {
+    color: #ffffff !important;
+    background: transparent !important;
+}
+
+/* Dropdown parents stay flat until truly active (was painting every has-dropdown blue) */
+body .dashboard .sidebar-menu-list__item.has-dropdown:not(.active) > .sidebar-menu-list__link,
+body .dashboard .sidebar-menu-list__item.has-dropdown:not(.active) > .sidebar-menu-list__link.w-100 {
     background: transparent !important;
 }
 
@@ -2559,12 +2572,6 @@ body .dashboard .sidebar-submenu .icon {
     opacity: 0.7;
 }
 
-body .dashboard .sidebar-menu-list__item.has-dropdown > .sidebar-menu-list__link,
-body .dashboard .sidebar-menu-list__item.open > .sidebar-menu-list__link {
-    background: rgba(0, 113, 227, 0.18) !important;
-    border-radius: 10px !important;
-}
-
 body .dashboard .sidebar-submenu-list__item.active > .sidebar-submenu-list__link {
     background: rgba(0, 113, 227, 0.16) !important;
     border-radius: 8px !important;
@@ -2573,6 +2580,18 @@ body .dashboard .sidebar-submenu-list__item.active > .sidebar-submenu-list__link
 
 body .dashboard .sidebar-submenu-list__item.active > .sidebar-submenu-list__link .text,
 body .dashboard .sidebar-submenu-list__item.active > .sidebar-submenu-list__link .icon {
+    color: #ffffff !important;
+    background: transparent !important;
+}
+
+body .dashboard .sidebar-submenu-list__link:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+}
+
+body .dashboard .sidebar-submenu-list__link:hover .text,
+body .dashboard .sidebar-submenu-list__link:hover .icon {
+    background: transparent !important;
     color: #ffffff !important;
 }
 

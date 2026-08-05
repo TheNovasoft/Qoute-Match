@@ -1155,13 +1155,22 @@ hr {
   cursor: pointer;
 }
 
-.payment-item:has(.payment-item__radio:checked) {
+.payment-item:has(.payment-item__radio:checked),
+.payment-item.active {
   border-color: hsl(var(--base) / 0.2);
   background-color: hsl(var(--base) / 0.07);
 }
 
-.payment-item:has(.payment-item__radio:checked) .payment-item__name {
+.payment-item:has(.payment-item__radio:checked) .payment-item__name,
+.payment-item.active .payment-item__name {
   color: hsl(var(--base));
+}
+
+.payment-item:has(.payment-item__radio:checked) .payment-item__check,
+.payment-item.active .payment-item__check {
+  background-color: hsl(var(--base));
+  border-color: hsl(var(--base));
+  box-shadow: 0 0 0 3px hsl(var(--base) / 0.15);
 }
 
 .payment-item:has(.payment-item__radio:checked) .check-type-icon {

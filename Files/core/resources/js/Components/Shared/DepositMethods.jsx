@@ -1,11 +1,12 @@
-import { useForm } from '@inertiajs/react';
-import { useEffect, useMemo, useState } from 'react';
+import { router } from '@inertiajs/react';
+import { useMemo, useState } from 'react';
 import RequestFormFields from '@/Components/Jobs/RequestFormFields';
 
 export default function DepositMethods({ gateways, storeUrl, currencySymbol, currencyText }) {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [amount, setAmount] = useState('');
-    const form = useForm({ gateway: '', currency: '', amount: '' });
+    const [processing, setProcessing] = useState(false);
+    const [error, setError] = useState('');
 
     const selected = gateways[selectedIndex] ?? gateways[0];
 
@@ -14,20 +15,54 @@ export default function DepositMethods({ gateways, storeUrl, currencySymbol, cur
         if (!selected || !value) {
             return { charge: 0, payable: 0 };
         }
-        const charge = selected.fixedCharge + (value * selected.percentCharge) / 100;
+        const charge = Number(selected.fixedCharge || 0) + (value * Number(selected.percentCharge || 0)) / 100;
         return { charge, payable: value + charge };
     }, [amount, selected]);
 
-    useEffect(() => {
-        if (selected) {
-            form.setData({ gateway: selected.methodCode, currency: selected.currency });
-        }
-    }, [selected]);
+    const amountValue = parseFloat(amount);
+    const amountInRange =
+        amount !== '' &&
+        !Number.isNaN(amountValue) &&
+        !!selected &&
+        amountValue >= Number(selected.minAmount) &&
+        amountValue <= Number(selected.maxAmount);
 
     const submit = (event) => {
         event.preventDefault();
-        form.setData({ gateway: selected?.methodCode, currency: selected?.currency, amount });
-        form.post(storeUrl);
+        setError('');
+
+        if (!selected) {
+            setError('Select a payment method.');
+            return;
+        }
+        if (!storeUrl) {
+            setError('Deposit endpoint is missing. Refresh the page and try again.');
+            return;
+        }
+        if (!amountInRange) {
+            setError(
+                `Enter an amount between ${selected.minAmountFormatted} and ${selected.maxAmountFormatted}.`,
+            );
+            return;
+        }
+        if (processing) return;
+
+        setProcessing(true);
+        router.post(
+            storeUrl,
+            {
+                gateway: selected.methodCode,
+                currency: selected.currency,
+                amount: String(amount).trim(),
+            },
+            {
+                preserveScroll: true,
+                onError: (errors) => {
+                    setError(errors.amount || errors.gateway || errors.currency || 'Unable to start deposit.');
+                },
+                onFinish: () => setProcessing(false),
+            },
+        );
     };
 
     if (!gateways.length) {
@@ -38,17 +73,22 @@ export default function DepositMethods({ gateways, storeUrl, currencySymbol, cur
         );
     }
 
-    const canSubmit = selected && amount && parseFloat(amount) >= selected.minAmount && parseFloat(amount) <= selected.maxAmount;
-
     return (
         <form onSubmit={submit} className="deposit-form">
-            <input type="hidden" name="currency" value={form.data.currency} />
+            {error && (
+                <div className="alert alert-danger mb-3" role="alert">
+                    {error}
+                </div>
+            )}
             <div className="gateway-card">
                 <div className="row justify-content-center gy-sm-4 gy-3">
                     <div className="col-xl-6">
                         <div className="payment-system-list is-scrollable gateway-option-list">
                             {gateways.map((gateway, index) => (
-                                <label key={`${gateway.methodCode}-${gateway.currency}`} className={`payment-item gateway-option ${selectedIndex === index ? 'active' : ''}`}>
+                                <label
+                                    key={`${gateway.methodCode}-${gateway.currency}`}
+                                    className={`payment-item gateway-option ${selectedIndex === index ? 'active' : ''}`}
+                                >
                                     <div className="payment-item__info">
                                         <span className="payment-item__check" />
                                         <span className="payment-item__name">{gateway.name}</span>
@@ -59,6 +99,8 @@ export default function DepositMethods({ gateways, storeUrl, currencySymbol, cur
                                     <input
                                         type="radio"
                                         className="payment-item__radio gateway-input"
+                                        name="gateway_option"
+                                        value={`${gateway.methodCode}|${gateway.currency}`}
                                         checked={selectedIndex === index}
                                         onChange={() => setSelectedIndex(index)}
                                         hidden
@@ -71,38 +113,61 @@ export default function DepositMethods({ gateways, storeUrl, currencySymbol, cur
                         <div className="payment-system-list deposit-panel">
                             <p className="deposit-panel__eyebrow">Deposit Summary</p>
                             <h5 className="deposit-panel__heading">How much would you like to add?</h5>
-                            <label className="deposit-panel__label">Amount</label>
+                            <label className="deposit-panel__label" htmlFor="deposit-amount">
+                                Amount
+                            </label>
                             <div className="deposit-amount-field">
                                 <span className="deposit-amount-field__prefix">{currencySymbol}</span>
                                 <input
+                                    id="deposit-amount"
                                     className="deposit-amount-field__input amount form--control"
                                     type="text"
                                     inputMode="decimal"
+                                    name="amount"
                                     value={amount}
-                                    onChange={(e) => setAmount(e.target.value)}
+                                    onChange={(e) => {
+                                        setAmount(e.target.value);
+                                        setError('');
+                                    }}
                                     placeholder="0.00"
+                                    autoComplete="off"
                                 />
                                 <span className="deposit-amount-field__suffix">{currencyText}</span>
                             </div>
                             <ul className="deposit-panel__meta">
                                 <li>
                                     <span>Limit</span>
-                                    <strong>{selected ? `${selected.minAmountFormatted} - ${selected.maxAmountFormatted}` : '—'}</strong>
+                                    <strong>
+                                        {selected ? `${selected.minAmountFormatted} - ${selected.maxAmountFormatted}` : '—'}
+                                    </strong>
                                 </li>
                                 <li>
                                     <span>Processing Charge</span>
-                                    <strong>{currencySymbol}{calculation.charge.toFixed(2)} {currencyText}</strong>
+                                    <strong>
+                                        {currencySymbol}
+                                        {calculation.charge.toFixed(2)} {currencyText}
+                                    </strong>
                                 </li>
                             </ul>
                             <div className="deposit-panel__total">
                                 <span className="deposit-panel__total-label">Total Payable</span>
                                 <strong className="deposit-panel__total-value">
-                                    {currencySymbol}{calculation.payable.toFixed(2)} {currencyText}
+                                    {currencySymbol}
+                                    {calculation.payable.toFixed(2)} {currencyText}
                                 </strong>
                             </div>
-                            <button type="submit" className="btn btn--base w-100 deposit-panel__submit" disabled={!canSubmit || form.processing}>
-                                Confirm Deposit
+                            <button
+                                type="submit"
+                                className="btn btn--base w-100 deposit-panel__submit"
+                                disabled={processing}
+                            >
+                                {processing ? 'Processing…' : 'Confirm Deposit'}
                             </button>
+                            {selected?.name && (
+                                <p className="small text-muted text-center mt-2 mb-0">
+                                    Paying with <strong>{selected.name}</strong>
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -113,7 +178,7 @@ export default function DepositMethods({ gateways, storeUrl, currencySymbol, cur
 
 export function ManualPaymentConfirm({ payment }) {
     const [fieldValues, setFieldValues] = useState({});
-    const form = useForm({});
+    const [processing, setProcessing] = useState(false);
 
     const submit = (event) => {
         event.preventDefault();
@@ -121,14 +186,21 @@ export function ManualPaymentConfirm({ payment }) {
         Object.entries(fieldValues).forEach(([key, value]) => {
             if (value instanceof File) {
                 data.append(key, value);
-            } else if (Array.isArray(value)) {
-                value.forEach((item) => data.append(`${key}[]`, item));
             } else if (value !== null && value !== undefined) {
-                data.append(key, value);
+                if (Array.isArray(value)) {
+                    value.forEach((item) => data.append(`${key}[]`, item));
+                } else {
+                    data.append(key, value);
+                }
             }
         });
-        form.transform(() => Object.fromEntries(data.entries()));
-        form.post(payment.submitUrl, { forceFormData: true });
+        // Post FormData directly — transform(() => Object.fromEntries(...)) drops File
+        // values and can return undefined, which silently breaks manual/bank submits.
+        setProcessing(true);
+        router.post(payment.submitUrl, data, {
+            forceFormData: true,
+            onFinish: () => setProcessing(false),
+        });
     };
 
     return (
@@ -148,8 +220,8 @@ export function ManualPaymentConfirm({ payment }) {
                         values={fieldValues}
                         onChange={(label, value) => setFieldValues((prev) => ({ ...prev, [label]: value }))}
                     />
-                    <button type="submit" className="btn btn--base w-100 mt-3" disabled={form.processing}>
-                        Pay Now
+                    <button type="submit" className="btn btn--base w-100 mt-3" disabled={processing}>
+                        {processing ? 'Processing…' : 'Pay Now'}
                     </button>
                 </form>
             </div>

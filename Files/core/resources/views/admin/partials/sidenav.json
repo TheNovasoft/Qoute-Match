@@ -788,6 +788,48 @@
         ]
     },
 
+    "payment_gateways": {
+        "title": "Payment Gateways",
+        "icon": "las la-credit-card",
+        "menu_active": ["admin.gateway*", "admin.withdraw.method*"],
+        "submenu": [
+            {
+                "keyword": [
+                    "Automatic Gateway",
+                    "Payment Gateways",
+                    "Stripe",
+                    "PayPal",
+                    "configure payment gateways"
+                ],
+                "title": "Automatic Gateways",
+                "route_name": "admin.gateway.automatic.index",
+                "menu_active": ["admin.gateway.automatic.index", "admin.gateway.automatic.edit"]
+            },
+            {
+                "keyword": [
+                    "Manual Gateway",
+                    "Bank Transfer",
+                    "Payment Gateways",
+                    "offline payment"
+                ],
+                "title": "Manual Gateways",
+                "route_name": "admin.gateway.manual.index",
+                "menu_active": ["admin.gateway.manual*"]
+            },
+            {
+                "keyword": [
+                    "Withdraw Methods",
+                    "Withdrawal Methods",
+                    "Bank Transfer",
+                    "payout methods"
+                ],
+                "title": "Withdraw Methods",
+                "route_name": "admin.withdraw.method.index",
+                "menu_active": ["admin.withdraw.method*"]
+            }
+        ]
+    },
+
     "withdrawals": {
         "title": "Withdrawals",
         "icon": "la la-bank",

@@ -136,14 +136,25 @@ class MonetisationPaymentController extends Controller
             return to_route('user.monetisation.payment.manual.confirm');
         }
 
+        if (!$deposit->gateway) {
+            $notify[] = ['error', 'Payment gateway is not available for this payment.'];
+            return to_route('user.lead.credits.index')->withNotify($notify);
+        }
+
         $dirName = $deposit->gateway->alias;
         $new = 'App\\Http\\Controllers\\Gateway\\' . $dirName . '\\ProcessController';
+
+        if (!class_exists($new)) {
+            $notify[] = ['error', 'Payment processor is not available.'];
+            return to_route('user.lead.credits.index')->withNotify($notify);
+        }
+
         $data = $new::process($deposit);
         $data = json_decode($data);
 
         if (isset($data->error)) {
-            $notify[] = ['error', $data->message];
-            return back()->withNotify($notify);
+            $notify[] = ['error', $data->message ?: 'Unable to start payment.'];
+            return to_route('user.lead.credits.index')->withNotify($notify);
         }
         if (isset($data->redirect)) {
             return redirect($data->redirect_url);
