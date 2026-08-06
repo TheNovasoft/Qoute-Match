@@ -3,11 +3,24 @@ import FrontendLayout from '@/Components/Layout/FrontendLayout';
 import SectionRenderer, { FreelancerCard } from '@/Components/Sections/SectionRenderer';
 import Pagination, { EmptyState } from '@/Components/Shared/Pagination';
 
-export default function Freelancers({ pageTitle, seo, sections, freelancers, skills, filters }) {
+export default function Freelancers({ pageTitle, seo, sections, freelancers, skills, filters, saveSearch }) {
     const submit = (event) => {
         event.preventDefault();
         const formData = new FormData(event.target);
         router.get('/providers', Object.fromEntries(formData), { preserveState: true });
+    };
+
+    const saveCurrentSearch = () => {
+        if (!saveSearch?.url) return;
+        router.post(saveSearch.url, {
+            type: saveSearch.type || 'providers',
+            filters: {
+                rating: filters?.rating || '',
+                skill: filters?.skill || '',
+                search: filters?.search || '',
+                sort: filters?.sort || 'recommended',
+            },
+        }, { preserveScroll: true });
     };
 
     return (
@@ -31,11 +44,21 @@ export default function Freelancers({ pageTitle, seo, sections, freelancers, ski
                                             <option key={skill.id} value={skill.id}>{skill.name}</option>
                                         ))}
                                     </select>
+                                    <select className="form-select form--control" name="sort" defaultValue={filters.sort || 'recommended'}>
+                                        <option value="recommended">Recommended</option>
+                                        <option value="rating">Highest rating</option>
+                                        <option value="earning">Top earning</option>
+                                    </select>
                                     <input className="form-control form--control" name="search" type="search"
                                         defaultValue={filters.search || ''} placeholder="Search Talent" />
                                     <button className="btn btn--base" type="submit">
                                         <i className="las la-filter"></i>
                                     </button>
+                                    {saveSearch?.url && (
+                                        <button className="btn btn-outline--base filter-save-btn" type="button" onClick={saveCurrentSearch}>
+                                            Save Search
+                                        </button>
+                                    )}
                                 </form>
                             </div>
                             <div className="filter-wrapper__right d-none d-lg-block">

@@ -205,7 +205,6 @@ body .user-type-card__title,
 body .about-item__title,
 body .work-completion-content__title,
 body .subscribe-content__title,
-body .freelancer-item__name,
 body .choose-wrapper .choose-item__title,
 body .how-wowrk-section .how-work-item__title,
 body .how-work-section .how-work-item__title {
@@ -213,6 +212,16 @@ body .how-work-section .how-work-item__title {
     font-weight: 600 !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
+    background: none !important;
+    letter-spacing: -0.02em !important;
+}
+
+/* Provider cards sit on white — name must stay dark (not photo-overlay white) */
+body .freelancer-item__name {
+    font-size: 22px !important;
+    font-weight: 600 !important;
+    color: var(--ink) !important;
+    -webkit-text-fill-color: var(--ink) !important;
     background: none !important;
     letter-spacing: -0.02em !important;
 }
@@ -1684,10 +1693,93 @@ body .form--label {
     font-weight: 500 !important;
 }
 
-/* —— Ratings: single accent —— */
+/* —— Ratings: white stars on green chips —— */
 body .rating-list__item i,
 body .review-rating-list__item i {
+    color: #ffffff !important;
+}
+
+/* Verification badges — keep tone colors visible on white cards */
+body .verification-badge--success,
+body .verification-badge--identity,
+body .verification-badge--insurance {
+    background: rgba(40, 199, 111, 0.14) !important;
+    color: #1f9d55 !important;
+    -webkit-text-fill-color: #1f9d55 !important;
+}
+
+body .verification-badge--primary,
+body .verification-badge--approved {
+    background: rgba(0, 113, 227, 0.12) !important;
+    color: #0071e3 !important;
+    -webkit-text-fill-color: #0071e3 !important;
+}
+
+body .verification-badge--info,
+body .verification-badge--company,
+body .verification-badge--licence {
+    background: rgba(30, 159, 242, 0.14) !important;
+    color: #0b7ec8 !important;
+    -webkit-text-fill-color: #0b7ec8 !important;
+}
+
+body .verification-badge i {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+}
+
+/* Providers filter bar — keep Save Search readable + filter icon hover white */
+body .talent-main-section .filter-form {
+    flex-wrap: wrap;
+}
+
+body .talent-main-section .filter-form .btn {
+    flex: 0 0 auto !important;
+    flex-shrink: 0 !important;
+}
+
+body .talent-main-section .filter-form .btn--base {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+}
+
+body .talent-main-section .filter-form .btn--base,
+body .talent-main-section .filter-form .btn--base i,
+body .talent-main-section .filter-form .btn--base:hover,
+body .talent-main-section .filter-form .btn--base:hover i,
+body .talent-main-section .filter-form .btn--base:focus,
+body .talent-main-section .filter-form .btn--base:focus i {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+body .talent-main-section .filter-form .filter-save-btn,
+body .talent-main-section .filter-form .btn-outline--base.filter-save-btn {
+    width: auto !important;
+    min-width: auto !important;
+    height: auto !important;
+    white-space: nowrap !important;
+    writing-mode: horizontal-tb !important;
+    padding: 12px 20px !important;
+    border-radius: var(--qm-pill) !important;
+    border: 1px solid var(--blue) !important;
     color: var(--blue) !important;
+    -webkit-text-fill-color: var(--blue) !important;
+    background: #ffffff !important;
+}
+
+body .talent-main-section .filter-form .filter-save-btn:hover,
+body .talent-main-section .filter-form .btn-outline--base.filter-save-btn:hover {
+    background: var(--blue) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border-color: var(--blue) !important;
 }
 
 /* Soften decorative shapes (keep how-work arrows visible — styled above) */

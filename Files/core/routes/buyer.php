@@ -131,6 +131,12 @@ Route::middleware('buyer')->name('buyer.')->group(function () {
                 Route::get('/', 'index')->name('index');
             });
 
+            Route::controller('SavedSearchController')->prefix('saved-searches')->name('saved.searches.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::post('delete/{id}', 'destroy')->name('destroy');
+            });
+
             //Conversation
             Route::controller('ConversationController')->prefix('conversation')->name('conversation.')->group(function () {
                 Route::get('unread-summary', 'unreadSummary')->name('unread.summary');
