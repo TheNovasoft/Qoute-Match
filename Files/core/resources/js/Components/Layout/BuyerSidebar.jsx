@@ -151,6 +151,16 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                         </Link>
                     </li>
 
+                    <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerSavedSearches ?? '/customer/saved-searches') ? ' active' : ''}`}>
+                        <Link
+                            href={routes.buyerSavedSearches ?? '/customer/saved-searches'}
+                            className={`sidebar-menu-list__link${isNavActive(url, routes.buyerSavedSearches ?? '/customer/saved-searches') ? ' active' : ''}`}
+                        >
+                            <span className="icon"><i className="las la-bookmark"></i></span>
+                            <span className="text">Saved Searches</span>
+                        </Link>
+                    </li>
+
                     <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerDisputes ?? '/buyer/disputes') ? ' active' : ''}`}>
                         <Link
                             href={routes.buyerDisputes ?? '/buyer/disputes'}

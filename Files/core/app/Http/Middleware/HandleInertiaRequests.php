@@ -172,6 +172,8 @@ class HandleInertiaRequests extends Middleware
                 'buyerJobBidChat' => url('/customer/conversation/bid-chat'),
                 'buyerJobHire' => url('/customer/job/post/hire-talent'),
                 'buyerProjects' => route('buyer.project.index'),
+                'buyerSavedSearches' => route('buyer.saved.searches.index'),
+                'buyerSavedSearchesStore' => route('buyer.saved.searches.store'),
                 'buyerDisputes' => route('buyer.disputes.index'),
                 'buyerNotifications' => route('buyer.notifications.index'),
                 'buyerDeposit' => route('buyer.deposit.index'),

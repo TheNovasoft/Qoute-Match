@@ -532,7 +532,13 @@ class ManageJobController extends Controller
         $statsBids = (clone $statsQuery)->get();
         $statsLowest = $statsBids->min(fn (Bid $bid) => (float) $bid->bid_amount);
 
-        $bidsQuery = (clone $statsQuery)->with(['user.providerVerifications']);
+        $bidsQuery = (clone $statsQuery)->with([
+            'user.providerVerifications',
+            'user.projects',
+            'user.approvedReviews',
+            'user.badge',
+            'user.skills',
+        ]);
 
         if ($filterVerified) {
             $bidsQuery->whereHas('user', fn ($q) => $q->where('provider_approved', true)->where('kv', Status::KYC_VERIFIED));
@@ -566,6 +572,7 @@ class ManageJobController extends Controller
             'price_desc' => $bidsQuery->orderByDesc('bid_amount'),
             'newest' => $bidsQuery->orderByDesc('id'),
             'availability' => $bidsQuery->orderBy('estimated_time'),
+            'recommended', 'rating' => $bidsQuery->orderBy('id'),
             default => $bidsQuery->orderBy('bid_amount'),
         };
 
@@ -573,8 +580,12 @@ class ManageJobController extends Controller
 
         if ($sort === 'rating') {
             $bidModels = $bidModels->sortByDesc(function (Bid $bid) {
-                return (float) $bid->user->approvedReviews()->avg('rating');
+                return (float) ($bid->user->avg_rating ?? 0);
             })->values();
+        }
+
+        if ($sort === 'recommended') {
+            $bidModels = \App\Lib\ProviderRankingService::sortBidsByRecommended($bidModels, $job);
         }
 
         $lowestAmount = $bidModels->min(fn (Bid $bid) => (float) $bid->bid_amount);

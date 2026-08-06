@@ -235,6 +235,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                     value={localFilters.sort || 'price_asc'}
                                     onChange={(e) => setLocalFilters({ ...localFilters, sort: e.target.value })}
                                 >
+                                    <option value="recommended">Recommended</option>
                                     <option value="price_asc">Lowest price</option>
                                     <option value="price_desc">Highest price</option>
                                     <option value="rating">Highest rating</option>

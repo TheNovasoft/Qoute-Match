@@ -209,6 +209,7 @@ class SiteController extends Controller
     public function allFreelancers(Request $request)
     {
         $pageTitle = "Talent Freelancers";
+        $sort = $request->get('sort', 'recommended');
         $mainQuery = User::active();
         if ($request->rating && in_array($request->rating, [1, 2, 3, 4, 5])) {
             $mainQuery = $mainQuery->where('users.avg_rating', $request->rating);
@@ -219,16 +220,33 @@ class SiteController extends Controller
             });
         }
 
-        $freelancers = $mainQuery->select('users.*')
+        $mainQuery = $mainQuery->select('users.*')
             ->searchable(['users.username', 'users.firstname', 'users.lastname'])
-            ->with('projects', 'badge', 'skills')->orderBy('earning', 'DESC')
-            ->paginate(getPaginate());
+            ->with(['projects', 'badge', 'skills', 'providerVerifications', 'approvedReviews']);
 
-        $totalFreelancer = $freelancers->count();
+        if ($sort === 'rating') {
+            $freelancers = $mainQuery->orderByDesc('avg_rating')->orderByDesc('earning')->paginate(getPaginate());
+        } elseif ($sort === 'earning') {
+            $freelancers = $mainQuery->orderByDesc('earning')->paginate(getPaginate());
+        } else {
+            // Recommended: score current filter set, then paginate manually
+            $scored = \App\Lib\ProviderRankingService::sortByScore($mainQuery->get());
+            $page = max(1, (int) $request->get('page', 1));
+            $perPage = (int) getPaginate();
+            $freelancers = new \Illuminate\Pagination\LengthAwarePaginator(
+                $scored->forPage($page, $perPage)->values(),
+                $scored->count(),
+                $perPage,
+                $page,
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
+        }
+
         $skills          = Skill::active()->get();
         $sections        = Page::where('tempname', activeTemplate())->where('slug', 'talents')->first();
         $seoContents     = $sections->seo_content;
         $seoImage        = @$seoContents->image ? getImage(getFilePath('seo') . '/' . @$seoContents->image, getFileSize('seo')) : null;
+        $buyer = auth()->guard('buyer')->user();
 
         return Inertia::render('Public/Freelancers', [
             'pageTitle' => $pageTitle,
@@ -240,7 +258,12 @@ class SiteController extends Controller
                 'rating' => $request->rating,
                 'skill' => $request->skill,
                 'search' => $request->search,
+                'sort' => $sort,
             ],
+            'saveSearch' => $buyer ? [
+                'url' => route('buyer.saved.searches.store'),
+                'type' => 'providers',
+            ] : null,
         ]);
     }
 

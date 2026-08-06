@@ -123,10 +123,8 @@ export function FreelancerCard({ freelancer }) {
                 <img src={freelancer.image} alt={freelancer.fullname} />
             </div>
             <div className="freelancer-item__content">
-                <h6 className="freelancer-item__name d-flex align-items-center flex-wrap gap-1">
-                    {freelancer.fullname}
-                    <VerificationBadges badges={freelancer.verificationBadges} compact />
-                </h6>
+                <VerificationBadges badges={freelancer.verificationBadges} compact className="justify-content-center mb-1" />
+                <h6 className="freelancer-item__name">{freelancer.fullname}</h6>
                 <span className="freelancer-item__designation">{freelancer.tagline}</span>
                 {freelancer.avgRating > 0 && (
                     <ul className="text-list review-rating-list mb-0">
