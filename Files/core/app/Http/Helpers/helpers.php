@@ -14,6 +14,7 @@ use App\Notify\Notify;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 function systemDetails() {
@@ -444,10 +445,20 @@ function dateSorting($arr) {
 
 function gs($key = null) {
     $general = Cache::get('GeneralSetting');
+
     if (!$general) {
-        $general = GeneralSetting::first();
-        Cache::put('GeneralSetting', $general);
+        try {
+            if (Schema::hasTable('general_settings')) {
+                $general = GeneralSetting::first();
+                if ($general) {
+                    Cache::put('GeneralSetting', $general);
+                }
+            }
+        } catch (\Throwable) {
+            $general = null;
+        }
     }
+
     if ($key) {
         return @$general->$key;
     }
