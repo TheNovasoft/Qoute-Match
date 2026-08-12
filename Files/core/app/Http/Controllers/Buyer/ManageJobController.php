@@ -360,6 +360,8 @@ class ManageJobController extends Controller
         $job->save();
 
         if ($status === Status::JOB_PUBLISH && !$wasPublished) {
+            \App\Lib\InvoiceService::forJobPublished($job);
+
             $adminNotification = new AdminNotification();
             $adminNotification->buyer_id = $buyer->id;
             $adminNotification->title = 'New job posted by ' . $buyer->fullname;
@@ -751,11 +753,21 @@ class ManageJobController extends Controller
     public function hireTalent($bidId)
     {
         $buyer = auth()->guard('buyer')->user();
-        $bid  = Bid::with(['job', 'user'])->where('id', $bidId)->where('buyer_id', $buyer->id)->where('status', Status::BID_PENDING)->firstOrFail();
-        $jobTitle = $bid->job->title;
-        $buyer = $bid->job->buyer;
+        $bid = Bid::with(['job', 'user'])
+            ->where('id', $bidId)
+            ->where('buyer_id', $buyer->id)
+            ->where('status', Status::BID_PENDING)
+            ->firstOrFail();
+
+        $job = $bid->job;
+        $jobTitle = $job->title;
         $freelancer = $bid->user;
-        $bidAmount = $bid->bid_amount;
+        $bidAmount = (float) $bid->bid_amount;
+
+        if (!$freelancer) {
+            $notify[] = ['error', 'Provider account not found for this quote.'];
+            return back()->withNotify($notify);
+        }
 
         $existProject = Project::where('job_id', $bid->job_id)->where('status', '!=', Status::PROJECT_REJECTED)->first();
 
@@ -764,74 +776,97 @@ class ManageJobController extends Controller
             return back()->withNotify($notify);
         }
 
-        if (gs('escrow_payment') && $buyer->balance < $bidAmount) {
-            $shortfall = max(0, (float) $bidAmount - (float) $buyer->balance);
+        if (gs('escrow_payment') && (float) $buyer->balance < $bidAmount) {
+            $shortfall = max(0, $bidAmount - (float) $buyer->balance);
             $notify[] = ['error', 'Insufficient balance. Deposit at least ' . showAmount($shortfall) . ' to accept this quote.'];
             return to_route('buyer.deposit.index')->withNotify($notify);
         }
 
-        $job = $bid->job;
-        $job->status = Status::JOB_PROCESSING;
-        $job->save();
+        try {
+            $assign = \Illuminate\Support\Facades\DB::transaction(function () use ($buyer, $bid, $job, $freelancer, $bidAmount) {
+                $job->status = Status::JOB_PROCESSING;
+                $job->save();
 
+                $assign = new Project();
+                $assign->bid_id = $bid->id;
+                $assign->job_id = $bid->job_id;
+                $assign->user_id = $freelancer->id;
+                $assign->buyer_id = $buyer->id;
+                if (gs('escrow_payment')) {
+                    $assign->escrow_amount = $bidAmount;
+                    $buyer->balance -= $bidAmount;
+                    $buyer->save();
+                }
+                $assign->status = Status::PROJECT_RUNNING;
+                $assign->save();
 
-        //project-assign
-        $assign = new Project();
-        $assign->bid_id = $bid->id;
-        $assign->job_id = $bid->job_id;
-        $assign->user_id = $freelancer->id;
-        $assign->buyer_id = $buyer->id;
-        if (gs('escrow_payment')) {
-            $assign->escrow_amount = $bidAmount;
-            $buyer->balance -= $bidAmount;
-            $buyer->save();
+                $bid->status = Status::BID_ACCEPTED;
+                $bid->project_id = $assign->id;
+                $bid->save();
+
+                if (gs('escrow_payment')) {
+                    $transaction = new Transaction();
+                    $transaction->buyer_id = $buyer->id;
+                    $transaction->project_id = $assign->id;
+                    $transaction->amount = $bidAmount;
+                    $transaction->post_balance = $buyer->balance;
+                    $transaction->trx_type = '-';
+                    $transaction->details = 'Project hold amount, job: ' . $job->title;
+                    $transaction->trx = getTrx();
+                    $transaction->remark = 'project_hold_amount';
+                    $transaction->save();
+                }
+
+                return $assign;
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            $notify[] = ['error', 'Unable to accept this quote right now. Please try again.'];
+            return back()->withNotify($notify);
         }
 
-        $assign->status = Status::PROJECT_RUNNING;
-        $assign->save();
+        $holdTrx = Transaction::where('project_id', $assign->id)
+            ->where('remark', 'project_hold_amount')
+            ->latest('id')
+            ->value('trx');
 
-        //Accept bid
-        $bid->status = Status::BID_ACCEPTED;
-        $bid->project_id = $assign->id;
-        $bid->save();
+        \App\Lib\InvoiceService::forProjectAccepted($assign, $bid, $bidAmount, $holdTrx);
 
-        notify($freelancer, 'BID_ACCEPTED', [
-            'title' =>  $jobTitle,
-            'buyer' => $buyer->fullname,
-            'budget_type' => $bid->job->custom_budget ? 'Customized' : 'Fixed',
-            'bid_amount' => showAmount($bidAmount),
-            'estimated_time' => $bid->estimated_time,
-            'assigned_at' => $bid->created_at,
-        ]);
+        try {
+            notify($freelancer, 'BID_ACCEPTED', [
+                'title' => $jobTitle,
+                'buyer' => $buyer->fullname,
+                'budget_type' => $job->custom_budget ? 'Customized' : 'Fixed',
+                'bid_amount' => showAmount($bidAmount),
+                'estimated_time' => $bid->estimated_time,
+                'assigned_at' => $bid->created_at,
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         $rejectsBids = Bid::where('job_id', $bid->job_id)->where('status', Status::BID_PENDING)->get();
-        //bid rejected
         foreach ($rejectsBids as $rejBid) {
-            $freelancer = $rejBid->user; //freelancer
+            $rejFreelancer = $rejBid->user;
             $rejBid->status = Status::BID_REJECTED;
             $rejBid->save();
 
-            notify($freelancer, 'BID_REJECTED', [
-                'title' => $jobTitle,
-                'budget_type' => $rejBid->job->custom_budget ? 'Customized' : 'Fixed',
-                'bid_amount' => showAmount($rejBid->bid_amount),
-            ]);
-        }
+            if (!$rejFreelancer) {
+                continue;
+            }
 
-        if (gs('escrow_payment') ) {
-            $transaction               = new Transaction();
-            $transaction->buyer_id    =  $buyer->id;
-            $transaction->project_id   =  $bid->project_id;
-            $transaction->amount       =  $bidAmount;
-            $transaction->post_balance =  $buyer->balance;
-            $transaction->trx_type     = '-';
-            $transaction->details      = 'Project hold amount, job: ' . $job->title;
-            $transaction->trx          = getTrx();
-            $transaction->remark       = 'project_hold_amount';
-            $transaction->save();
+            try {
+                notify($rejFreelancer, 'BID_REJECTED', [
+                    'title' => $jobTitle,
+                    'budget_type' => $job->custom_budget ? 'Customized' : 'Fixed',
+                    'bid_amount' => showAmount($rejBid->bid_amount),
+                ]);
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         $notify[] = ['success', 'Your project has been successfully assigned!'];
-        return back()->withNotify($notify);
+        return to_route('buyer.project.detail', $assign->id)->withNotify($notify);
     }
 }

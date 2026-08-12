@@ -75,6 +75,11 @@ Route::middleware('buyer')->name('buyer.')->group(function () {
                 Route::post('talent-invite/{fId}', 'talentInviteByBuyer')->name('talent.invite');
             });
 
+            Route::controller('InvoiceController')->prefix('invoices')->name('invoices.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('{id}', 'show')->name('show');
+            });
+
             //manage Job
             Route::controller('ManageJobController')->prefix('job/post')->name('job.post.')->group(function () {
                 Route::get('index', 'index')->name('index');

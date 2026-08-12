@@ -1,5 +1,6 @@
 import AppLayout from '@/Components/Layout/AppLayout';
 import DashboardUserMenu from '@/Components/Layout/DashboardUserMenu';
+import PortalBackLink from '@/Components/Shared/PortalBackLink';
 import useInboxNotifications from '@/hooks/useInboxNotifications';
 import useMessageNotifications from '@/hooks/useMessageNotifications';
 import { isNavActive } from '@/utils/helpers';
@@ -29,7 +30,7 @@ function SidebarLink({ href, icon, label, active, badge, asButton, cta }) {
     );
 }
 
-export default function MasterLayout({ children, pageTitle }) {
+export default function MasterLayout({ children, pageTitle, backUrl }) {
     const { url, props } = usePage();
     const { auth, site, template, routes, monetisation } = props;
     const user = auth?.user;
@@ -53,6 +54,7 @@ export default function MasterLayout({ children, pageTitle }) {
     const notificationsHref = routes.userNotifications ?? '/freelancer/notifications';
     const withdrawHref = routes.userWithdraw ?? '/freelancer/withdraw';
     const transactionsHref = routes.userTransactions ?? '/freelancer/transactions';
+    const invoicesHref = routes.userInvoices ?? '/provider/invoices';
     const leadCreditsHref = routes.userLeadCredits ?? '/freelancer/lead-credits';
     const verificationHref = routes.userVerification ?? '/freelancer/verification';
     const conversationHref = routes.userConversation ?? '/freelancer/conversation';
@@ -155,6 +157,12 @@ export default function MasterLayout({ children, pageTitle }) {
                                     label="Transactions"
                                     active={isNavActive(url, transactionsHref)}
                                 />
+                                <SidebarLink
+                                    href={invoicesHref}
+                                    icon="las la-file-invoice"
+                                    label="Invoices"
+                                    active={isNavActive(url, invoicesHref)}
+                                />
                                 {monetisation?.enabled && (
                                     <SidebarLink
                                         href={leadCreditsHref}
@@ -220,7 +228,10 @@ export default function MasterLayout({ children, pageTitle }) {
                                     >
                                         <span className="dashboard-body__bar-icon"><i className="fas fa-bars"></i></span>
                                     </div>
-                                    <h6 className="title">{pageTitle}</h6>
+                                    <div className="d-flex flex-wrap align-items-center gap-2">
+                                        <h6 className="title mb-0">{pageTitle}</h6>
+                                        {backUrl ? <PortalBackLink href={backUrl} /> : null}
+                                    </div>
                                 </div>
                                 <DashboardUserMenu
                                     user={user}

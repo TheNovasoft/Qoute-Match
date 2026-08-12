@@ -72,6 +72,11 @@ Route::middleware('auth')->name('user.')->group(function () {
                 Route::post('add-device-token', 'addDeviceToken')->name('add.device.token');
             });
 
+            Route::controller('InvoiceController')->prefix('invoices')->name('invoices.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('{id}', 'show')->name('show');
+            });
+
             //Profile setting
             Route::controller('ProfileController')->group(function () {
                 Route::get('change-password', 'changePassword')->name('change.password');

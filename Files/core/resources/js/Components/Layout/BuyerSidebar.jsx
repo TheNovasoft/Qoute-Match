@@ -234,6 +234,16 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                         </Link>
                     </li>
 
+                    <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerInvoices ?? '/customer/invoices') ? ' active' : ''}`}>
+                        <Link
+                            href={routes.buyerInvoices ?? '/customer/invoices'}
+                            className={`sidebar-menu-list__link${isNavActive(url, routes.buyerInvoices ?? '/customer/invoices') ? ' active' : ''}`}
+                        >
+                            <span className="icon"><i className="las la-file-invoice"></i></span>
+                            <span className="text">Invoices</span>
+                        </Link>
+                    </li>
+
                     <DropdownMenu
                         id="support"
                         icon="las la-ticket-alt"

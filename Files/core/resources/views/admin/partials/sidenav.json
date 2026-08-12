@@ -139,6 +139,44 @@
             }
         ]
     },
+    "blogs": {
+        "keyword": [
+            "Blog",
+            "Blogs",
+            "Posts",
+            "Articles",
+            "News",
+            "Blog posts",
+            "Create blog",
+            "Edit blog",
+            "Manage blogs"
+        ],
+        "title": "Manage Blogs",
+        "icon": "las la-newspaper",
+        "menu_active": [
+            "admin.frontend.sections"
+        ],
+        "submenu": [
+            {
+                "title": "All Posts",
+                "route_name": "admin.frontend.sections",
+                "menu_active": "admin.frontend.sections",
+                "params": {
+                    "key": "blog"
+                },
+                "keyword": ["all posts", "blog list", "manage posts"]
+            },
+            {
+                "title": "Add New Post",
+                "route_name": "admin.frontend.sections.element",
+                "menu_active": "admin.frontend.sections.element",
+                "params": {
+                    "key": "blog"
+                },
+                "keyword": ["create blog", "new post", "add article"]
+            }
+        ]
+    },
     "monetisation": {
         "keyword": ["Monetisation", "Lead Credits", "Subscription", "Provider Plans", "Quote Credits"],
         "title": "Monetisation",
@@ -960,6 +998,17 @@
         "icon": "la la-list",
         "menu_active": "admin.report*",
         "submenu": [
+            {
+                "keyword": [
+                    "Invoices",
+                    "Invoice management",
+                    "Invoice report",
+                    "Project invoices"
+                ],
+                "title": "Invoices",
+                "route_name": "admin.invoices.index",
+                "menu_active": "admin.invoices*"
+            },
             {
                 "keyword": [
                     "Transaction Log",

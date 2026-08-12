@@ -269,7 +269,7 @@ class ProjectManagerController extends Controller
         $transaction->remark       = 'commission';
         $transaction->save();
 
-
+        \App\Lib\InvoiceService::forProjectCompleted($project, $bid, (float) $bidAmount, (float) $chargeAmount, $trx);
 
         $conversation = Conversation::where('buyer_id', $buyer->id)
             ->where('user_id', $freelancer->id)
@@ -421,6 +421,21 @@ class ProjectManagerController extends Controller
         $job->status = Status::JOB_COMPLETED;
         $job->is_approved = Status::JOB_APPROVED;
         $job->save();
+
+        \App\Lib\InvoiceService::forProjectCompleted(
+            $project,
+            $bid,
+            (float) $freelancerPay,
+            (float) $chargeAmount,
+            $trx,
+            \App\Models\Invoice::TYPE_PROJECT_PARTIAL,
+            [
+                'partial_reason' => $request->reason,
+                'buyer_refund' => showAmount($buyerRefund),
+                'freelancer_percent' => $request->freelancer_amount,
+                'buyer_percent' => $request->buyer_amount,
+            ]
+        );
 
         notify($freelancer, 'REPORTED_PROJECT_PARTIAL_COMPLETED', [
             'job'        => $job->title,
