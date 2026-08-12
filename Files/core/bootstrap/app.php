@@ -68,6 +68,18 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->redirectGuestsTo(function ($request) {
+            if ($request->is('customer') || $request->is('customer/*') || $request->is('buyer') || $request->is('buyer/*')) {
+                return route('buyer.login');
+            }
+
+            if ($request->is('admin') || $request->is('admin/*')) {
+                return route('admin.login');
+            }
+
+            return route('user.login');
+        });
+
         $middleware->web(append: [
             \App\Http\Middleware\LanguageMiddleware::class,
             \App\Http\Middleware\ActiveTemplateMiddleware::class,

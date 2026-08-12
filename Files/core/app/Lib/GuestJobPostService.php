@@ -137,6 +137,8 @@ class GuestJobPostService
         $job->skills()->sync($draft['skill_ids'] ?? []);
 
         if ((int) $budgetData['status'] === Status::JOB_PUBLISH) {
+            \App\Lib\InvoiceService::forJobPublished($job);
+
             $adminNotification = new AdminNotification();
             $adminNotification->buyer_id = $buyer->id;
             $adminNotification->title = 'New job posted by ' . $buyer->fullname;

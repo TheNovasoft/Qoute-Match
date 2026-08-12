@@ -128,7 +128,13 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
             return;
         }
         if (!window.confirm('Accept this quote? Other pending quotes will be rejected.')) return;
-        router.post(`${routes.buyerJobHire}/${bid.id}`, {}, { preserveScroll: true });
+        const hireUrl = routes.buyerJobHire || '/customer/job/post/hire-talent';
+        router.post(`${hireUrl}/${bid.id}`, {}, {
+            preserveScroll: true,
+            onError: () => {
+                window.alert('Unable to accept this quote. Please refresh and try again.');
+            },
+        });
     };
 
     const rejectQuote = (bidId) => {
@@ -153,7 +159,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
     };
 
     return (
-        <BuyerMasterLayout pageTitle={pageTitle}>
+        <BuyerMasterLayout pageTitle={pageTitle} backUrl={job?.viewUrl}>
             <div className="buyer-panel-content">
                 <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
                     <div>
@@ -423,8 +429,13 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                         )}
                                         {bid.canAccept && (
                                             <>
-                                                <button type="button" className="btn btn-sm btn--base" onClick={() => acceptQuote(bid)}>
-                                                    Accept
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn--base"
+                                                    disabled={hireRequirements?.escrowEnabled && bid.shortfallRaw > 0}
+                                                    onClick={() => acceptQuote(bid)}
+                                                >
+                                                    {hireRequirements?.escrowEnabled && bid.shortfallRaw > 0 ? 'Deposit to Accept' : 'Accept'}
                                                 </button>
                                                 <button type="button" className="btn btn-sm btn-outline--danger" onClick={() => rejectQuote(bid.id)}>
                                                     Reject

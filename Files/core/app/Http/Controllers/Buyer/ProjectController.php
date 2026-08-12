@@ -206,6 +206,7 @@ class ProjectController extends Controller
         $transaction->trx = $trxData ? $trxData->trx : null;
         $transaction->save();
 
+        \App\Lib\InvoiceService::forProjectCompleted($project, $bid, (float) $bidAmount, (float) $chargeAmount, $trx);
 
         notify($freelancer, 'PROJECT_COMPLETED', [
             'job'      => $job->title,

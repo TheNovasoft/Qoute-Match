@@ -203,7 +203,10 @@ export default function ProjectDetail({
                         </div>
                     )}
 
-                    <div className="mt-4">
+                    <div className="mt-4 d-flex flex-wrap gap-2">
+                        {project.invoiceUrl ? (
+                            <Link href={project.invoiceUrl} className="btn btn--base btn-sm">View Invoice</Link>
+                        ) : null}
                         <Link href={project.indexUrl} className="btn btn-outline--base btn-sm">Back to Projects</Link>
                     </div>
                 </div>

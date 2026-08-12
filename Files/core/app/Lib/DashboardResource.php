@@ -8,6 +8,7 @@ use App\Models\Bid;
 use App\Models\Buyer;
 use App\Models\Conversation;
 use App\Models\Dispute;
+use App\Models\Invoice;
 use App\Models\Message;
 use App\Models\Project;
 use App\Models\User;
@@ -227,7 +228,29 @@ class DashboardResource
             'completeUrl' => $role === 'buyer' ? route('buyer.project.complete', $project->id) : null,
             'reportUrl' => $role === 'buyer' ? route('buyer.project.report', $project->id) : route('user.project.report', $project->id),
             'indexUrl' => $role === 'buyer' ? route('buyer.project.index') : route('user.project.index'),
+            'invoiceUrl' => self::projectInvoiceUrl($project, $role),
         ], $extra);
+    }
+
+    protected static function projectInvoiceUrl(Project $project, string $role): ?string
+    {
+        $invoice = Invoice::where('project_id', $project->id)
+            ->whereIn('type', [
+                Invoice::TYPE_PROJECT_COMPLETED,
+                Invoice::TYPE_PROJECT_PARTIAL,
+                Invoice::TYPE_PROJECT_ACCEPTED,
+            ])
+            ->orderByRaw("FIELD(type, 'project_completed', 'project_partial', 'project_accepted')")
+            ->latest('id')
+            ->first();
+
+        if (!$invoice) {
+            return null;
+        }
+
+        return $role === 'buyer'
+            ? route('buyer.invoices.show', $invoice->id)
+            : route('user.invoices.show', $invoice->id);
     }
 
     public static function bids(LengthAwarePaginator $paginator): array
@@ -274,27 +297,34 @@ class DashboardResource
         ];
     }
 
-    public static function disputes(LengthAwarePaginator $paginator): array
+    public static function disputes(LengthAwarePaginator $paginator, string $role = 'freelancer'): array
     {
         return [
-            'data' => collect($paginator->items())->map(fn (Dispute $dispute) => self::disputeRow($dispute))->values()->all(),
+            'data' => collect($paginator->items())->map(fn (Dispute $dispute) => self::disputeRow($dispute, $role))->values()->all(),
             'links' => $paginator->linkCollection()->toArray(),
             'meta' => self::paginationMeta($paginator),
         ];
     }
 
-    public static function disputeRow(Dispute $dispute): array
+    public static function disputeRow(Dispute $dispute, string $role = 'freelancer'): array
     {
+        $isBuyer = $role === 'buyer';
+
         return [
             'id' => (int) $dispute->id,
             'subject' => strLimit($dispute->subject, 40),
             'jobTitle' => strLimit($dispute->job?->title ?? '—', 30),
             'providerName' => $dispute->user?->fullname ?? '—',
+            'customerName' => $dispute->buyer?->fullname ?? '—',
+            'counterpartyName' => $isBuyer
+                ? ($dispute->user?->fullname ?? '—')
+                : ($dispute->buyer?->fullname ?? '—'),
+            'counterpartyLabel' => $isBuyer ? 'Provider' : 'Customer',
             'typeLabel' => (string) $dispute->typeLabel,
             'raisedBy' => ucfirst($dispute->raised_by),
             'createdAt' => showDateTime($dispute->created_at),
             'status' => self::disputeStatus((int) $dispute->status),
-            'detailUrl' => $dispute->buyer_id
+            'detailUrl' => $isBuyer
                 ? route('buyer.disputes.detail', $dispute->id)
                 : route('user.disputes.detail', $dispute->id),
         ];
@@ -302,6 +332,8 @@ class DashboardResource
 
     public static function disputeDetail(Dispute $dispute, string $role): array
     {
+        $isBuyer = $role === 'buyer';
+
         return [
             'id' => (int) $dispute->id,
             'subject' => $dispute->subject,
@@ -310,14 +342,19 @@ class DashboardResource
             'typeLabel' => (string) $dispute->typeLabel,
             'raisedBy' => ucfirst($dispute->raised_by),
             'providerName' => $dispute->user?->fullname ?? '—',
+            'customerName' => $dispute->buyer?->fullname ?? '—',
+            'counterpartyName' => $isBuyer
+                ? ($dispute->user?->fullname ?? '—')
+                : ($dispute->buyer?->fullname ?? '—'),
+            'counterpartyLabel' => $isBuyer ? 'Provider' : 'Customer',
             'jobTitle' => $dispute->job?->title ?? '—',
             'bidAmount' => $dispute->bid ? showAmount($dispute->bid->bid_amount) : '—',
             'createdAt' => showDateTime($dispute->created_at),
             'resolvedAt' => $dispute->resolved_at ? showDateTime($dispute->resolved_at) : null,
             'status' => self::disputeStatus((int) $dispute->status),
-            'indexUrl' => $role === 'buyer' ? route('buyer.disputes.index') : route('user.disputes.index'),
+            'indexUrl' => $isBuyer ? route('buyer.disputes.index') : route('user.disputes.index'),
             'projectUrl' => $dispute->project_id
-                ? ($role === 'buyer'
+                ? ($isBuyer
                     ? route('buyer.project.detail', $dispute->project_id)
                     : route('user.project.detail', $dispute->project_id))
                 : null,

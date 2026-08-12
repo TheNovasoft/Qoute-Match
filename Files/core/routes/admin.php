@@ -382,6 +382,12 @@ Route::middleware('admin')->group(function () {
     });
 
 
+    Route::controller('InvoiceController')->prefix('invoices')->name('invoices.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('{id}', 'show')->name('show');
+        Route::post('delete/{id}', 'delete')->name('delete');
+    });
+
     // projects
     Route::controller('ProjectManagerController')->prefix('project')->name('project.')->group(function () {
         Route::get('/all', 'index')->name('index');
@@ -517,6 +523,7 @@ Route::middleware('admin')->group(function () {
             Route::get('frontend-slug-check/{key}/{id?}', 'frontendElementSlugCheck')->name('sections.element.slug.check');
             Route::get('frontend-element-seo/{key}/{id}', 'frontendSeo')->name('sections.element.seo');
             Route::post('frontend-element-seo/{key}/{id}', 'frontendSeoUpdate');
+            Route::post('frontend-element-status/{id}', 'elementStatus')->name('sections.element.status');
             Route::post('update-seo', 'updateSeoContent')->name('seo.update');
             Route::post('remove/{id}', 'remove')->name('remove');
         });

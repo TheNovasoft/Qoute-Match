@@ -116,6 +116,8 @@ class ManageJobController extends Controller
         $job->is_approved = Status::JOB_APPROVED;
         $job->save();
 
+        \App\Lib\InvoiceService::forJobPublished($job);
+
         \App\Lib\JobPostNotificationService::notifyApproved($job);
 
         $notify[] = ['success', 'Job approved successfully. The poster has been emailed and the request is now live on Find Jobs.'];
