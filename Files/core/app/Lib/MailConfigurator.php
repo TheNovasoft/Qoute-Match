@@ -4,6 +4,7 @@ namespace App\Lib;
 
 use App\Models\GeneralSetting;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class MailConfigurator
 {
@@ -13,6 +14,14 @@ class MailConfigurator
         $password = trim((string) env('MAIL_PASSWORD', ''));
 
         if ($username === '' || $password === '') {
+            return;
+        }
+
+        try {
+            if (!Schema::hasTable('general_settings')) {
+                return;
+            }
+        } catch (\Throwable) {
             return;
         }
 
