@@ -36,6 +36,7 @@ class InvoiceResource
                 'admin' => route('admin.invoices.show', $invoice->id),
                 default => route('user.invoices.show', $invoice->id),
             },
+            'deleteUrl' => $role === 'admin' ? route('admin.invoices.delete', $invoice->id) : null,
         ];
     }
 
@@ -53,6 +54,11 @@ class InvoiceResource
             Invoice::TYPE_PROJECT_PARTIAL,
         ], true);
 
+        $createdAt = $invoice->created_at;
+        $customerId = $invoice->buyer_id
+            ? 'C-' . str_pad((string) $invoice->buyer_id, 4, '0', STR_PAD_LEFT)
+            : '—';
+
         return [
             'id' => (int) $invoice->id,
             'invoiceNumber' => $invoice->invoice_number,
@@ -66,7 +72,11 @@ class InvoiceResource
             'netAmount' => showAmount($invoice->net_amount),
             'providerPayout' => $meta['provider_payout'] ?? showAmount($invoice->net_amount),
             'trx' => $invoice->trx,
-            'createdAt' => showDateTime($invoice->created_at),
+            'createdAt' => showDateTime($createdAt),
+            'invoiceDate' => $createdAt ? showDateTime($createdAt, 'j/n/Y') : '—',
+            'dueDate' => $createdAt ? showDateTime($createdAt->copy()->addDays(30), 'j/n/Y') : null,
+            'customerId' => $customerId,
+            'buyerId' => $invoice->buyer_id ? (int) $invoice->buyer_id : null,
             'buyerName' => __($meta['buyer_name'] ?? $buyer?->fullname ?? '—'),
             'buyerEmail' => $meta['buyer_email'] ?? $buyer?->email,
             'buyerMobile' => $meta['buyer_mobile'] ?? ($buyer?->mobileNumber ?? $buyer?->mobile),
@@ -84,6 +94,9 @@ class InvoiceResource
             'isProjectInvoice' => $isProjectInvoice,
             'siteName' => gs('site_name'),
             'siteEmail' => gs('email_from') ?: gs('site_email'),
+            'sitePhone' => gs('site_phone') ?: gs('phone') ?: null,
+            'siteAddress' => gs('site_address') ?: null,
+            'siteUrl' => url('/'),
             'currencyText' => gs('cur_text'),
             'indexUrl' => match ($role) {
                 'buyer' => route('buyer.invoices.index'),

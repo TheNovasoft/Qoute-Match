@@ -25,7 +25,9 @@ class InvoiceController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('invoice_number', 'like', '%' . $search . '%')
                     ->orWhere('trx', 'like', '%' . $search . '%')
-                    ->orWhere('meta->job_title', 'like', '%' . $search . '%');
+                    ->orWhere('meta->job_title', 'like', '%' . $search . '%')
+                    ->orWhere('meta->buyer_name', 'like', '%' . $search . '%')
+                    ->orWhere('meta->provider_name', 'like', '%' . $search . '%');
             });
         }
 
