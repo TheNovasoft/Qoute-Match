@@ -993,22 +993,36 @@
             }
         ]
     },
+    "invoices": {
+        "keyword": [
+            "Invoices",
+            "Invoice management",
+            "Invoice report",
+            "Project invoices",
+            "Billing",
+            "Manage invoices"
+        ],
+        "title": "Invoices",
+        "icon": "las la-file-invoice",
+        "menu_active": "admin.invoices*",
+        "submenu": [
+            {
+                "keyword": [
+                    "All Invoices",
+                    "Invoice list",
+                    "Manage invoices"
+                ],
+                "title": "All Invoices",
+                "route_name": "admin.invoices.index",
+                "menu_active": "admin.invoices.index"
+            }
+        ]
+    },
     "reports": {
         "title": "Report",
         "icon": "la la-list",
         "menu_active": "admin.report*",
         "submenu": [
-            {
-                "keyword": [
-                    "Invoices",
-                    "Invoice management",
-                    "Invoice report",
-                    "Project invoices"
-                ],
-                "title": "Invoices",
-                "route_name": "admin.invoices.index",
-                "menu_active": "admin.invoices*"
-            },
             {
                 "keyword": [
                     "Transaction Log",
