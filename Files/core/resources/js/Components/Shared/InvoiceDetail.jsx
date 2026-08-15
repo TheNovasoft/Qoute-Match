@@ -16,6 +16,8 @@ export default function InvoiceDetail({ invoice }) {
     const showProvider = invoice.isProjectInvoice;
     const payout = invoice.providerPayout || invoice.netAmount;
     const totalDisplay = isCompletion ? payout : invoice.amount;
+    const escrowHeld = invoice.escrowStatus === 'held';
+    const escrowReleased = invoice.escrowStatus === 'released';
 
     const deleteInvoice = () => {
         if (!invoice.deleteUrl) return;
@@ -25,11 +27,17 @@ export default function InvoiceDetail({ invoice }) {
 
     const comments = [
         invoice.typeLabel ? `Status: ${invoice.typeLabel}` : null,
+        invoice.paymentMethod ? `Payment method: ${invoice.paymentMethod}` : null,
         invoice.trx ? `Transaction: ${invoice.trx}` : null,
         showProvider && invoice.providerName ? `Service provided by: ${invoice.providerName}` : null,
         invoice.estimatedTime ? `Estimated time: ${invoice.estimatedTime}` : null,
         invoice.deadline ? `Deadline: ${invoice.deadline}` : null,
-        invoice.escrowAmount ? `Escrow held: ${invoice.escrowAmount}` : null,
+        escrowHeld && invoice.escrowAmount
+            ? `Escrow held from customer wallet: ${invoice.escrowAmount}`
+            : null,
+        escrowReleased && invoice.escrowAmount
+            ? `Escrow released to provider (gross): ${invoice.escrowAmount}`
+            : null,
         invoice.partialReason ? `Note: ${invoice.partialReason}` : null,
         'Please include the invoice number with any payment reference.',
     ].filter(Boolean);
@@ -71,6 +79,7 @@ export default function InvoiceDetail({ invoice }) {
                                     <MetaRow label="INVOICE #" value={invoice.invoiceNumber} />
                                     <MetaRow label="CUSTOMER ID" value={invoice.customerId} />
                                     <MetaRow label="STATUS" value={invoice.typeLabel} />
+                                    <MetaRow label="PAYMENT" value={invoice.paymentMethod} />
                                     {invoice.dueDate ? <MetaRow label="DUE DATE" value={invoice.dueDate} /> : null}
                                 </tbody>
                             </table>
@@ -118,6 +127,26 @@ export default function InvoiceDetail({ invoice }) {
                                 <td className="text-center">—</td>
                                 <td className="text-end">{invoice.amount}</td>
                             </tr>
+                            {escrowHeld && invoice.escrowAmount ? (
+                                <tr>
+                                    <td>
+                                        <strong>Escrow hold (customer wallet)</strong>
+                                        <div className="std-invoice__item-sub">Funds locked until project completion</div>
+                                    </td>
+                                    <td className="text-center">—</td>
+                                    <td className="text-end">{invoice.escrowAmount}</td>
+                                </tr>
+                            ) : null}
+                            {escrowReleased && invoice.escrowAmount ? (
+                                <tr>
+                                    <td>
+                                        <strong>Escrow released</strong>
+                                        <div className="std-invoice__item-sub">Paid from held escrow to provider</div>
+                                    </td>
+                                    <td className="text-center">—</td>
+                                    <td className="text-end">{invoice.escrowAmount}</td>
+                                </tr>
+                            ) : null}
                             {isCompletion && invoice.chargeAmountRaw > 0 ? (
                                 <tr>
                                     <td>Platform commission</td>
@@ -169,6 +198,12 @@ export default function InvoiceDetail({ invoice }) {
                                         <tr>
                                             <th>Provider amount</th>
                                             <td>{payout}</td>
+                                        </tr>
+                                    ) : null}
+                                    {invoice.escrowAmount ? (
+                                        <tr>
+                                            <th>{escrowHeld ? 'Escrow held' : 'Escrow released'}</th>
+                                            <td>{invoice.escrowAmount}</td>
                                         </tr>
                                     ) : null}
                                     <tr className="std-invoice__total-row">

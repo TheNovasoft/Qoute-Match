@@ -89,6 +89,8 @@ class InvoiceResource
             'budgetLabel' => __($meta['budget_label'] ?? ''),
             'deadline' => $meta['deadline'] ?? null,
             'escrowAmount' => $meta['escrow_amount'] ?? null,
+            'escrowStatus' => $meta['escrow_status'] ?? null,
+            'paymentMethod' => $meta['payment_method'] ?? null,
             'estimatedTime' => $meta['estimated_time'] ?? null,
             'partialReason' => $meta['partial_reason'] ?? null,
             'isProjectInvoice' => $isProjectInvoice,

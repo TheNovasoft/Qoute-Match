@@ -269,7 +269,21 @@ class ProjectManagerController extends Controller
         $transaction->remark       = 'commission';
         $transaction->save();
 
-        \App\Lib\InvoiceService::forProjectCompleted($project, $bid, (float) $bidAmount, (float) $chargeAmount, $trx);
+        $escrowHeld = (float) ($project->escrow_amount ?? 0);
+        \App\Lib\InvoiceService::forProjectCompleted(
+            $project,
+            $bid,
+            (float) $bidAmount,
+            (float) $chargeAmount,
+            $trx,
+            \App\Models\Invoice::TYPE_PROJECT_COMPLETED,
+            $escrowHeld > 0 ? ['escrow_amount' => showAmount($escrowHeld)] : []
+        );
+
+        if ($escrowHeld > 0) {
+            $project->escrow_amount = 0;
+            $project->save();
+        }
 
         $conversation = Conversation::where('buyer_id', $buyer->id)
             ->where('user_id', $freelancer->id)
@@ -422,6 +436,7 @@ class ProjectManagerController extends Controller
         $job->is_approved = Status::JOB_APPROVED;
         $job->save();
 
+        $escrowHeld = (float) ($project->escrow_amount ?? 0);
         \App\Lib\InvoiceService::forProjectCompleted(
             $project,
             $bid,
@@ -429,13 +444,19 @@ class ProjectManagerController extends Controller
             (float) $chargeAmount,
             $trx,
             \App\Models\Invoice::TYPE_PROJECT_PARTIAL,
-            [
+            array_filter([
                 'partial_reason' => $request->reason,
                 'buyer_refund' => showAmount($buyerRefund),
                 'freelancer_percent' => $request->freelancer_amount,
                 'buyer_percent' => $request->buyer_amount,
-            ]
+                'escrow_amount' => $escrowHeld > 0 ? showAmount($escrowHeld) : null,
+            ])
         );
+
+        if ($escrowHeld > 0) {
+            $project->escrow_amount = 0;
+            $project->save();
+        }
 
         notify($freelancer, 'REPORTED_PROJECT_PARTIAL_COMPLETED', [
             'job'        => $job->title,
