@@ -81,9 +81,44 @@ Alternative for testing:
 ------------------------
 If your deployment uses the install wizard, see the install\ folder and follow any on-screen steps after DB import and .env configuration.
 
-9) Troubleshooting
-------------------
+9) One-click setup (Windows / Laragon)
+--------------------------------------
+From the Files folder in PowerShell:
+
+  .\scripts\setup-local.ps1
+
+This imports database\olance.sql, prepares .env for MySQL, runs composer if needed,
+and clears Laravel caches. Then start the app:
+
+  cd core
+  php artisan serve --host=127.0.0.1 --port=8000
+
+Import database only:
+
+  .\scripts\import-database.ps1
+
+10) Demo data included in database dump
+---------------------------------------
+The dump (database/olance.sql) includes sample buyers, providers, jobs, projects,
+invoices, and settings (escrow payment enabled). After import you can log in with
+your existing admin/buyer/provider credentials from the imported database.
+
+Useful URLs after setup:
+  Homepage:           http://127.0.0.1:8000/
+  Admin:              http://127.0.0.1:8000/admin
+  Customer invoices:  http://127.0.0.1:8000/customer/invoices
+  Provider invoices:  http://127.0.0.1:8000/provider/invoices
+  Admin invoices:     http://127.0.0.1:8000/admin/invoices
+
+Helper scripts (Files\core\scripts):
+  add-buyer-balance.php   Add wallet balance to a buyer for testing escrow
+  add-user-balance.php    Add wallet balance to a provider
+  check-admin.php         Verify admin account
+
+11) Troubleshooting
+-------------------
 - 500 errors: check storage and bootstrap\cache permissions; run php artisan config:clear.
 - Blank CSS: confirm Files\build exists and document root is Files, not core.
 - DB errors: verify .env credentials and that olance.sql imported successfully.
+- MySQL refused connection: start MySQL in Laragon before opening the site.
 
