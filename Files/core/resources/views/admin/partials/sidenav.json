@@ -829,7 +829,7 @@
     "payment_gateways": {
         "title": "Payment Gateways",
         "icon": "las la-credit-card",
-        "menu_active": ["admin.gateway*", "admin.withdraw.method*"],
+        "menu_active": ["admin.gateway*", "admin.withdraw.method*", "admin.setting.system.configuration"],
         "submenu": [
             {
                 "keyword": [
@@ -864,6 +864,18 @@
                 "title": "Withdraw Methods",
                 "route_name": "admin.withdraw.method.index",
                 "menu_active": ["admin.withdraw.method*"]
+            },
+            {
+                "keyword": [
+                    "System Configuration",
+                    "Escrow Payment",
+                    "Escrow",
+                    "system modules",
+                    "configuration settings"
+                ],
+                "title": "System Configuration",
+                "route_name": "admin.setting.system.configuration",
+                "menu_active": ["admin.setting.system.configuration"]
             }
         ]
     },
@@ -1019,6 +1031,7 @@
         ]
     },
     "reports": {
+        "hide": true,
         "title": "Report",
         "icon": "la la-list",
         "menu_active": "admin.report*",
@@ -1143,7 +1156,6 @@
         ],
         "title": "System Setting",
         "icon": "las la-life-ring",
-        "hide": true,
         "route_name": "admin.setting.system",
         "menu_active": [
             "admin.setting.system",
@@ -1262,6 +1274,7 @@
         ]
     },
     "report_and_request": {
+        "hide": true,
         "keyword": [
             "Report & Request",
             "Report and Request",

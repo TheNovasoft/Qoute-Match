@@ -54,6 +54,8 @@ class InvoiceService
 
             $buyer = $project->buyer;
             $provider = $project->user;
+            $escrowHeld = (float) ($project->escrow_amount ?? 0);
+            $usedEscrow = $escrowHeld > 0;
 
             return self::store([
                 'type' => Invoice::TYPE_PROJECT_ACCEPTED,
@@ -67,7 +69,9 @@ class InvoiceService
                 'trx' => $trx,
                 'meta' => array_merge(self::partyMeta($buyer, $provider), [
                     'job_title' => $project->job?->title,
-                    'escrow_amount' => $project->escrow_amount ? showAmount($project->escrow_amount) : null,
+                    'escrow_amount' => $usedEscrow ? showAmount($escrowHeld) : null,
+                    'escrow_status' => $usedEscrow ? 'held' : null,
+                    'payment_method' => $usedEscrow ? __('Escrow hold') : __('Pay on completion'),
                     'estimated_time' => $bid->estimated_time,
                     'provider_payout' => showAmount($bidAmount),
                 ]),
@@ -97,6 +101,8 @@ class InvoiceService
             $netAmount = max(0, $bidAmount - $chargeAmount);
             $buyer = $project->buyer;
             $provider = $project->user;
+            $escrowHeld = (float) ($project->escrow_amount ?? 0);
+            $usedEscrow = $escrowHeld > 0 || !empty($extraMeta['escrow_amount']);
 
             return self::store([
                 'type' => $type,
@@ -110,7 +116,11 @@ class InvoiceService
                 'trx' => $trx,
                 'meta' => array_merge(self::partyMeta($buyer, $provider), [
                     'job_title' => $project->job?->title,
-                    'escrow_amount' => $project->escrow_amount ? showAmount($project->escrow_amount) : null,
+                    'escrow_amount' => $usedEscrow
+                        ? ($extraMeta['escrow_amount'] ?? showAmount($escrowHeld > 0 ? $escrowHeld : $bidAmount))
+                        : null,
+                    'escrow_status' => $usedEscrow ? 'released' : null,
+                    'payment_method' => $usedEscrow ? __('Escrow (released)') : __('Wallet balance'),
                     'provider_payout' => showAmount($netAmount),
                 ], $extraMeta),
             ]);

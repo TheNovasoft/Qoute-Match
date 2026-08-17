@@ -206,7 +206,21 @@ class ProjectController extends Controller
         $transaction->trx = $trxData ? $trxData->trx : null;
         $transaction->save();
 
-        \App\Lib\InvoiceService::forProjectCompleted($project, $bid, (float) $bidAmount, (float) $chargeAmount, $trx);
+        $escrowHeld = (float) ($project->escrow_amount ?? 0);
+        \App\Lib\InvoiceService::forProjectCompleted(
+            $project,
+            $bid,
+            (float) $bidAmount,
+            (float) $chargeAmount,
+            $trx,
+            \App\Models\Invoice::TYPE_PROJECT_COMPLETED,
+            $escrowHeld > 0 ? ['escrow_amount' => showAmount($escrowHeld)] : []
+        );
+
+        if ($escrowHeld > 0) {
+            $project->escrow_amount = 0;
+            $project->save();
+        }
 
         notify($freelancer, 'PROJECT_COMPLETED', [
             'job'      => $job->title,
