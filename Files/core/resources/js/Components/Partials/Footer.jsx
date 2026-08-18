@@ -1,8 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
+import { quotePostUrl } from '@/utils/quotePostUrl';
 
 export default function Footer() {
     const { site, navigation, routes, auth, footerData: data = {} } = usePage().props;
     const pages = navigation?.pages || [];
+    const postJobUrl = quotePostUrl(routes, auth);
 
     return (
         <footer className="footer-area">
@@ -23,7 +25,7 @@ export default function Footer() {
                                 {data.account?.buyerTitle}
                             </h4>
                             <p className="sign-up-content__desc">{data.account?.buyerContent}</p>
-                            <Link href={routes.buyerJobPost} className="sign-up-content__btn btn btn--base">
+                            <Link href={postJobUrl} className="sign-up-content__btn btn btn--base">
                                 {data.account?.buyerButton}
                             </Link>
                         </div>
@@ -62,7 +64,7 @@ export default function Footer() {
                                     <li className="footer-menu__item"><Link href={routes.userLogin} className="footer-menu__link">Provider Login</Link></li>
                                 </>
                             )}
-                            <li className="footer-menu__item"><Link href={routes.buyerJobPost} className="footer-menu__link">Post a Requirement</Link></li>
+                            <li className="footer-menu__item"><Link href={postJobUrl} className="footer-menu__link">Post a Requirement</Link></li>
                         </ul>
                     </div>
 

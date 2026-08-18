@@ -55,15 +55,40 @@ class GuestJobPostService
             && filled($draft['description'] ?? null);
     }
 
-    public static function hasPreferencesStep(): bool
+    public static function defaultPreferences(int $categoryId): array
+    {
+        $skillIds = \App\Models\Skill::active()
+            ->forCategory($categoryId)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        if ($skillIds === []) {
+            $skillIds = \App\Models\Skill::active()
+                ->limit(3)
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+        }
+
+        return [
+            'skill_ids' => $skillIds,
+            'project_scope' => 2,
+            'job_longevity' => 2,
+            'skill_level' => 3,
+        ];
+    }
+
+    public static function applyDefaultPreferencesToDraft(): void
     {
         $draft = self::draft();
+        $categoryId = (int) ($draft['category_id'] ?? 0);
 
-        return self::hasDetailsStep()
-            && ! empty($draft['skill_ids'])
-            && filled($draft['project_scope'] ?? null)
-            && filled($draft['job_longevity'] ?? null)
-            && filled($draft['skill_level'] ?? null);
+        if ($categoryId <= 0) {
+            return;
+        }
+
+        self::putDraft(array_merge(self::defaultPreferences($categoryId), $draft));
     }
 
     public static function createBuyerFromContact(array $contact): Buyer
@@ -174,18 +199,13 @@ class GuestJobPostService
             return 0;
         }
 
-        if (! self::hasPreferencesStep()) {
-            return 1;
-        }
-
         return 2;
     }
 
     public static function guardStep(int $step): ?\Illuminate\Http\RedirectResponse
     {
         return match ($step) {
-            2 => self::hasDetailsStep() ? null : redirect()->route('post.job.details'),
-            3 => self::hasPreferencesStep() ? null : redirect()->route('post.job.preferences'),
+            2, 3 => self::hasDetailsStep() ? null : redirect()->route('post.job.details'),
             default => null,
         };
     }

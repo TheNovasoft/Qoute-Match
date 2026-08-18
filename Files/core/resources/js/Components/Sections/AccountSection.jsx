@@ -1,7 +1,9 @@
 import { Link, usePage } from '@inertiajs/react';
+import { quotePostUrl } from '@/utils/quotePostUrl';
 
 export default function AccountSection({ data }) {
-    const { routes } = usePage().props;
+    const { routes, auth } = usePage().props;
+    const postJobUrl = quotePostUrl(routes, auth);
 
     return (
         <div className="account-section my-120">
@@ -33,7 +35,7 @@ export default function AccountSection({ data }) {
                                 </h3>
                                 <p className="account-item__text">{data.customerContent}</p>
                                 <div className="account-item__btn">
-                                    <Link href={routes.buyerJobPost} className="btn btn--base">
+                                    <Link href={postJobUrl} className="btn btn--base">
                                         {data.customerButton}
                                     </Link>
                                 </div>

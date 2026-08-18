@@ -3,14 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Constants\Status;
-use App\Lib\FormProcessor;
 use App\Lib\GuestJobPostService;
 use App\Lib\RequestFormService;
 use App\Models\Buyer;
 use App\Models\Category;
 use App\Models\Job;
 use App\Models\Skill;
-use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -25,6 +23,11 @@ class GuestJobController extends Controller
         }
 
         $draft = GuestJobPostService::draft();
+        $draft = self::applyCategoryPrefill($draft, request('category'), request('subcategory'));
+        if ($draft !== GuestJobPostService::draft()) {
+            GuestJobPostService::putDraft($draft);
+        }
+
         $categories = Category::active()->with(['subcategories' => fn ($q) => $q->active(), 'requestForm'])->get();
         $skills = Skill::active()->orderBy('name')->get(['id', 'name', 'category_id']);
 
@@ -62,25 +65,23 @@ class GuestJobController extends Controller
             'title' => 'required|string|max:255',
             'slug' => ['required', 'string', 'max:255', Rule::unique('jobs', 'slug')],
             'category_id' => ['required', 'integer', 'gt:0', Rule::exists('categories', 'id')->where(fn ($query) => $query->where('status', Status::YES))],
-            'subcategory_id' => ['required', 'integer', 'gt:0', Rule::exists('subcategories', 'id')->where(fn ($query) => $query->where('status', Status::YES))],
             'description' => 'required|string',
         ]);
 
-        $category = Category::active()->with('requestForm')->findOrFail($request->category_id);
+        $category = Category::active()->with(['requestForm', 'subcategories' => fn ($q) => $q->active()])->findOrFail($request->category_id);
+        $subcategoryId = self::resolveSubcategoryId($category, $request->subcategory_id);
+        $request->merge(['subcategory_id' => $subcategoryId]);
+        $request->validate([
+            'subcategory_id' => ['required', 'integer', 'gt:0', Rule::exists('subcategories', 'id')->where(fn ($query) => $query->where('status', Status::YES))],
+        ]);
         $existingRequestData = GuestJobPostService::draft()['request_data'] ?? null;
 
         if ($category->requestForm) {
-            $formProcessor = new FormProcessor();
-            $dynamicRules = $formProcessor->valueValidation($category->requestForm->form_data);
-            $existingByLabel = collect($existingRequestData ?? [])->keyBy('label');
-
-            foreach ($category->requestForm->form_data as $field) {
-                if ($field->type === 'file' && ($existingByLabel->get($field->label)['value'] ?? null)) {
-                    $dynamicRules[$field->label] = ['nullable', new FileTypeValidate(explode(',', $field->extensions))];
-                }
-            }
-
-            $request->validate($dynamicRules);
+            $request->validate(RequestFormService::validationRules(
+                $category->requestForm->form_data,
+                $request->except(['_token', '_method']),
+                $existingRequestData
+            ));
         }
 
         $requestData = null;
@@ -173,6 +174,8 @@ class GuestJobController extends Controller
         if ($redirect = GuestJobPostService::guardStep(3)) {
             return $redirect;
         }
+
+        GuestJobPostService::applyDefaultPreferencesToDraft();
 
         $request->validate([
             'budget' => 'required|numeric|gt:0',
@@ -306,5 +309,57 @@ class GuestJobController extends Controller
                 ),
             ];
         })->all();
+    }
+
+    private static function applyCategoryPrefill(array $draft, ?string $categorySlug, ?string $subcategorySlug): array
+    {
+        if (filled($draft['category_id'] ?? null) || ! filled($categorySlug)) {
+            return $draft;
+        }
+
+        $category = Category::active()
+            ->with(['subcategories' => fn ($q) => $q->active()])
+            ->where('slug', $categorySlug)
+            ->first();
+
+        if (! $category) {
+            return $draft;
+        }
+
+        $draft['category_id'] = $category->id;
+
+        if (filled($subcategorySlug)) {
+            $subcategory = $category->subcategories->firstWhere('slug', $subcategorySlug);
+            if ($subcategory) {
+                $draft['subcategory_id'] = $subcategory->id;
+            }
+        } elseif ($category->subcategories->count() === 1) {
+            $draft['subcategory_id'] = $category->subcategories->first()->id;
+        }
+
+        return $draft;
+    }
+
+    private static function resolveSubcategoryId(Category $category, $requestedId): int
+    {
+        $subcategories = $category->subcategories ?? collect();
+
+        if ($subcategories->isEmpty()) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'subcategory_id' => 'Please choose a category that has an active subcategory.',
+            ]);
+        }
+
+        if (filled($requestedId) && $subcategories->contains('id', (int) $requestedId)) {
+            return (int) $requestedId;
+        }
+
+        if ($subcategories->count() === 1) {
+            return (int) $subcategories->first()->id;
+        }
+
+        throw \Illuminate\Validation\ValidationException::withMessages([
+            'subcategory_id' => 'Please choose a subcategory for this job.',
+        ]);
     }
 }

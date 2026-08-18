@@ -1,31 +1,8 @@
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import CbmCalculator from '@/Components/Jobs/CbmCalculator';
+import CountryCityFields from '@/Components/Jobs/CountryCityFields';
 import WizardOptionCard from '@/Components/Jobs/WizardOptionCard';
-
-const SKILL_LEVELS = [
-    { value: '1', label: 'Pro level', description: 'Highly experienced specialists' },
-    { value: '2', label: 'Expert', description: 'Strong track record in this field' },
-    { value: '3', label: 'Intermediate', description: 'Solid experience for most jobs' },
-    { value: '4', label: 'Entry level', description: 'Good for simpler tasks' },
-];
-
-const PROJECT_SCOPES = [
-    { value: '3', label: 'Small project', description: 'Quick job or minor work' },
-    { value: '2', label: 'Medium project', description: 'A clear piece of work with a few tasks' },
-    { value: '1', label: 'Large project', description: 'Bigger job with multiple stages' },
-];
-
-const JOB_DURATIONS = [
-    { value: '1', label: 'Less than 1 week' },
-    { value: '2', label: 'Less than 1 month' },
-    { value: '3', label: '1 to 3 months' },
-    { value: '4', label: '3 to 6 months' },
-];
-
-const CUSTOM_BUDGET_OPTIONS = [
-    { value: '1', label: 'Yes', description: 'Providers can suggest a different price' },
-    { value: '0', label: 'No', description: 'Stick to my stated budget' },
-];
 
 function slugFromTitle(title) {
     return title
@@ -49,17 +26,7 @@ function valuesFromFields(fields = []) {
     return values;
 }
 
-function buildScreens(categories, categoryForms, skills, categoryId, { includeContact = true } = {}) {
-    const categorySkills = (skills || []).filter((skill) => {
-        if (!categoryId) {
-            return true;
-        }
-        if (skill.category_id === null || skill.category_id === undefined || skill.category_id === '') {
-            return true;
-        }
-        return String(skill.category_id) === String(categoryId);
-    });
-
+function buildScreens(categories, categoryForms, categoryId, { includeContact = true } = {}) {
     const screens = [
         {
             id: 'category',
@@ -109,9 +76,77 @@ function buildScreens(categories, categoryForms, skills, categoryId, { includeCo
     ];
 
     const dynamicFields = categoryForms?.[categoryId] || [];
+    const groupedCityLabels = new Set();
+    const consumedLabels = new Set();
+
     dynamicFields.forEach((field) => {
+        if (field.type === 'city' && field.locationGroup) {
+            groupedCityLabels.add(field.label);
+        }
+    });
+
+    dynamicFields.forEach((field) => {
+        if (groupedCityLabels.has(field.label) || consumedLabels.has(field.label)) {
+            return;
+        }
+
+        const showWhen = field.showWhen?.field ? field.showWhen : null;
+        const baseScreen = {
+            showWhen,
+            required: field.isRequired,
+        };
+
+        if (field.label === 'hs_code') {
+            const weightField = dynamicFields.find((item) => item.label === 'gross_weight_kg');
+            const cbmField = dynamicFields.find((item) => item.type === 'cbm');
+
+            if (weightField && cbmField) {
+                screens.push({
+                    ...baseScreen,
+                    id: 'dynamic-cargo-details',
+                    phase: 0,
+                    question: 'Tell us about your cargo',
+                    hint: 'HS code, weight and dimensions help providers quote accurately.',
+                    type: 'cargo-details',
+                    hsField: field.label,
+                    weightField: weightField.label,
+                    cbmField: cbmField.label,
+                    hsMeta: field,
+                    weightMeta: weightField,
+                    cbmMeta: cbmField,
+                    fields: [field.label, weightField.label, cbmField.label],
+                });
+                consumedLabels.add(field.label);
+                consumedLabels.add(weightField.label);
+                consumedLabels.add(cbmField.label);
+                return;
+            }
+        }
+
+        if (field.type === 'country') {
+            const cityField = dynamicFields.find((item) => (
+                item.type === 'city' && item.locationGroup && item.locationGroup === field.locationGroup
+            ));
+            const isOrigin = field.locationGroup === 'origin';
+
+            screens.push({
+                ...baseScreen,
+                id: `dynamic-${field.locationGroup || field.label}`,
+                phase: 0,
+                question: isOrigin ? 'Where is this shipment coming from?' : 'Where should this shipment go?',
+                hint: 'Select the country first, then the city.',
+                type: 'country-city',
+                countryField: field.label,
+                cityField: cityField?.label || null,
+                fields: [field.label, cityField?.label].filter(Boolean),
+                required: field.isRequired || cityField?.isRequired,
+            });
+            return;
+        }
+
         if (['radio', 'select'].includes(field.type) && field.options?.length) {
             screens.push({
+                ...baseScreen,
                 id: `dynamic-${field.label}`,
                 phase: 0,
                 question: field.name,
@@ -122,6 +157,7 @@ function buildScreens(categories, categoryForms, skills, categoryId, { includeCo
             });
         } else if (field.type === 'checkbox' && field.options?.length) {
             screens.push({
+                ...baseScreen,
                 id: `dynamic-${field.label}`,
                 phase: 0,
                 question: field.name,
@@ -132,16 +168,17 @@ function buildScreens(categories, categoryForms, skills, categoryId, { includeCo
             });
         } else if (field.type === 'textarea') {
             screens.push({
+                ...baseScreen,
                 id: `dynamic-${field.label}`,
                 phase: 0,
                 question: field.name,
                 hint: field.instruction || '',
                 type: 'textarea',
                 field: field.label,
-                required: field.isRequired,
             });
         } else if (field.type === 'file') {
             screens.push({
+                ...baseScreen,
                 id: `dynamic-${field.label}`,
                 phase: 0,
                 question: field.name,
@@ -149,62 +186,32 @@ function buildScreens(categories, categoryForms, skills, categoryId, { includeCo
                 type: 'file',
                 field: field.label,
                 extensions: field.extensions,
-                required: field.isRequired,
+            });
+        } else if (field.type === 'cbm') {
+            screens.push({
+                ...baseScreen,
+                id: `dynamic-${field.label}`,
+                phase: 0,
+                question: field.name,
+                hint: field.instruction || 'Enter package dimensions to calculate CBM.',
+                type: 'cbm',
+                field: field.label,
+                optional: !field.isRequired,
             });
         } else {
             screens.push({
+                ...baseScreen,
                 id: `dynamic-${field.label}`,
                 phase: 0,
                 question: field.name,
                 hint: field.instruction || '',
                 type: field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : field.type === 'email' ? 'email' : 'text',
                 field: field.label,
-                required: field.isRequired,
             });
         }
     });
 
     screens.push(
-        {
-            id: 'skills',
-            phase: 1,
-            question: 'Which skills should providers have?',
-            hint: categorySkills.length
-                ? 'Select all that apply for this category, then tap Next.'
-                : 'No skills are set for this category yet. Tap Next to continue.',
-            type: 'cards-multi',
-            field: 'skill_ids',
-            options: categorySkills.map((s) => ({ value: s.id, label: s.name })),
-            minSelections: categorySkills.length ? 1 : 0,
-            optional: categorySkills.length === 0,
-        },
-        {
-            id: 'skill_level',
-            phase: 1,
-            question: 'What experience level do you need?',
-            hint: 'Choose the level that fits your job, then tap Next.',
-            type: 'cards-single',
-            field: 'skill_level',
-            options: SKILL_LEVELS,
-        },
-        {
-            id: 'project_scope',
-            phase: 1,
-            question: 'How big is this project?',
-            hint: 'This helps providers understand the scope. Tap Next when ready.',
-            type: 'cards-single',
-            field: 'project_scope',
-            options: PROJECT_SCOPES,
-        },
-        {
-            id: 'job_longevity',
-            phase: 1,
-            question: 'How long will the work take?',
-            hint: 'Your best estimate is fine. Tap Next when ready.',
-            type: 'cards-single',
-            field: 'job_longevity',
-            options: JOB_DURATIONS,
-        },
         {
             id: 'budget',
             phase: 2,
@@ -213,15 +220,6 @@ function buildScreens(categories, categoryForms, skills, categoryId, { includeCo
             type: 'number',
             field: 'budget',
             placeholder: '0.00',
-        },
-        {
-            id: 'custom_budget',
-            phase: 2,
-            question: 'Can providers suggest a different price?',
-            hint: 'Choose one option, then tap Next.',
-            type: 'cards-single',
-            field: 'custom_budget',
-            options: CUSTOM_BUDGET_OPTIONS,
         },
         {
             id: 'deadline',
@@ -268,6 +266,15 @@ function buildScreens(categories, categoryForms, skills, categoryId, { includeCo
     return screens.filter((screen) => !(screen.skipWhen?.() ?? false));
 }
 
+function screenIsVisible(screen, data) {
+    if (screen.showWhen?.field) {
+        const current = data[screen.showWhen.field];
+        return screen.showWhen.values.includes(current);
+    }
+
+    return true;
+}
+
 function resolveOptions(screen, data) {
     if (typeof screen.options === 'function') {
         return screen.options();
@@ -276,10 +283,27 @@ function resolveOptions(screen, data) {
 }
 
 function screenIsValid(screen, data) {
+    if (!screenIsVisible(screen, data)) {
+        return true;
+    }
+
     if (screen.type === 'name-split') {
         return Boolean(data.firstname?.trim() && data.lastname?.trim());
     }
+    if (screen.type === 'country-city') {
+        return Boolean(data[screen.countryField]?.trim() && data[screen.cityField]?.trim());
+    }
+    if (screen.type === 'cargo-details') {
+        const hsOk = !screen.hsMeta?.isRequired || Boolean(String(data[screen.hsField] ?? '').trim());
+        const weightVal = data[screen.weightField];
+        const weightOk = !screen.weightMeta?.isRequired || (weightVal !== '' && weightVal !== null && weightVal !== undefined);
+        const cbmOk = !screen.cbmMeta?.isRequired || Boolean(String(data[screen.cbmField] ?? '').trim());
+        return hsOk && weightOk && cbmOk;
+    }
     if (screen.optional) {
+        return true;
+    }
+    if (screen.required === false) {
         return true;
     }
     const field = screen.field;
@@ -336,7 +360,6 @@ function scrollWizardToTop() {
 export default function JobPostWizard({
     categories,
     categoryForms,
-    skills,
     draft = {},
     currencyText = 'USD',
     initialPhase = 0,
@@ -362,7 +385,7 @@ export default function JobPostWizard({
         budget: draft.budget || '',
         custom_budget: draft.custom_budget !== undefined && draft.custom_budget !== null && draft.custom_budget !== ''
             ? String(draft.custom_budget)
-            : '0',
+            : '1',
         deadline: draft.deadline || '',
         firstname: draft.contact_firstname || '',
         lastname: draft.contact_lastname || '',
@@ -376,11 +399,16 @@ export default function JobPostWizard({
         ) : {}),
     });
 
-    const screens = useMemo(
-        () => buildScreens(categories, categoryForms, skills, form.data.category_id, {
+    const baseScreens = useMemo(
+        () => buildScreens(categories, categoryForms, form.data.category_id, {
             includeContact: !isBuyer,
         }),
-        [categories, categoryForms, skills, form.data.category_id, isBuyer],
+        [categories, categoryForms, form.data.category_id, isBuyer],
+    );
+
+    const screens = useMemo(
+        () => baseScreens.filter((screen) => screenIsVisible(screen, form.data)),
+        [baseScreens, form.data],
     );
 
     const detailsStoreUrl = isBuyer
@@ -388,10 +416,6 @@ export default function JobPostWizard({
             ? `${routes?.buyerJobPostDetailsStore ?? '/customer/job/post/job-details'}/${jobId}`
             : (routes?.buyerJobPostDetailsStore ?? '/customer/job/post/job-details'))
         : (jobPostRoutes?.detailsStore ?? '/post-job');
-
-    const preferencesStoreUrl = isBuyer
-        ? `${routes?.buyerJobPostPreferencesStore ?? '/customer/job/post/provider-details'}/${jobId}`
-        : (jobPostRoutes?.preferencesStore ?? '/post-job/preferences');
 
     const budgetStoreUrl = isBuyer
         ? `${routes?.buyerJobPostBudgetStore ?? '/customer/job/post/budget'}/${jobId}`
@@ -408,7 +432,15 @@ export default function JobPostWizard({
 
     useEffect(() => {
         setScreenIndex(findScreenIndex(startPhase));
-    }, [startPhase, findScreenIndex]);
+        // Restart from the server phase only when that phase actually changes.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [startPhase]);
+
+    useEffect(() => {
+        if (screenIndex > screens.length - 1) {
+            setScreenIndex(Math.max(0, screens.length - 1));
+        }
+    }, [screens.length, screenIndex]);
 
     useEffect(() => {
         if (skipScrollOnMount.current) {
@@ -480,21 +512,6 @@ export default function JobPostWizard({
                 if (isBuyer) {
                     return;
                 }
-                const nextIdx = screens.findIndex((s) => s.phase === 1);
-                setScreenIndex(nextIdx >= 0 ? nextIdx : screenIndex + 1);
-            },
-        });
-    };
-
-    const savePreferencesPhase = () => {
-        form.post(preferencesStoreUrl, {
-            preserveScroll: false,
-            onStart: () => setSavingPhase(true),
-            onFinish: () => setSavingPhase(false),
-            onSuccess: () => {
-                if (isBuyer) {
-                    return;
-                }
                 const nextIdx = screens.findIndex((s) => s.phase === 2);
                 setScreenIndex(nextIdx >= 0 ? nextIdx : screenIndex + 1);
             },
@@ -502,6 +519,11 @@ export default function JobPostWizard({
     };
 
     const publishJob = () => {
+        form.transform((data) => ({
+            ...data,
+            custom_budget: data.custom_budget || '1',
+            status: data.status || '1',
+        }));
         form.post(budgetStoreUrl, {
             preserveScroll: false,
             onStart: () => setSavingPhase(true),
@@ -517,14 +539,9 @@ export default function JobPostWizard({
         }
 
         const isLastInPhase0 = screen.phase === 0 && lastInPhase;
-        const isLastInPhase1 = screen.phase === 1 && lastInPhase;
 
         if (isLastInPhase0) {
             saveDetailsPhase();
-            return;
-        }
-        if (isLastInPhase1) {
-            savePreferencesPhase();
             return;
         }
         if (screenIndex === screens.length - 1) {
@@ -536,24 +553,22 @@ export default function JobPostWizard({
 
     const selectSingle = (field, value) => {
         if (field === 'category_id') {
-            const allowed = (skills || [])
-                .filter((skill) => {
-                    if (skill.category_id === null || skill.category_id === undefined || skill.category_id === '') {
-                        return true;
-                    }
-                    return String(skill.category_id) === String(value);
-                })
-                .map((skill) => skill.id);
-
             form.setData({
                 ...form.data,
                 category_id: value,
                 subcategory_id: '',
-                skill_ids: (form.data.skill_ids || []).filter((id) => allowed.some((allowedId) => String(allowedId) === String(id))),
             });
         } else {
             form.setData(field, value);
         }
+    };
+
+    const setCountryCity = (countryField, cityField, country) => {
+        form.setData({
+            ...form.data,
+            [countryField]: country,
+            [cityField]: '',
+        });
     };
 
     const toggleMulti = (field, value) => {
@@ -634,6 +649,70 @@ export default function JobPostWizard({
             );
         }
 
+        if (screen.type === 'country-city') {
+            return (
+                <CountryCityFields
+                    countryValue={form.data[screen.countryField] || ''}
+                    cityValue={form.data[screen.cityField] || ''}
+                    onCountryChange={(country) => setCountryCity(screen.countryField, screen.cityField, country)}
+                    onCityChange={(city) => form.setData(screen.cityField, city)}
+                    countryError={form.errors[screen.countryField]}
+                    cityError={form.errors[screen.cityField]}
+                />
+            );
+        }
+
+        if (screen.type === 'cargo-details') {
+            return (
+                <div className="row gy-4">
+                    <div className="col-md-6">
+                        <label className="form-label">{screen.hsMeta.name}</label>
+                        <input
+                            type="text"
+                            className="form-control form--control form-control-lg"
+                            placeholder="e.g. 8471.30"
+                            value={form.data[screen.hsField] || ''}
+                            onChange={(e) => form.setData(screen.hsField, e.target.value)}
+                        />
+                        {screen.hsMeta.instruction && (
+                            <small className="text-muted d-block mt-1">{screen.hsMeta.instruction}</small>
+                        )}
+                        {form.errors[screen.hsField] && (
+                            <small className="text-danger d-block mt-1">{form.errors[screen.hsField]}</small>
+                        )}
+                    </div>
+                    <div className="col-md-6">
+                        <label className="form-label">{screen.weightMeta.name}</label>
+                        <input
+                            type="number"
+                            className="form-control form--control form-control-lg"
+                            placeholder="e.g. 500"
+                            value={form.data[screen.weightField] || ''}
+                            onChange={(e) => form.setData(screen.weightField, e.target.value)}
+                            min="0"
+                            step="any"
+                        />
+                        {screen.weightMeta.instruction && (
+                            <small className="text-muted d-block mt-1">{screen.weightMeta.instruction}</small>
+                        )}
+                        {form.errors[screen.weightField] && (
+                            <small className="text-danger d-block mt-1">{form.errors[screen.weightField]}</small>
+                        )}
+                    </div>
+                    <div className="col-12">
+                        <label className="form-label">{screen.cbmMeta.name}</label>
+                        <CbmCalculator
+                            value={form.data[screen.cbmField] || ''}
+                            onChange={(nextValue) => form.setData(screen.cbmField, nextValue)}
+                        />
+                        {form.errors[screen.cbmField] && (
+                            <small className="text-danger d-block mt-1">{form.errors[screen.cbmField]}</small>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
         if (screen.type === 'textarea') {
             return (
                 <textarea
@@ -652,6 +731,15 @@ export default function JobPostWizard({
                     type="file"
                     className="form-control form--control form-control-lg"
                     onChange={(e) => form.setData(screen.field, e.target.files[0] || null)}
+                />
+            );
+        }
+
+        if (screen.type === 'cbm') {
+            return (
+                <CbmCalculator
+                    value={form.data[screen.field] || ''}
+                    onChange={(nextValue) => form.setData(screen.field, nextValue)}
                 />
             );
         }
@@ -685,7 +773,7 @@ export default function JobPostWizard({
         );
     };
 
-    const fieldError = screen.field ? form.errors[screen.field] : null;
+    const fieldError = screen.field && screen.type !== 'cargo-details' ? form.errors[screen.field] : null;
 
     return (
         <div className="job-wizard">

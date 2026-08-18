@@ -191,7 +191,7 @@ class InertiaResource
                 'name' => __($sub->name),
                 'slug' => $sub->slug,
                 'jobsUrl' => route('freelance.jobs', ['category_id' => $category->id, 'subcategory_id' => [$sub->id]]),
-                'postUrl' => route('buyer.job.post.details'),
+                'postUrl' => route('post.job.details', ['category' => $category->slug, 'subcategory' => $sub->slug]),
             ])->values()->all(),
         ])->values()->all();
     }
@@ -208,14 +208,14 @@ class InertiaResource
                 : null,
             'jobsCount' => $category->jobs_count,
             'jobsUrl' => route('freelance.jobs', ['category_id' => $category->id]),
-            'postUrl' => route('buyer.job.post.details'),
+            'postUrl' => route('post.job.details', ['category' => $category->slug]),
             'subcategories' => collect($category->subcategories)->map(fn ($sub) => [
                 'id' => $sub->id,
                 'name' => __($sub->name),
                 'slug' => $sub->slug,
                 'description' => __($sub->description),
                 'jobsUrl' => route('freelance.jobs', ['category_id' => $category->id, 'subcategory_id' => [$sub->id]]),
-                'postUrl' => route('buyer.job.post.details'),
+                'postUrl' => route('post.job.details', ['category' => $category->slug, 'subcategory' => $sub->slug]),
             ])->values()->all(),
         ];
     }

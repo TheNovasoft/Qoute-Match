@@ -431,7 +431,7 @@ class SectionDataBuilder
 
         $buttonUrl = match ($routeKey) {
             'provider' => route('user.register'),
-            'customer' => route('buyer.job.post.details'),
+            'customer' => route('post.job.details'),
             'contact' => route('contact'),
             default => null,
         };

@@ -13,7 +13,7 @@ class FormProcessor
             'form_generator.is_required.*'=>'required|in:required,optional',
             'form_generator.options.*'=>'nullable',
             'form_generator.form_label.*'=>'required',
-            'form_generator.form_type.*'=>'required|in:text,select,radio,textarea,checkbox,file,email,url,number,datetime,date,time',
+            'form_generator.form_type.*'=>'required|in:text,select,radio,textarea,checkbox,file,email,url,number,datetime,date,time,cbm,country,city',
             'form_generator.form_width.*'=>'required|in:12,6,4,3',
             'form_generator.extensions.*'=>'required_if:form_generator.form_type.*,file'
         ];
@@ -98,7 +98,10 @@ class FormProcessor
                 $rule = array_merge($rule,['url']);
             }
             if ($data->type == 'number') {
-                $rule = array_merge($rule,['integer']);
+                $rule = array_merge($rule,['numeric']);
+            }
+            if ($data->type == 'cbm' || $data->type == 'country' || $data->type == 'city') {
+                $rule = array_merge($rule,['string']);
             }
             if ($data->type == 'checkbox') {
                 $rule = array_merge($rule,['array']);
