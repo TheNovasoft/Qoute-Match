@@ -1,8 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
 import FrontendLayout from '@/Components/Layout/FrontendLayout';
+import { quotePostUrl } from '@/utils/quotePostUrl';
 
 export default function LocationDetail({ pageTitle, seo, location, intro, categories }) {
-    const { routes } = usePage().props;
+    const { routes, auth } = usePage().props;
+    const postJobUrl = quotePostUrl(routes, auth);
 
     return (
         <FrontendLayout
@@ -23,7 +25,7 @@ export default function LocationDetail({ pageTitle, seo, location, intro, catego
                             )}
                             <p className="section-heading__desc mb-4">{intro}</p>
                             <div className="d-flex flex-wrap gap-2">
-                                <Link href={routes.buyerJobPost} className="btn btn--base">
+                                <Link href={postJobUrl} className="btn btn--base">
                                     Post a Requirement
                                 </Link>
                                 <Link href={routes.categories} className="btn btn-outline--base">

@@ -29,5 +29,8 @@
         'dashboard' => request()->is('buyer') || request()->is('buyer/*') || request()->is('freelancer') || request()->is('freelancer/*') || request()->is('user') || request()->is('user/*') || request()->is('provider') || request()->is('provider/*') || request()->is('customer') || request()->is('customer/*'),
     ])>
     @inertia
+    @unless (request()->is('admin') || request()->is('admin/*'))
+        @php echo loadExtension('tawk-chat') @endphp
+    @endunless
 </body>
 </html>

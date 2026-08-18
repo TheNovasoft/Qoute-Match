@@ -50,7 +50,8 @@ export default function SectionRenderer({ sections = [] }) {
 }
 
 export function Banner({ data }) {
-    const { routes } = usePage().props;
+    const { routes, auth } = usePage().props;
+    const postJobUrl = auth?.buyer ? routes.buyerJobPost : routes.postJob;
 
     if (!data) return null;
 
@@ -69,7 +70,7 @@ export function Banner({ data }) {
                             <p className="banner-content__desc">{data.subheading}</p>
                         </div>
                         <div className="d-flex flex-wrap gap-3 align-items-center">
-                            <Link href={routes.buyerJobPost} className="btn btn--base btn--lg">
+                            <Link href={postJobUrl} className="btn btn--base btn--lg">
                                 Get Quotes
                             </Link>
                             <Link href={routes.forProviders} className="btn btn-outline--base btn--lg">

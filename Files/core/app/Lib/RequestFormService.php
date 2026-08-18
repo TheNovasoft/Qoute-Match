@@ -42,6 +42,15 @@ class RequestFormService
                 $existingFileUrl = route('buyer.download.attachment', encrypt(getFilePath('requestDocuments') . '/' . $savedValue));
             }
 
+            $showWhen = null;
+            if (! empty($field->show_when)) {
+                $condition = is_array($field->show_when) ? (object) $field->show_when : $field->show_when;
+                $showWhen = [
+                    'field' => $condition->field ?? null,
+                    'values' => array_values((array) ($condition->values ?? [])),
+                ];
+            }
+
             return [
                 'name' => $field->name,
                 'label' => $field->label,
@@ -51,18 +60,69 @@ class RequestFormService
                 'options' => $field->options ?? [],
                 'extensions' => $field->extensions ?? '',
                 'width' => $field->width ?? '12',
+                'showWhen' => $showWhen,
+                'locationGroup' => $field->location_group ?? null,
+                'dependsOn' => $field->depends_on ?? null,
                 'value' => $savedValue,
                 'existingFileUrl' => $existingFileUrl,
             ];
         })->values()->all();
     }
 
+    public static function visibleFields(mixed $formData, array $inputValues = []): array
+    {
+        return collect(self::normalizeFormFields($formData))
+            ->filter(fn ($field) => self::fieldIsVisible($field, $inputValues))
+            ->values()
+            ->all();
+    }
+
+    public static function fieldIsVisible(object $field, array $inputValues): bool
+    {
+        if (empty($field->show_when)) {
+            return true;
+        }
+
+        $condition = is_array($field->show_when) ? (object) $field->show_when : $field->show_when;
+        $dependsOn = $condition->field ?? null;
+        $allowedValues = array_values((array) ($condition->values ?? []));
+
+        if (! $dependsOn || $allowedValues === []) {
+            return true;
+        }
+
+        $currentValue = $inputValues[$dependsOn] ?? null;
+
+        return in_array($currentValue, $allowedValues, true);
+    }
+
+    public static function validationRules(mixed $formData, array $inputValues, ?array $existing = null): array
+    {
+        $formProcessor = new FormProcessor();
+        $existingByLabel = collect($existing ?? [])->keyBy('label');
+        $rules = [];
+
+        foreach (self::visibleFields($formData, $inputValues) as $field) {
+            $fieldRules = $formProcessor->valueValidation([$field->label => $field]);
+            $rule = $fieldRules[$field->label] ?? ['nullable'];
+
+            if ($field->type === 'file' && ($existingByLabel->get($field->label)['value'] ?? null)) {
+                $rule = ['nullable', new \App\Rules\FileTypeValidate(explode(',', $field->extensions))];
+            }
+
+            $rules[$field->label] = $rule;
+        }
+
+        return $rules;
+    }
+
     public static function processSubmission(Request $request, mixed $formData, ?array $existing = null): array
     {
         $existingByLabel = collect($existing ?? [])->keyBy('label');
         $requestForm = [];
+        $inputValues = $request->except(['_token', '_method']);
 
-        foreach (self::normalizeFormFields($formData) as $data) {
+        foreach (self::visibleFields($formData, $inputValues) as $data) {
             $label = $data->label;
 
             if ($data->type === 'file') {

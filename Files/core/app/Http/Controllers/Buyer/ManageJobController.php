@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Buyer;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
-use App\Lib\FormProcessor;
+use App\Lib\GuestJobPostService;
 use App\Lib\QuoteMessagingService;
 use App\Lib\RequestFormService;
 use App\Models\AdminNotification;
@@ -14,7 +14,6 @@ use App\Models\Bid;
 use App\Models\Project;
 use App\Models\Skill;
 use App\Models\Transaction;
-use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -212,14 +211,17 @@ class ManageJobController extends Controller
             'category_id' => ['required', 'integer', 'gt:0', Rule::exists('categories', 'id')->where(function ($query) {
                 $query->where('status', Status::YES);
             }),],
-            'subcategory_id' => ['required', 'integer', 'gt:0', Rule::exists('subcategories', 'id')->where(function ($query) {
-                $query->where('status', Status::YES);
-            }),],
             'description'    => 'required|string',
         ]);
 
-        $category = Category::active()->with('requestForm')->findOrFail($request->category_id);
-        $formProcessor = new FormProcessor();
+        $category = Category::active()->with(['requestForm', 'subcategories' => fn ($q) => $q->active()])->findOrFail($request->category_id);
+        $subcategoryId = $this->resolveSubcategoryId($category, $request->subcategory_id);
+        $request->merge(['subcategory_id' => $subcategoryId]);
+        $request->validate([
+            'subcategory_id' => ['required', 'integer', 'gt:0', Rule::exists('subcategories', 'id')->where(function ($query) {
+                $query->where('status', Status::YES);
+            }),],
+        ]);
         $buyer = auth()->guard('buyer')->user();
 
         if ($id) {
@@ -234,19 +236,11 @@ class ManageJobController extends Controller
         $existingRequestData = $job->request_data;
 
         if ($category->requestForm) {
-            $dynamicRules = $formProcessor->valueValidation($category->requestForm->form_data);
-            $existingByLabel = collect($existingRequestData ?? [])->keyBy('label');
-
-            foreach ($category->requestForm->form_data as $field) {
-                if ($field->type === 'file' && ($existingByLabel->get($field->label)['value'] ?? null)) {
-                    $dynamicRules[$field->label] = [
-                        'nullable',
-                        new FileTypeValidate(explode(',', $field->extensions)),
-                    ];
-                }
-            }
-
-            $request->validate($dynamicRules);
+            $request->validate(RequestFormService::validationRules(
+                $category->requestForm->form_data,
+                $request->except(['_token', '_method']),
+                $existingRequestData
+            ));
         }
 
         $job->buyer_id = $buyer->id;
@@ -342,6 +336,14 @@ class ManageJobController extends Controller
             return back()->withNotify($notify);
         }
 
+        $defaults = GuestJobPostService::defaultPreferences((int) $job->category_id);
+        if (! $job->skills()->exists()) {
+            $job->skills()->sync($defaults['skill_ids']);
+        }
+        $job->project_scope = $job->project_scope ?: $defaults['project_scope'];
+        $job->job_longevity = $job->job_longevity ?: $defaults['job_longevity'];
+        $job->skill_level = $job->skill_level ?: $defaults['skill_level'];
+
         $notification = $job->wasRecentlyCreated && !$job->getChanges() ? 'Job post created successfully' : 'Job post updated successfully';
 
         $wasPublished = (int) $job->status === Status::JOB_PUBLISH;
@@ -436,20 +438,30 @@ class ManageJobController extends Controller
             return 0;
         }
 
-        $hasSkills = $job->relationLoaded('skills')
-            ? $job->skills->isNotEmpty()
-            : $job->skills()->exists();
+        return 2;
+    }
 
-        if (
-            ! $hasSkills
-            || ! filled($job->project_scope)
-            || ! filled($job->job_longevity)
-            || ! filled($job->skill_level)
-        ) {
-            return 1;
+    private function resolveSubcategoryId(Category $category, $requestedId): int
+    {
+        $subcategories = $category->subcategories ?? collect();
+
+        if ($subcategories->isEmpty()) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'subcategory_id' => 'Please choose a category that has an active subcategory.',
+            ]);
         }
 
-        return 2;
+        if (filled($requestedId) && $subcategories->contains('id', (int) $requestedId)) {
+            return (int) $requestedId;
+        }
+
+        if ($subcategories->count() === 1) {
+            return (int) $subcategories->first()->id;
+        }
+
+        throw \Illuminate\Validation\ValidationException::withMessages([
+            'subcategory_id' => 'Please choose a subcategory for this job.',
+        ]);
     }
 
     private function uniqueJobSlug(string $title, $ignoreId = 0, ?string $preferredSlug = null): string

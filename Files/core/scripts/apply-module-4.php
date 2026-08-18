@@ -27,6 +27,9 @@ function upsertRequestForm(string $act, array $fields): Form
             'options' => $field['options'] ?? [],
             'type' => $field['type'],
             'width' => $field['width'] ?? '12',
+            'show_when' => $field['show_when'] ?? null,
+            'location_group' => $field['location_group'] ?? null,
+            'depends_on' => $field['depends_on'] ?? null,
         ];
     }
 
@@ -43,26 +46,18 @@ function upsertRequestForm(string $act, array $fields): Form
 $builderForm = upsertRequestForm('request_builders', [
     ['name' => 'Postcode', 'type' => 'text', 'required' => true, 'width' => '6', 'instruction' => 'Where is the project located?'],
     ['name' => 'Property Type', 'type' => 'select', 'required' => true, 'width' => '6', 'options' => ['House', 'Flat', 'Bungalow', 'Commercial', 'Other']],
-    ['name' => 'Property Age', 'type' => 'select', 'required' => true, 'width' => '6', 'options' => ['New build', '0-10 years', '10-50 years', '50+ years']],
     ['name' => 'Project Timeline', 'type' => 'select', 'required' => true, 'width' => '6', 'options' => ['ASAP', 'Within 1 month', '1-3 months', '3-6 months', 'Flexible']],
-    ['name' => 'Site Visit Required', 'type' => 'radio', 'required' => true, 'width' => '6', 'options' => ['Yes', 'No']],
-    ['name' => 'Plans / Drawings Upload', 'type' => 'file', 'required' => false, 'width' => '6', 'extensions' => 'pdf,jpg,jpeg,png'],
     ['name' => 'Additional Requirements', 'type' => 'textarea', 'required' => false, 'width' => '12', 'instruction' => 'Access restrictions, materials preferences, or other notes'],
 ]);
 
 $freightForm = upsertRequestForm('request_freight', [
-    ['name' => 'Origin City', 'type' => 'text', 'required' => true, 'width' => '6'],
-    ['name' => 'Origin Country', 'type' => 'text', 'required' => true, 'width' => '6'],
-    ['name' => 'Destination City', 'type' => 'text', 'required' => true, 'width' => '6'],
-    ['name' => 'Destination Country', 'type' => 'text', 'required' => true, 'width' => '6'],
-    ['name' => 'Incoterms', 'type' => 'select', 'required' => true, 'width' => '6', 'options' => ['EXW', 'FOB', 'CIF', 'DAP', 'DDP', 'Other']],
-    ['name' => 'Shipment Type', 'type' => 'select', 'required' => true, 'width' => '6', 'options' => ['Sea freight', 'Air freight', 'Road freight', 'Multimodal']],
-    ['name' => 'Gross Weight (kg)', 'type' => 'number', 'required' => true, 'width' => '6', 'instruction' => 'Approximate total weight in kilograms'],
-    ['name' => 'Dimensions / CBM', 'type' => 'text', 'required' => false, 'width' => '6', 'instruction' => 'e.g. 120 x 80 x 60 cm or 2.5 CBM'],
-    ['name' => 'Commodity Description', 'type' => 'textarea', 'required' => true, 'width' => '12'],
-    ['name' => 'Customs Clearance Needed', 'type' => 'radio', 'required' => true, 'width' => '6', 'options' => ['Yes', 'No', 'Unsure']],
-    ['name' => 'Target Delivery Date', 'type' => 'date', 'required' => false, 'width' => '6'],
-    ['name' => 'Commercial Invoice / Packing List', 'type' => 'file', 'required' => false, 'width' => '12', 'extensions' => 'pdf,jpg,jpeg,png,doc,docx'],
+    ['name' => 'Origin Country', 'type' => 'country', 'required' => true, 'width' => '6', 'location_group' => 'origin'],
+    ['name' => 'Origin City', 'type' => 'city', 'required' => true, 'width' => '6', 'location_group' => 'origin', 'depends_on' => 'origin_country'],
+    ['name' => 'Destination Country', 'type' => 'country', 'required' => true, 'width' => '6', 'location_group' => 'destination'],
+    ['name' => 'Destination City', 'type' => 'city', 'required' => true, 'width' => '6', 'location_group' => 'destination', 'depends_on' => 'destination_country'],
+    ['name' => 'HS Code', 'type' => 'text', 'required' => true, 'width' => '6', 'instruction' => 'Harmonized System code for your goods (e.g. 8471.30)'],
+    ['name' => 'Gross Weight kg', 'type' => 'number', 'required' => true, 'width' => '6', 'instruction' => 'Approximate total weight in kilograms'],
+    ['name' => 'Dimensions CBM', 'type' => 'cbm', 'required' => false, 'width' => '12', 'instruction' => 'Enter package dimensions to calculate cubic metres (CBM).'],
 ]);
 
 $links = [

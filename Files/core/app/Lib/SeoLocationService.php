@@ -120,7 +120,7 @@ class SeoLocationService
                 'jobsCount' => $category->jobs_count,
                 'categoryUrl' => route('categories.show', $category->slug),
                 'serviceUrl' => self::categoryLocationUrl($category, $location),
-                'postUrl' => route('buyer.job.post.details'),
+                'postUrl' => route('post.job.details', ['category' => $category->slug]),
             ])->values()->all(),
         ];
     }
