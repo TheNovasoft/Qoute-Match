@@ -1,1 +1,0 @@
-import{j as r}from"./app-B9uyd52N.js";import{F as t,B as n,S as m}from"./SectionRenderer-BGJmRl90.js";function u({pageTitle:e,seo:s,sections:a,banner:o}){return r.jsxs(t,{pageTitle:e,seo:s,showBreadcrumb:!1,children:[r.jsx(n,{data:o}),r.jsx(m,{sections:a})]})}export{u as default};

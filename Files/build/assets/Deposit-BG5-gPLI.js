@@ -1,1 +1,0 @@
-import{j as o}from"./app-DCLWXVEI.js";import{DepositPage as r}from"./AuthPages-BDK6_eSL.js";import"./AppLayout-Ddiul1HJ.js";import"./PasswordInput-Dnj81T3x.js";import"./RequestFormFields-DlHvjbpS.js";import"./BuyerMasterLayout-UReVZW8K.js";import"./useMessageNotifications-Cn951B5N.js";import"./MasterLayout-B3NHuqSh.js";function u(t){return o.jsx(r,{...t})}export{u as default};

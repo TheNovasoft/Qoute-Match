@@ -1,1 +1,0 @@
-import{j as t}from"./app-Dy2Eqyks.js";import{B as i}from"./BuyerMasterLayout-C4qAy62a.js";import{D as e}from"./DisputeDetail-B1IGUrUt.js";import"./AppLayout-CGUhFRxB.js";import"./useMessageNotifications-CuBTzi_z.js";import"./StatusBadge-Dp99-gHU.js";function n({pageTitle:r,dispute:o}){return t.jsx(i,{pageTitle:r,children:t.jsx(e,{dispute:o})})}export{n as default};

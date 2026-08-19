@@ -1,1 +1,0 @@
-import{j as t}from"./app-DUP-Em7_.js";import{A as i}from"./AdminLayout-CIMMidIG.js";import{I as m}from"./InvoiceDetail-B3Zzg99W.js";import"./PortalBackLink-CtWiz-1L.js";import"./adminBack-D-lcgjTv.js";function f({pageTitle:o,invoice:r}){return t.jsx(i,{pageTitle:o,children:t.jsx(m,{invoice:r})})}export{f as default};

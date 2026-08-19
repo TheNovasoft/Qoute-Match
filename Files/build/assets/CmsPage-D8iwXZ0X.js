@@ -1,1 +1,0 @@
-import{j as r}from"./app-BripaW2D.js";import{F as m}from"./FrontendLayout-CDhVQiih.js";import{S as i}from"./SectionRenderer-CihScGPw.js";import"./AppLayout-C4wJwu3x.js";import"./VerificationBadges-MYmuXjGe.js";function u({pageTitle:o,seo:t,sections:e}){return r.jsx(m,{pageTitle:o,seo:t,children:r.jsx(i,{sections:e})})}export{u as default};

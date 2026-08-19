@@ -1,1 +1,0 @@
-import{j as r}from"./app-Byi-A3gx.js";import{B as o}from"./BuyerMasterLayout-BsEhL2Xc.js";import{C as e}from"./ChatInbox-CuCMbXpE.js";import"./AppLayout-D9wzngU-.js";import"./useMessageNotifications-C2pIVR-R.js";import"./VerificationBadges-CdG2Ibsa.js";function u(t){return r.jsx(o,{pageTitle:t.pageTitle,children:r.jsx(e,{...t})})}export{u as default};

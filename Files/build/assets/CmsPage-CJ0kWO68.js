@@ -1,1 +1,0 @@
-import{j as r}from"./app-CckM5a3d.js";import{F as m}from"./FrontendLayout-B8W6HrTw.js";import{S as n}from"./SectionRenderer-C_DqIAOC.js";import"./AppLayout-HSe8ZbRz.js";function f({pageTitle:o,seo:t,sections:e}){return r.jsx(m,{pageTitle:o,seo:t,children:r.jsx(n,{sections:e})})}export{f as default};
