@@ -41,36 +41,17 @@ function upsertQuoteForm(string $act, array $fields): Form
 
 $builderQuote = upsertQuoteForm('quote_builders', [
     ['name' => 'Total Price', 'type' => 'number', 'required' => true, 'width' => '6'],
-    ['name' => 'Labour Cost', 'type' => 'number', 'required' => false, 'width' => '6'],
-    ['name' => 'Material Cost', 'type' => 'number', 'required' => false, 'width' => '6'],
-    ['name' => 'VAT Status', 'type' => 'select', 'required' => true, 'width' => '6', 'options' => ['VAT included', 'VAT excluded', 'Not applicable']],
-    ['name' => 'Estimated Start Date', 'type' => 'date', 'required' => true, 'width' => '6'],
     ['name' => 'Estimated Completion Time', 'type' => 'text', 'required' => true, 'width' => '6', 'instruction' => 'e.g. 2 weeks, 6-8 weeks'],
-    ['name' => 'Site Visit Required', 'type' => 'radio', 'required' => true, 'width' => '6', 'options' => ['Yes', 'No']],
-    ['name' => 'Payment Schedule', 'type' => 'textarea', 'required' => false, 'width' => '12'],
-    ['name' => 'Warranty or Guarantee', 'type' => 'text', 'required' => false, 'width' => '6'],
-    ['name' => 'Inclusions', 'type' => 'textarea', 'required' => true, 'width' => '12'],
-    ['name' => 'Exclusions', 'type' => 'textarea', 'required' => true, 'width' => '12'],
     ['name' => 'Quote Expiry Date', 'type' => 'date', 'required' => true, 'width' => '6'],
-    ['name' => 'Notes and Assumptions', 'type' => 'textarea', 'required' => false, 'width' => '12'],
+    ['name' => 'Notes', 'type' => 'textarea', 'required' => false, 'width' => '12', 'instruction' => 'Optional notes for the buyer'],
 ]);
 
 $freightQuote = upsertQuoteForm('quote_freight', [
     ['name' => 'Freight Cost', 'type' => 'number', 'required' => true, 'width' => '6'],
-    ['name' => 'Customs Clearance Cost', 'type' => 'number', 'required' => false, 'width' => '6'],
-    ['name' => 'Delivery / Haulage Cost', 'type' => 'number', 'required' => false, 'width' => '6'],
-    ['name' => 'Documentation Charges', 'type' => 'number', 'required' => false, 'width' => '6'],
-    ['name' => 'Tail Lift Charge', 'type' => 'number', 'required' => false, 'width' => '6'],
-    ['name' => 'Insurance Cost', 'type' => 'number', 'required' => false, 'width' => '6'],
-    ['name' => 'VAT or Duty Handling Notes', 'type' => 'textarea', 'required' => false, 'width' => '12'],
-    ['name' => 'Transit Time', 'type' => 'text', 'required' => true, 'width' => '6'],
-    ['name' => 'Collection Date', 'type' => 'date', 'required' => false, 'width' => '6'],
+    ['name' => 'Transit Time', 'type' => 'text', 'required' => true, 'width' => '6', 'instruction' => 'e.g. 5-7 days'],
     ['name' => 'Estimated Delivery Date', 'type' => 'date', 'required' => true, 'width' => '6'],
-    ['name' => 'Pallet Exchange Included', 'type' => 'radio', 'required' => true, 'width' => '6', 'options' => ['Yes', 'No']],
     ['name' => 'Quote Valid Until', 'type' => 'date', 'required' => true, 'width' => '6'],
-    ['name' => 'Inclusions', 'type' => 'textarea', 'required' => true, 'width' => '12'],
-    ['name' => 'Exclusions', 'type' => 'textarea', 'required' => true, 'width' => '12'],
-    ['name' => 'Notes and Assumptions', 'type' => 'textarea', 'required' => false, 'width' => '12'],
+    ['name' => 'Notes', 'type' => 'textarea', 'required' => false, 'width' => '12', 'instruction' => 'Optional notes for the buyer'],
 ]);
 
 $links = [
