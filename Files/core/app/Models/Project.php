@@ -43,6 +43,11 @@ class Project extends Model
         return $this->hasOne(BuyerReview::class);
     }
 
+    public function milestones()
+    {
+        return $this->hasMany(ProjectMilestone::class)->orderBy('sort_order');
+    }
+
     public function statusBadge(): Attribute
     {
         return new Attribute(function () {

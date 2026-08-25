@@ -124,6 +124,8 @@ Route::middleware('buyer')->name('buyer.')->group(function () {
                 Route::post('complete/{project_id}', 'complete')->name('complete');
                 Route::post('report/{project_id}', 'report')->name('report');
                 Route::post('review-rating/{project_id}', 'updateReviewRating')->name('update.review-rating');
+                Route::post('milestones/{project_id}', 'storeMilestones')->name('milestones.store');
+                Route::post('milestones/{project_id}/approve/{milestone_id}', 'approveMilestone')->name('milestones.approve');
             });
 
             Route::controller('DisputeController')->prefix('disputes')->name('disputes.')->group(function () {

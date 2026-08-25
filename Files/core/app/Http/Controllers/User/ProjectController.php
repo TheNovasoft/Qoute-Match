@@ -13,6 +13,8 @@ use App\Models\Conversation;
 use App\Models\Dispute;
 use App\Models\Message;
 use App\Models\Project;
+use App\Models\ProjectMilestone;
+use App\Lib\MilestoneService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -33,7 +35,7 @@ class ProjectController extends Controller
     public function detail($id)
     {
         $pageTitle = 'Project Details';
-        $project   = Project::with(['job', 'bid', 'user', 'buyer', 'review', 'buyerReview'])
+        $project   = Project::with(['job', 'bid', 'user', 'buyer', 'review', 'buyerReview', 'milestones'])
             ->where('user_id', auth()->id())
             ->where('id', $id)
             ->firstOrFail();
@@ -48,7 +50,10 @@ class ProjectController extends Controller
 
         return Inertia::render('User/Projects/Detail', [
             'pageTitle' => $pageTitle,
-            'project' => DashboardResource::projectDetail($project, 'freelancer'),
+            'project' => DashboardResource::projectDetail($project, 'freelancer', [
+                'milestones' => MilestoneService::resourceCollection($project),
+                'milestoneSubmitUrl' => route('user.project.milestones.submit', [$project->id, '__ID__']),
+            ]),
             'canReport' => $canReport,
             'dispute' => $dispute ? ['id' => $dispute->id, 'subject' => $dispute->subject] : null,
             'disputeDetailRoute' => $disputeDetailRoute,
@@ -273,6 +278,26 @@ class ProjectController extends Controller
         );
 
         $notify[] = ['success', 'Project reported successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function submitMilestone(Request $request, $projectId, $milestoneId)
+    {
+        $request->validate([
+            'notes' => 'nullable|string|max:2000',
+        ]);
+
+        $project = Project::where('user_id', auth()->id())->findOrFail($projectId);
+        $milestone = ProjectMilestone::where('project_id', $project->id)->findOrFail($milestoneId);
+
+        try {
+            MilestoneService::submit($milestone, $request->notes);
+        } catch (\InvalidArgumentException $e) {
+            $notify[] = ['error', $e->getMessage()];
+            return back()->withNotify($notify);
+        }
+
+        $notify[] = ['success', 'Milestone marked as complete. Waiting for customer approval.'];
         return back()->withNotify($notify);
     }
 }
