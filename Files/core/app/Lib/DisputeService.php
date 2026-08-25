@@ -6,6 +6,7 @@ use App\Constants\Status;
 use App\Models\AdminNotification;
 use App\Models\Bid;
 use App\Models\Dispute;
+use App\Models\DisputeMessage;
 use App\Models\Project;
 
 class DisputeService
@@ -40,6 +41,13 @@ class DisputeService
         $dispute->status = Status::DISPUTE_OPEN;
         $dispute->save();
 
+        $initial = new DisputeMessage();
+        $initial->dispute_id = $dispute->id;
+        $initial->author_type = $raisedBy;
+        $initial->author_id = $raisedBy === 'buyer' ? (int) $project->buyer_id : (int) $project->user_id;
+        $initial->message = $description;
+        $initial->save();
+
         $adminNotification = new AdminNotification();
         $adminNotification->user_id = $project->user_id;
         $adminNotification->buyer_id = $project->buyer_id;
@@ -58,6 +66,49 @@ class DisputeService
         }
 
         return $dispute;
+    }
+
+    public static function openFromUser(
+        Project $project,
+        string $raisedBy,
+        string $description,
+        string $type = 'other',
+        ?string $subject = null
+    ): Dispute {
+        $project->loadMissing('bid', 'job');
+        $bid = $project->bid;
+        if (!$bid) {
+            throw new \InvalidArgumentException('Project quote not found.');
+        }
+
+        return self::createFromProjectReport($project, $bid, $raisedBy, $description, $type, $subject);
+    }
+
+    public static function addReply(Dispute $dispute, string $authorType, int $authorId, string $message): DisputeMessage
+    {
+        if (!$dispute->isActive()) {
+            throw new \InvalidArgumentException('This dispute is closed.');
+        }
+
+        $entry = new DisputeMessage();
+        $entry->dispute_id = $dispute->id;
+        $entry->author_type = $authorType;
+        $entry->author_id = $authorId;
+        $entry->message = $message;
+        $entry->save();
+
+        $dispute->loadMissing('job', 'buyer', 'user');
+        $otherParty = $authorType === 'buyer' ? $dispute->user : $dispute->buyer;
+        if ($otherParty) {
+            notify($otherParty, 'DISPUTE_OPENED', [
+                'subject'     => $dispute->subject,
+                'request'     => $dispute->job->title ?? 'Project',
+                'raised_by'   => ucfirst($authorType),
+                'description' => strLimit($message, 200),
+            ]);
+        }
+
+        return $entry;
     }
 
     public static function markInReview(Dispute $dispute, ?string $adminNote = null): void

@@ -129,6 +129,8 @@ Route::middleware('buyer')->name('buyer.')->group(function () {
             Route::controller('DisputeController')->prefix('disputes')->name('disputes.')->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::get('detail/{id}', 'detail')->name('detail');
+                Route::post('open/{project_id}', 'open')->name('open');
+                Route::post('reply/{id}', 'reply')->name('reply');
             });
 
             Route::controller('NotificationController')->prefix('notifications')->name('notifications.')->group(function () {

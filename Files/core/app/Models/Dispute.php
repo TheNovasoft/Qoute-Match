@@ -42,6 +42,11 @@ class Dispute extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function messages()
+    {
+        return $this->hasMany(DisputeMessage::class)->orderBy('id');
+    }
+
     public function scopeOpen($query)
     {
         return $query->where('status', Status::DISPUTE_OPEN);

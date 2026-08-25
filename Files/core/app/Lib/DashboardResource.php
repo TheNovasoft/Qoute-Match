@@ -333,6 +333,22 @@ class DashboardResource
     public static function disputeDetail(Dispute $dispute, string $role): array
     {
         $isBuyer = $role === 'buyer';
+        $dispute->loadMissing('messages');
+
+        $messages = $dispute->messages->map(fn ($msg) => [
+            'id' => (int) $msg->id,
+            'authorType' => $msg->author_type,
+            'authorLabel' => match ($msg->author_type) {
+                'buyer' => 'Customer',
+                'user' => 'Provider',
+                'admin' => 'Admin',
+                default => ucfirst($msg->author_type),
+            },
+            'message' => $msg->message,
+            'createdAt' => showDateTime($msg->created_at),
+            'isMine' => ($isBuyer && $msg->author_type === 'buyer')
+                || (!$isBuyer && $msg->author_type === 'user'),
+        ])->values()->all();
 
         return [
             'id' => (int) $dispute->id,
@@ -352,6 +368,11 @@ class DashboardResource
             'createdAt' => showDateTime($dispute->created_at),
             'resolvedAt' => $dispute->resolved_at ? showDateTime($dispute->resolved_at) : null,
             'status' => self::disputeStatus((int) $dispute->status),
+            'isActive' => $dispute->isActive(),
+            'messages' => $messages,
+            'replyUrl' => $isBuyer
+                ? route('buyer.disputes.reply', $dispute->id)
+                : route('user.disputes.reply', $dispute->id),
             'indexUrl' => $isBuyer ? route('buyer.disputes.index') : route('user.disputes.index'),
             'projectUrl' => $dispute->project_id
                 ? ($isBuyer
