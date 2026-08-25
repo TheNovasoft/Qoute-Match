@@ -10,8 +10,10 @@ use App\Models\Charge;
 use App\Models\Conversation;
 use App\Models\Dispute;
 use App\Models\Message;
+use App\Models\Job;
 use App\Models\Project;
 use App\Models\Review;
+use Illuminate\Support\Str;
 use App\Models\Transaction;
 use App\Lib\DashboardResource;
 use App\Lib\StructuredReviewService;
@@ -56,6 +58,47 @@ class ProjectController extends Controller
             'reviewDimensions' => DashboardResource::reviewDimensions(),
             'disputeTypes' => DashboardResource::disputeTypes(),
         ]);
+    }
+
+    public function rehire($id)
+    {
+        $buyer = auth()->guard('buyer')->user();
+        $project = Project::where('buyer_id', $buyer->id)
+            ->where('status', Status::PROJECT_COMPLETED)
+            ->with(['job.skills', 'user'])
+            ->findOrFail($id);
+
+        $source = $project->job;
+        $job = new Job();
+        $job->buyer_id = $buyer->id;
+        $job->title = $source->title;
+        $job->slug = Str::slug($source->title) . '-' . Str::lower(Str::random(6));
+        $job->category_id = $source->category_id;
+        $job->subcategory_id = $source->subcategory_id;
+        $job->description = $source->description;
+        $job->request_data = $source->request_data;
+        $job->project_scope = $source->project_scope;
+        $job->job_longevity = $source->job_longevity;
+        $job->skill_level = $source->skill_level;
+        $job->budget = $source->budget;
+        $job->custom_budget = $source->custom_budget;
+        $job->questions = $source->questions;
+        $job->status = Status::JOB_DRAFT;
+        $job->is_approved = Status::JOB_PENDING;
+        $job->save();
+
+        if ($source->relationLoaded('skills') && $source->skills->isNotEmpty()) {
+            $job->skills()->sync($source->skills->pluck('id'));
+        }
+
+        session([
+            'rehire_provider_id' => $project->user_id,
+            'rehire_provider_name' => $project->user->fullname,
+        ]);
+
+        $notify[] = ['success', 'Job copied from your completed project. Review and publish it, then invite ' . $project->user->fullname . ' again.'];
+
+        return redirect()->route('buyer.job.post.details', $job->id)->withNotify($notify);
     }
 
     public function downloadFile($id, $file)
