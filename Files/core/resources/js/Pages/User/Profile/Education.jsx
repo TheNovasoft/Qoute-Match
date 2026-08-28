@@ -137,15 +137,16 @@ export default function Education({ pageTitle, user, educations: initialEducatio
                                             </Link>
                                             <button
                                                 type="button"
-                                                className="btn btn-outline--base"
+                                                className="btn btn--base"
                                                 onClick={() => router.post(routes?.userSkipProfileEducation ?? '/provider/profile-education-skip')}
                                             >
-                                                Skip for now
+                                                Skip — I will add this later
                                             </button>
                                             <button type="submit" className="btn btn--dark" disabled={processing}>
                                                 {processing ? 'Saving...' : 'Next'}
                                             </button>
                                         </div>
+                                        <p className="text-muted small mt-3 mb-0">Education is optional. Most customers care more about your skills and past work.</p>
                                     </form>
                                 </div>
                             </div>

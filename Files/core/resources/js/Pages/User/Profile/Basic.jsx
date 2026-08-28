@@ -77,7 +77,8 @@ export default function Basic({ pageTitle, user }) {
     const submit = (event) => {
         event.preventDefault();
         post(routes?.userStoreProfileSetting ?? '/provider/profile-setting', {
-            forceFormData: true,
+            forceFormData: Boolean(data.image),
+            preserveScroll: true,
         });
     };
 
