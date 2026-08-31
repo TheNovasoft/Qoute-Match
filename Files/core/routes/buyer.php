@@ -126,11 +126,14 @@ Route::middleware('buyer')->name('buyer.')->group(function () {
                 Route::post('review-rating/{project_id}', 'updateReviewRating')->name('update.review-rating');
                 Route::post('milestones/{project_id}', 'storeMilestones')->name('milestones.store');
                 Route::post('milestones/{project_id}/approve/{milestone_id}', 'approveMilestone')->name('milestones.approve');
+                Route::post('rehire/{project_id}', 'rehire')->name('rehire');
             });
 
             Route::controller('DisputeController')->prefix('disputes')->name('disputes.')->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::get('detail/{id}', 'detail')->name('detail');
+                Route::post('open/{project_id}', 'open')->name('open');
+                Route::post('reply/{id}', 'reply')->name('reply');
             });
 
             Route::controller('NotificationController')->prefix('notifications')->name('notifications.')->group(function () {

@@ -299,6 +299,16 @@ export default function ProjectDetail({
                     )}
 
                     <div className="mt-4 d-flex flex-wrap gap-2">
+                        {project.canRehire && project.rehireUrl && (
+                            <Link href={project.rehireUrl} method="post" as="button" className="btn btn--base btn-sm">
+                                Hire {project.providerName} Again
+                            </Link>
+                        )}
+                        {project.canRehire && project.rehireInviteUrl && (
+                            <Link href={project.rehireInviteUrl} method="post" as="button" className="btn btn-outline--base btn-sm">
+                                Invite Provider
+                            </Link>
+                        )}
                         {project.invoiceUrl ? (
                             <Link href={project.invoiceUrl} className="btn btn--base btn-sm">View Invoice</Link>
                         ) : null}

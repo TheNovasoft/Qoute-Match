@@ -80,6 +80,7 @@ Route::controller('SiteController')->group(function () {
     Route::get('blog/{slug}', 'blogDetails')->name('blog.details');
 
     Route::get('policy/{slug}', 'policyPages')->name('policy.pages');
+    Route::get('faq', 'faq')->name('faq');
 
     Route::get('placeholder-image/{size}', 'placeholderImage')->withoutMiddleware('maintenance')->name('placeholder.image');
     Route::get('maintenance-mode', 'maintenance')->withoutMiddleware('maintenance')->name('maintenance');

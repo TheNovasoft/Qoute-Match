@@ -33,6 +33,7 @@ export default function JobDetails({
     const [similarOffset, setSimilarOffset] = useState(5);
     const [showBidModal, setShowBidModal] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
+    const [quoteStep, setQuoteStep] = useState(0);
     const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
     const [quoteValues, setQuoteValues] = useState({});
@@ -61,7 +62,22 @@ export default function JobDetails({
 
     const showStandaloneBidAmount = job.customBudget && !amountQuoteField && !isSummedTotal;
 
-    const { data, setData, processing, reset } = useForm({
+    const priceStepFields = useMemo(() => {
+        if (isSummedTotal) {
+            return costFields;
+        }
+        if (amountQuoteField) {
+            return [amountQuoteField];
+        }
+        return [];
+    }, [isSummedTotal, costFields, amountQuoteField]);
+
+    const detailsStepFields = useMemo(() => {
+        const priceLabels = new Set(priceStepFields.map((field) => field.label));
+        return quoteFields.filter((field) => !priceLabels.has(field.label));
+    }, [quoteFields, priceStepFields]);
+
+    const { data, setData, processing, reset, errors } = useForm({
         bid_amount: existingBid?.bid_amount ?? '',
         estimated_time: existingBid?.estimated_time ?? '',
         bid_quote: existingBid?.bid_quote ?? '',
@@ -93,6 +109,53 @@ export default function JobDetails({
             setQuoteValues(initial);
         }
     }, [existingBid?.id, quoteFields]);
+
+    useEffect(() => {
+        if (!showBidModal) {
+            setQuoteStep(0);
+        }
+    }, [showBidModal]);
+
+    const quoteWizardSteps = ['Your price', 'Timeline', 'Proposal', 'Review'];
+    const quotePriceLabel = isSummedTotal
+        ? `${summedTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${job.currencyText}`
+        : (data.bid_amount || (amountQuoteField ? quoteValues[amountQuoteField.label] : '') || '—');
+
+    const canAdvanceQuoteStep = () => {
+        if (quoteStep === 0) {
+            if (showStandaloneBidAmount) {
+                return Boolean(String(data.bid_amount ?? '').trim());
+            }
+            if (isSummedTotal) {
+                return summedTotal > 0;
+            }
+            if (amountQuoteField) {
+                return Boolean(String(quoteValues[amountQuoteField.label] ?? '').trim());
+            }
+            return true;
+        }
+        if (quoteStep === 1) {
+            return Boolean(String(data.estimated_time ?? '').trim());
+        }
+        if (quoteStep === 2) {
+            if (quoteFields.length > 0) {
+                return true;
+            }
+            return Boolean(String(data.bid_quote ?? '').trim());
+        }
+        return true;
+    };
+
+    const handleQuoteWizardSubmit = (event) => {
+        if (quoteStep < quoteWizardSteps.length - 1) {
+            event.preventDefault();
+            if (canAdvanceQuoteStep()) {
+                setQuoteStep((step) => step + 1);
+            }
+            return;
+        }
+        submitBid(event);
+    };
 
     const loadMoreFreelancers = async () => {
         const response = await window.axios.get('/explore-get-similar-providers', {
@@ -187,7 +250,7 @@ export default function JobDetails({
                                         <div className="right">
                                             {job.customBudget && <sup className="d-block">Flexible budget available.</sup>}
                                             <h5 className="price">{job.budget}</h5>
-                                            <small className="text">Bids: {job.bidsCount}</small>
+                                            <small className="text">Quotes: {job.bidsCount}</small>
                                             <small className="text">Interviews: {job.interviews}</small>
                                         </div>
                                     </div>
@@ -271,7 +334,7 @@ export default function JobDetails({
                                     {job.questions?.length > 0 && (
                                         <div className="question-section">
                                             <div className="question-header">
-                                                <h4>Job questions for freelancers</h4>
+                                                <h4>Screening questions for providers</h4>
                                             </div>
                                             <ul className="question-list">
                                                 {job.questions.map((question, index) => (
@@ -288,12 +351,12 @@ export default function JobDetails({
                                 <div className="details-item">
                                     <div className="bid-wrapper">
                                         <div className="bid-wrapper__top">
-                                            <h6 className="mb-0">{totalBiddenFreelancers} - Freelancers are bidding on this job</h6>
+                                            <h6 className="mb-0">{totalBiddenFreelancers} provider{totalBiddenFreelancers === 1 ? '' : 's'} quoted on this job</h6>
                                         </div>
                                         <div className="freelancers-wrapper">
                                             {freelancers.length ? freelancers.map((freelancer) => (
                                                 <BidFreelancerCard key={freelancer.username} freelancer={freelancer} />
-                                            )) : <EmptyState message="No freelancer found!" />}
+                                            )) : <EmptyState message="No quotes yet" description="Be the first provider to send a quote on this job." />}
                                         </div>
                                         {totalBiddenFreelancers > freelancers.length && (
                                             <div className="bid-wrapper__bottom">
@@ -316,12 +379,12 @@ export default function JobDetails({
                                                 {bidState.canEdit ? (
                                                     <button type="button" className="btn btn--base w-100 mt-3"
                                                         onClick={() => openBidModal(true)}>
-                                                        <i className="las la-edit"></i> Edit Bid
+                                                        <i className="las la-edit"></i> Edit Quote
                                                     </button>
                                                 ) : (
                                                     <button type="button" className={`btn btn--base w-100 mt-3 ${bidState.disabled ? 'disabled' : ''}`}
                                                         disabled={bidState.disabled} onClick={() => openBidModal(false)}>
-                                                        <i className="lab la-gavel"></i> Bid on the project
+                                                        <i className="lab la-gavel"></i> Send Your Quote
                                                     </button>
                                                 )}
                                                 {bidState.hasBid && !bidState.canEdit && (
@@ -361,11 +424,11 @@ export default function JobDetails({
                                                             <span>Your subscription does not include unlimited quotes for new submissions.</span>
                                                         ) : (
                                                             <>
-                                                                Insufficient lead credits. You need {bidState.monetisation.quote_cost} credit(s) to submit a new quote
+                                                                Insufficient quote tokens. You need {bidState.monetisation.quote_cost} token(s) to submit a new quote
                                                                 (balance: {bidState.monetisation.credits}).
                                                                 {' '}
                                                                 <Link href={routes.userLeadCredits ?? '/provider/lead-credits'} className="text--base">
-                                                                    Buy credits
+                                                                    Buy tokens
                                                                 </Link>
                                                             </>
                                                         )}
@@ -373,16 +436,16 @@ export default function JobDetails({
                                                 )}
                                                 {bidState.monetisation?.enabled && bidState.canAffordQuote && bidState.needsCreditsForNewQuote && !bidState.monetisation.unlimited_quotes && (
                                                     <p className="text-muted small mt-2 mb-0 text-center">
-                                                        Submitting a new quote uses {bidState.monetisation.quote_cost} lead credit(s).
+                                                        Submitting a new quote uses {bidState.monetisation.quote_cost} quote token(s).
                                                         Balance: {bidState.monetisation.credits}.
                                                     </p>
                                                 )}
                                             </>
                                         ) : (
-                                            <Link href="/provider/login" className="btn btn--base w-100">Bid on the project</Link>
+                                            <Link href="/provider/login" className="btn btn--base w-100">Send Your Quote</Link>
                                         )}
                                         <p className="sidebar-header__text">
-                                            By clicking contact, you have read and agreed to our{' '}
+                                            By sending a quote, you have read and agreed to our{' '}
                                             {policies.map((policy, index) => (
                                                 <span key={policy.slug}>
                                                     <Link href={policy.url} className="text--base">{policy.title}</Link>
@@ -456,74 +519,123 @@ export default function JobDetails({
                 <div className="modal custom--modal show d-block" id="bidModal" tabIndex="-1">
                     <div className="modal-dialog modal-dialog-centered modal-lg">
                         <div className="modal-content">
-                            <form onSubmit={submitBid}>
+                            <form onSubmit={handleQuoteWizardSubmit}>
                                 <div className="modal-body p-4">
                                     <div className="d-flex justify-content-between align-items-center">
-                                        <h5 className="mb-2">{isEditMode ? 'Update your bid' : job.title}</h5>
+                                        <h5 className="mb-2">{isEditMode ? 'Update your quote' : job.title}</h5>
                                         <button type="button" className="btn-close" onClick={() => {
                                             setShowBidModal(false);
                                             setIsEditMode(false);
                                         }}></button>
                                     </div>
-                                    <p className="mb-3">
-                                        <i className="las la-angle-double-right"></i>{' '}
-                                        {isEditMode ? 'Update your quote details below.' : 'Are you sure you\'ve read this job post carefully?'}
-                                    </p>
-                                    {!isEditMode && <h6 className="mb-3">{job.customBudget ? 'Estimated Budget' : 'Budget'}: {job.budget}</h6>}
-                                    {isEditMode && (
+
+                                    <div className="quote-wizard-steps d-flex flex-wrap gap-2 mb-3">
+                                        {quoteWizardSteps.map((label, index) => (
+                                            <span
+                                                key={label}
+                                                className={`badge ${index === quoteStep ? 'bg--base' : index < quoteStep ? 'bg-success' : 'bg-secondary'}`}
+                                            >
+                                                {index + 1}. {label}
+                                            </span>
+                                        ))}
+                                    </div>
+
+                                    {quoteStep === 0 && (
                                         <>
-                                            <h6 className="mb-3">{job.title}</h6>
-                                            {bidState?.requestUpdatedAfterBid && (
+                                            {!isEditMode && <h6 className="mb-3">{job.customBudget ? 'Estimated Budget' : 'Budget'}: {job.budget}</h6>}
+                                            {showStandaloneBidAmount && (
+                                                <div className="form-group mb-3">
+                                                    <label className="form-label">Your Quote Amount</label>
+                                                    <div className="input-group">
+                                                        <input type="number" step="any" className="form-control form--control" name="bid_amount"
+                                                            value={data.bid_amount} onChange={(e) => handleBidAmountChange(e.target.value)} required />
+                                                        <span className="input-group-text">{job.currencyText}</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {priceStepFields.length > 0 && (
+                                                <RequestFormFields
+                                                    fields={priceStepFields}
+                                                    values={quoteValues}
+                                                    onChange={handleQuoteFieldChange}
+                                                    errors={errors}
+                                                />
+                                            )}
+                                            {isSummedTotal && (
+                                                <div className="quote-total-box d-flex justify-content-between align-items-center mt-3 p-3">
+                                                    <span className="fw-semibold">Total Quote</span>
+                                                    <span className="fw-bold fs-5">
+                                                        {summedTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {job.currencyText}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {(errors.bid_amount) && (
+                                                <div className="alert alert-danger small mt-2">{errors.bid_amount}</div>
+                                            )}
+                                        </>
+                                    )}
+
+                                    {quoteStep === 1 && (
+                                        <div className="form-group mb-3">
+                                            <label className="form-label">How long will it take?</label>
+                                            <input type="text" className="form-control form--control" name="estimated_time"
+                                                value={data.estimated_time} onChange={(e) => setData('estimated_time', e.target.value)}
+                                                placeholder="e.g. 2 weeks" required />
+                                            {errors.estimated_time && <small className="text-danger d-block mt-1">{errors.estimated_time}</small>}
+                                        </div>
+                                    )}
+
+                                    {quoteStep === 2 && (
+                                        <>
+                                            {isEditMode && bidState?.requestUpdatedAfterBid && (
                                                 <div className="alert alert-warning small mb-3">
                                                     The buyer updated this request. Review the latest request details on this page before saving your changes.
                                                 </div>
                                             )}
+                                            {detailsStepFields.length > 0 ? (
+                                                <RequestFormFields
+                                                    fields={detailsStepFields}
+                                                    values={quoteValues}
+                                                    onChange={handleQuoteFieldChange}
+                                                    errors={errors}
+                                                />
+                                            ) : (
+                                                <div className="form-group mb-3">
+                                                    <label className="form-label">Your Proposal</label>
+                                                    <textarea className="form-control form--control" name="bid_quote" rows="5"
+                                                        value={data.bid_quote} onChange={(e) => setData('bid_quote', e.target.value)} required />
+                                                </div>
+                                            )}
+                                            {errors.bid_quote && <div className="alert alert-danger small">{errors.bid_quote}</div>}
                                         </>
                                     )}
-                                    {showStandaloneBidAmount && (
-                                        <div className="form-group mb-3">
-                                            <label className="form-label">Your Bid Amount</label>
-                                            <div className="input-group">
-                                                <input type="number" step="any" className="form-control form--control" name="bid_amount"
-                                                    value={data.bid_amount} onChange={(e) => handleBidAmountChange(e.target.value)} required />
-                                                <span className="input-group-text">{job.currencyText}</span>
-                                            </div>
+
+                                    {quoteStep === 3 && (
+                                        <div className="border rounded p-3 bg-light">
+                                            <p className="mb-2"><strong>Price:</strong> {quotePriceLabel} {typeof quotePriceLabel === 'string' && !quotePriceLabel.includes(job.currencyText) ? job.currencyText : ''}</p>
+                                            <p className="mb-2"><strong>Timeline:</strong> {data.estimated_time || '—'}</p>
+                                            {!quoteFields.length && (
+                                                <p className="mb-0"><strong>Proposal:</strong> {(data.bid_quote || '—').slice(0, 200)}{(data.bid_quote?.length > 200 ? '…' : '')}</p>
+                                            )}
+                                            {quoteFields.length > 0 && (
+                                                <p className="mb-0 text-muted small">Custom quote fields will be submitted with your quote.</p>
+                                            )}
                                         </div>
                                     )}
-                                    <div className="form-group mb-3">
-                                        <label className="form-label">Estimated Time</label>
-                                        <input type="text" className="form-control form--control" name="estimated_time"
-                                            value={data.estimated_time} onChange={(e) => setData('estimated_time', e.target.value)} required />
-                                    </div>
-                                    {quoteFields.length > 0 ? (
-                                        <RequestFormFields
-                                            fields={quoteFields}
-                                            values={quoteValues}
-                                            onChange={handleQuoteFieldChange}
-                                        />
-                                    ) : (
-                                        <div className="form-group mb-3">
-                                            <label className="form-label">Your Bid Quote</label>
-                                            <textarea className="form-control form--control" name="bid_quote" rows="5"
-                                                value={data.bid_quote} onChange={(e) => setData('bid_quote', e.target.value)} required />
-                                        </div>
-                                    )}
-                                    {isSummedTotal && (
-                                        <div className="quote-total-box d-flex justify-content-between align-items-center mt-3 p-3">
-                                            <span className="fw-semibold">Total Quote</span>
-                                            <span className="fw-bold fs-5">
-                                                {summedTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {job.currencyText}
-                                            </span>
-                                        </div>
-                                    )}
-                                    {isSummedTotal && (
-                                        <small className="text-muted d-block mt-1">
-                                            The buyer sees this sum of all cost fields above as your total quote.
-                                        </small>
-                                    )}
-                                    <div className="text-end">
-                                        <button type="submit" className="btn btn--base" disabled={processing}>
-                                            {isEditMode ? 'Update Bid' : 'Submit'}
+
+                                    <div className="d-flex justify-content-between align-items-center mt-4">
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline--secondary"
+                                            disabled={quoteStep === 0 || processing}
+                                            onClick={() => setQuoteStep((step) => Math.max(0, step - 1))}
+                                        >
+                                            Back
+                                        </button>
+                                        <button type="submit" className="btn btn--base" disabled={processing || !canAdvanceQuoteStep()}>
+                                            {quoteStep === quoteWizardSteps.length - 1
+                                                ? (isEditMode ? 'Update Quote' : 'Send Quote')
+                                                : 'Next'}
                                         </button>
                                     </div>
                                 </div>

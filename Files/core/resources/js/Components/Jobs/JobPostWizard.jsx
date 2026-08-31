@@ -12,6 +12,26 @@ function slugFromTitle(title) {
         .replace(/[^\w-]+/g, '');
 }
 
+function budgetSuggestionForCategory(categoryId, categories = []) {
+    const category = categories.find((item) => String(item.id) === String(categoryId));
+    const name = (category?.name || '').toLowerCase();
+
+    if (name.includes('web') || name.includes('software') || name.includes('app')) {
+        return { low: 500, mid: 2500, high: 10000, label: 'Web & software projects' };
+    }
+    if (name.includes('design') || name.includes('logo') || name.includes('creative')) {
+        return { low: 100, mid: 500, high: 2500, label: 'Design work' };
+    }
+    if (name.includes('freight') || name.includes('logistic') || name.includes('shipping')) {
+        return { low: 200, mid: 1200, high: 8000, label: 'Freight & logistics' };
+    }
+    if (name.includes('build') || name.includes('construction') || name.includes('renovation')) {
+        return { low: 500, mid: 3500, high: 20000, label: 'Building & renovation' };
+    }
+
+    return { low: 50, mid: 350, high: 1500, label: 'General projects' };
+}
+
 function valuesFromFields(fields = []) {
     const values = {};
     fields.forEach((field) => {
@@ -263,6 +283,14 @@ function buildScreens(categories, categoryForms, categoryId, { includeContact = 
         );
     }
 
+    screens.push({
+        id: 'preview',
+        phase: 2,
+        question: 'Review your job post',
+        hint: 'Check everything looks right, then post for free.',
+        type: 'preview',
+    });
+
     return screens.filter((screen) => !(screen.skipWhen?.() ?? false));
 }
 
@@ -287,6 +315,10 @@ function screenIsValid(screen, data) {
         return true;
     }
 
+    if (screen.type === 'preview') {
+        return true;
+    }
+
     if (screen.type === 'name-split') {
         return Boolean(data.firstname?.trim() && data.lastname?.trim());
     }
@@ -304,6 +336,9 @@ function screenIsValid(screen, data) {
         return true;
     }
     if (screen.required === false) {
+        return true;
+    }
+    if (screen.field === 'budget' && String(data.custom_budget) === '1') {
         return true;
     }
     const field = screen.field;
@@ -745,18 +780,79 @@ export default function JobPostWizard({
         }
 
         if (screen.type === 'number' && screen.field === 'budget') {
+            const suggestions = budgetSuggestionForCategory(form.data.category_id, categories);
+            const openToQuotes = String(form.data.custom_budget) === '1' && !form.data.budget;
+
             return (
-                <div className="input-group input-group-lg">
-                    <input
-                        type="number"
-                        className="form-control form--control"
-                        placeholder={screen.placeholder}
-                        value={form.data.budget}
-                        onChange={(e) => form.setData('budget', e.target.value)}
-                        min="0"
-                        step="0.01"
-                    />
-                    <span className="input-group-text">{currencyText}</span>
+                <div>
+                    <div className="job-wizard-budget-helper mb-3 p-3 rounded border bg-light">
+                        <p className="mb-2 small text-muted">
+                            Typical {suggestions.label.toLowerCase()} often range between{' '}
+                            <strong>{suggestions.low.toLocaleString()}</strong> and{' '}
+                            <strong>{suggestions.high.toLocaleString()}</strong> {currencyText}.
+                        </p>
+                        <div className="d-flex flex-wrap gap-2">
+                            {[suggestions.low, suggestions.mid, suggestions.high].map((amount) => (
+                                <button
+                                    key={amount}
+                                    type="button"
+                                    className="btn btn-sm btn-outline--base"
+                                    onClick={() => form.setData({ ...form.data, budget: String(amount), custom_budget: '0' })}
+                                >
+                                    {amount.toLocaleString()} {currencyText}
+                                </button>
+                            ))}
+                            <button
+                                type="button"
+                                className={`btn btn-sm ${openToQuotes ? 'btn--base' : 'btn-outline--secondary'}`}
+                                onClick={() => form.setData({ ...form.data, budget: '', custom_budget: '1' })}
+                            >
+                                Open to quotes
+                            </button>
+                        </div>
+                    </div>
+                    {!openToQuotes && (
+                        <div className="input-group input-group-lg">
+                            <input
+                                type="number"
+                                className="form-control form--control"
+                                placeholder={screen.placeholder}
+                                value={form.data.budget}
+                                onChange={(e) => form.setData({ ...form.data, budget: e.target.value, custom_budget: '0' })}
+                                min="0"
+                                step="0.01"
+                            />
+                            <span className="input-group-text">{currencyText}</span>
+                        </div>
+                    )}
+                    {openToQuotes && (
+                        <p className="text-muted small mb-0">Providers will propose their own prices.</p>
+                    )}
+                </div>
+            );
+        }
+
+        if (screen.type === 'preview') {
+            const category = categories.find((item) => String(item.id) === String(form.data.category_id));
+            const subcategory = category?.subcategories?.find((item) => String(item.id) === String(form.data.subcategory_id));
+            const budgetLabel = String(form.data.custom_budget) === '1' && !form.data.budget
+                ? 'Open to quotes'
+                : `${form.data.budget || '0'} ${currencyText}`;
+
+            return (
+                <div className="job-wizard-preview border rounded p-3 bg-light">
+                    <dl className="mb-0">
+                        <dt className="text-muted small">Category</dt>
+                        <dd>{category?.name || '—'}{subcategory ? ` › ${subcategory.name}` : ''}</dd>
+                        <dt className="text-muted small">Title</dt>
+                        <dd>{form.data.title || '—'}</dd>
+                        <dt className="text-muted small">Description</dt>
+                        <dd className="mb-2">{(form.data.description || '—').slice(0, 280)}{(form.data.description?.length > 280 ? '…' : '')}</dd>
+                        <dt className="text-muted small">Budget</dt>
+                        <dd>{budgetLabel}</dd>
+                        <dt className="text-muted small">Deadline</dt>
+                        <dd className="mb-0">{form.data.deadline || '—'}</dd>
+                    </dl>
                 </div>
             );
         }
@@ -820,7 +916,7 @@ export default function JobPostWizard({
                 >
                     {form.processing || savingPhase
                         ? 'Saving…'
-                        : screenIndex === screens.length - 1
+                        : screen.type === 'preview' || screenIndex === screens.length - 1
                             ? 'Post job free'
                             : lastInPhase
                                 ? 'Save & continue'
