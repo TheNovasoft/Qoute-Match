@@ -1,3 +1,5 @@
+import { laymanHintForField } from '@/utils/fieldHints';
+
 function acceptForExtensions(extensions) {
     if (!extensions) return undefined;
     return extensions
@@ -27,14 +29,15 @@ export default function RequestFormFields({ fields, values, onChange, errors = {
                 const colClass = `col-md-${field.width || '12'}`;
                 const value = values[field.label];
                 const error = errors[field.label];
+                const laymanHint = field.instruction || laymanHintForField(field.name);
 
                 return (
                     <div className={colClass} key={field.label}>
                         <div className="form-group">
                             <label className="form--label">
                                 {field.name}
-                                {field.instruction && (
-                                    <small className="text-muted ms-1" title={field.instruction}>
+                                {laymanHint && (
+                                    <small className="text-muted ms-1" title={laymanHint}>
                                         <i className="fas fa-info-circle"></i>
                                     </small>
                                 )}
@@ -42,6 +45,9 @@ export default function RequestFormFields({ fields, values, onChange, errors = {
                                     <span className="text--danger"> *</span>
                                 )}
                             </label>
+                            {laymanHint && (
+                                <small className="text-muted d-block mb-2">{laymanHint}</small>
+                            )}
 
                             {field.type === 'text' && (
                                 <input
