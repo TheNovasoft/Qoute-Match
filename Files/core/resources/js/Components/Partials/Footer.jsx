@@ -48,6 +48,7 @@ export default function Footer() {
                             ))}
                             <li className="footer-menu__item"><Link href={routes.blogs} className="footer-menu__link">Blogs</Link></li>
                             <li className="footer-menu__item"><Link href={routes.contact} className="footer-menu__link">Contact Us</Link></li>
+                            <li className="footer-menu__item"><Link href={routes.faq ?? '/faq'} className="footer-menu__link">FAQ</Link></li>
                         </ul>
                     </div>
 

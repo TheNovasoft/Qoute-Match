@@ -282,6 +282,18 @@ class SiteController extends Controller
         ]);
     }
 
+    public function faq()
+    {
+        return Inertia::render('Public/Faq', [
+            'pageTitle' => 'Help & FAQ',
+            'seo' => [
+                'title' => 'Help & FAQ | ' . gs('site_name'),
+                'description' => 'Answers for customers and providers using the marketplace.',
+                'canonical' => route('faq'),
+            ],
+        ]);
+    }
+
     public function contact()
     {
         $pageTitle   = "Contact Us";

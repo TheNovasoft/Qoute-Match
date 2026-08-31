@@ -208,6 +208,7 @@ class HandleInertiaRequests extends Middleware
                 'forProviders' => url('/for-providers'),
                 'pricing' => url('/pricing'),
                 'trustSafety' => url('/trust-and-safety'),
+                'faq' => route('faq'),
                 'cookieAccept' => route('cookie.accept'),
                 'cookiePolicy' => route('cookie.policy'),
                 'adminLogin' => route('admin.login'),
