@@ -160,6 +160,10 @@ class DashboardResource
                 ? route('buyer.project.detail', $project->id)
                 : route('user.project.detail', $project->id),
             'canViewDetail' => (int) $project->status !== Status::PROJECT_REJECTED,
+            'canRehire' => $role === 'buyer' && (int) $project->status === Status::PROJECT_COMPLETED,
+            'rehireUrl' => $role === 'buyer' && (int) $project->status === Status::PROJECT_COMPLETED
+                ? route('buyer.project.rehire', $project->id)
+                : null,
             'canReview' => $role === 'buyer'
                 && in_array((int) $project->status, [Status::PROJECT_BUYER_REVIEW, Status::PROJECT_PARTIAL_COMPLETED], true)
                 && (int) $project->upload_count > 0,
@@ -229,6 +233,14 @@ class DashboardResource
             'reportUrl' => $role === 'buyer' ? route('buyer.project.report', $project->id) : route('user.project.report', $project->id),
             'indexUrl' => $role === 'buyer' ? route('buyer.project.index') : route('user.project.index'),
             'invoiceUrl' => self::projectInvoiceUrl($project, $role),
+            'canRehire' => $role === 'buyer' && (int) $project->status === Status::PROJECT_COMPLETED,
+            'rehireUrl' => $role === 'buyer' && (int) $project->status === Status::PROJECT_COMPLETED
+                ? route('buyer.project.rehire', $project->id)
+                : null,
+            'rehireInviteUrl' => $role === 'buyer' && (int) $project->status === Status::PROJECT_COMPLETED
+                ? route('buyer.talent.invite', $project->user_id)
+                : null,
+            'providerName' => $project->user->fullname,
         ], $extra);
     }
 

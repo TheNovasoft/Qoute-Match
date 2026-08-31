@@ -153,6 +153,11 @@ export default function ProjectList({ projects, filters, statusOptions = [], rol
                                                     Upload
                                                 </Link>
                                             )}
+                                            {project.rehireUrl && (
+                                                <Link href={project.rehireUrl} method="post" as="button" className="btn btn-sm btn--base">
+                                                    Hire Again
+                                                </Link>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>
