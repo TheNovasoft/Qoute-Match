@@ -1,4 +1,5 @@
 import { isNavActive } from '@/utils/helpers';
+import { getSidebarNavMode, setSidebarNavMode } from '@/hooks/useSidebarNavMode';
 import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -49,22 +50,32 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
 
     const sectionOpen = useMemo(() => {
         if (isNavActive(url, jobListHref) || isNavActive(url, jobPostHref)) return 'jobs';
-        if (isNavActive(url, depositHref) || isNavActive(url, depositHistoryHref)) return 'deposit';
-        if (isNavActive(url, withdrawHref) || isNavActive(url, withdrawHistoryHref)) return 'withdraw';
+        if (isNavActive(url, depositHref) || isNavActive(url, depositHistoryHref)
+            || isNavActive(url, withdrawHref) || isNavActive(url, withdrawHistoryHref)
+            || isNavActive(url, routes.buyerTransactions ?? '/buyer/transactions')
+            || isNavActive(url, routes.buyerInvoices ?? '/customer/invoices')) return 'payments';
         if (isNavActive(url, ticketOpenHref) || isNavActive(url, ticketIndexHref)) return 'support';
         if (isNavActive(url, profileHref) || isNavActive(url, passwordHref) || isNavActive(url, twofactorHref)) return 'settings';
         return null;
     }, [
         url, jobListHref, jobPostHref, depositHref, depositHistoryHref,
         withdrawHref, withdrawHistoryHref, ticketOpenHref, ticketIndexHref,
-        profileHref, passwordHref, twofactorHref,
+        profileHref, passwordHref, twofactorHref, routes.buyerTransactions, routes.buyerInvoices,
     ]);
 
     const [openId, setOpenId] = useState(sectionOpen);
+    const [navMode, setNavMode] = useState(getSidebarNavMode);
+    const isSimple = navMode === 'simple';
 
     useEffect(() => {
         setOpenId(sectionOpen);
     }, [sectionOpen]);
+
+    const toggleNavMode = () => {
+        const next = navMode === 'simple' ? 'advanced' : 'simple';
+        setSidebarNavMode(next);
+        setNavMode(next);
+    };
 
     const currentOpenId = openId;
 
@@ -92,12 +103,18 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                     </div>
                     <span className="icon"><i className="las la-wallet"></i></span>
                     <div className="content">
-                        <span className="title">Balance</span>
+                        <span className="title">Wallet Balance</span>
                         <h6 className="number">{buyer?.balance_formatted ?? buyer?.balance ?? '0.00'}</h6>
                     </div>
                 </div>
 
                 <ul className="sidebar-menu-list">
+                    <li className="sidebar-menu-list__item px-3 py-2">
+                        <button type="button" className="btn btn-sm btn-outline--secondary w-100" onClick={toggleNavMode}>
+                            {isSimple ? 'Show all menu items' : 'Simple menu'}
+                        </button>
+                    </li>
+
                     <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerDashboard ?? '/buyer/dashboard', { exact: true }) ? ' active' : ''}`}>
                         <Link
                             href={routes.buyerDashboard ?? '/buyer/dashboard'}
@@ -111,25 +128,18 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                     <DropdownMenu
                         id="jobs"
                         icon="las la-rocket"
-                        label="Jobs"
+                        label="My Jobs"
                         openId={currentOpenId}
                         setOpenId={setOpenId}
                         active={sectionOpen === 'jobs'}
                     >
                         <ul className="sidebar-submenu-list">
-                            <DropdownItem href={jobListHref} label="Job List" active={isNavActive(url, jobListHref)} />
-                            <DropdownItem href={jobPostHref} label="Post Job" active={isNavActive(url, jobPostHref)} />
+                            <DropdownItem href={jobListHref} label="All Jobs" active={isNavActive(url, jobListHref)} />
+                            <DropdownItem href={jobPostHref} label="Post a Job" active={isNavActive(url, jobPostHref)} />
                         </ul>
                     </DropdownMenu>
 
-                    <li className={`sidebar-menu-list__item${isNavActive(url, jobListHref) ? ' active' : ''}`}>
-                        <Link href={jobListHref} className={`sidebar-menu-list__link${isNavActive(url, jobListHref) ? ' active' : ''}`}>
-                            <span className="icon"><i className="las la-columns"></i></span>
-                            <span className="text">Compare Quotes</span>
-                        </Link>
-                    </li>
-
-                    {trialTask && (
+                    {(!isSimple || trialTask) && trialTask && (
                         <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerTrialTasks ?? '/buyer/trial-task') ? ' active' : ''}`}>
                             <Link
                                 href={routes.buyerTrialTasks ?? '/buyer/trial-task'}
@@ -151,6 +161,8 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                         </Link>
                     </li>
 
+                    {!isSimple && (
+                        <>
                     <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerSavedSearches ?? '/customer/saved-searches') ? ' active' : ''}`}>
                         <Link
                             href={routes.buyerSavedSearches ?? '/customer/saved-searches'}
@@ -197,57 +209,29 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                     </li>
 
                     <DropdownMenu
-                        id="deposit"
+                        id="payments"
                         icon="las la-wallet"
-                        label="Deposit"
+                        label="Payments & Billing"
                         openId={currentOpenId}
                         setOpenId={setOpenId}
-                        active={sectionOpen === 'deposit'}
+                        active={sectionOpen === 'payments'}
                     >
                         <ul className="sidebar-submenu-list">
-                            <DropdownItem href={depositHref} label="Deposit Money" active={isNavActive(url, depositHref, { exact: true })} />
+                            <DropdownItem href={depositHref} label="Add Money" active={isNavActive(url, depositHref, { exact: true })} />
                             <DropdownItem href={depositHistoryHref} label="Deposit History" active={isNavActive(url, depositHistoryHref)} />
-                        </ul>
-                    </DropdownMenu>
-
-                    <DropdownMenu
-                        id="withdraw"
-                        icon="las la-money-check-alt"
-                        label="Withdraw"
-                        openId={currentOpenId}
-                        setOpenId={setOpenId}
-                        active={sectionOpen === 'withdraw'}
-                    >
-                        <ul className="sidebar-submenu-list">
-                            <DropdownItem href={withdrawHref} label="Withdraw Money" active={isNavActive(url, withdrawHref, { exact: true })} />
+                            <DropdownItem href={withdrawHref} label="Withdraw" active={isNavActive(url, withdrawHref, { exact: true })} />
                             <DropdownItem href={withdrawHistoryHref} label="Withdraw History" active={isNavActive(url, withdrawHistoryHref)} />
+                            <DropdownItem href={routes.buyerTransactions ?? '/buyer/transactions'} label="Transactions" active={isNavActive(url, routes.buyerTransactions ?? '/buyer/transactions')} />
+                            <DropdownItem href={routes.buyerInvoices ?? '/customer/invoices'} label="Invoices" active={isNavActive(url, routes.buyerInvoices ?? '/customer/invoices')} />
                         </ul>
                     </DropdownMenu>
-
-                    <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerTransactions ?? '/buyer/transactions') ? ' active' : ''}`}>
-                        <Link
-                            href={routes.buyerTransactions ?? '/buyer/transactions'}
-                            className={`sidebar-menu-list__link${isNavActive(url, routes.buyerTransactions ?? '/buyer/transactions') ? ' active' : ''}`}
-                        >
-                            <span className="icon"><i className="las la-exchange-alt"></i></span>
-                            <span className="text">Transactions</span>
-                        </Link>
-                    </li>
-
-                    <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerInvoices ?? '/customer/invoices') ? ' active' : ''}`}>
-                        <Link
-                            href={routes.buyerInvoices ?? '/customer/invoices'}
-                            className={`sidebar-menu-list__link${isNavActive(url, routes.buyerInvoices ?? '/customer/invoices') ? ' active' : ''}`}
-                        >
-                            <span className="icon"><i className="las la-file-invoice"></i></span>
-                            <span className="text">Invoices</span>
-                        </Link>
-                    </li>
+                        </>
+                    )}
 
                     <DropdownMenu
                         id="support"
-                        icon="las la-ticket-alt"
-                        label="Support Ticket"
+                        icon="las la-life-ring"
+                        label="Get Help"
                         openId={currentOpenId}
                         setOpenId={setOpenId}
                         active={sectionOpen === 'support'}
@@ -294,7 +278,7 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                         <ul className="sidebar-submenu-list">
                             <DropdownItem href={profileHref} label="Profile Setting" active={isNavActive(url, profileHref)} />
                             <DropdownItem href={passwordHref} label="Change Password" active={isNavActive(url, passwordHref)} />
-                            <DropdownItem href={twofactorHref} label="2FA Security" active={isNavActive(url, twofactorHref)} />
+                            <DropdownItem href={twofactorHref} label="Extra Login Protection" active={isNavActive(url, twofactorHref)} />
                         </ul>
                     </DropdownMenu>
 

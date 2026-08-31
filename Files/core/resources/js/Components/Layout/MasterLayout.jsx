@@ -4,6 +4,7 @@ import PortalBackLink from '@/Components/Shared/PortalBackLink';
 import useInboxNotifications from '@/hooks/useInboxNotifications';
 import useMessageNotifications from '@/hooks/useMessageNotifications';
 import { isNavActive } from '@/utils/helpers';
+import { getSidebarNavMode, setSidebarNavMode } from '@/hooks/useSidebarNavMode';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -35,6 +36,14 @@ export default function MasterLayout({ children, pageTitle, backUrl }) {
     const { auth, site, template, routes, monetisation } = props;
     const user = auth?.user;
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [navMode, setNavMode] = useState(getSidebarNavMode);
+    const isSimple = navMode === 'simple';
+
+    const toggleNavMode = () => {
+        const next = navMode === 'simple' ? 'advanced' : 'simple';
+        setSidebarNavMode(next);
+        setNavMode(next);
+    };
     const unreadCount = useMessageNotifications(
         routes.userConversationUnread,
         user?.unread_count ?? 0,
@@ -89,14 +98,19 @@ export default function MasterLayout({ children, pageTitle, backUrl }) {
                                 </div>
                                 <span className="icon"><i className="las la-wallet"></i></span>
                                 <div className="content">
-                                    <span className="title">Balance</span>
+                                    <span className="title">Wallet Balance</span>
                                     <h6 className="number">{user?.balance_formatted || user?.balance}</h6>
                                     {monetisation?.enabled && (
-                                        <span className="title d-block mt-1">Lead credits: {user?.lead_credits ?? 0}</span>
+                                        <span className="title d-block mt-1">Quote tokens: {user?.lead_credits ?? 0}</span>
                                     )}
                                 </div>
                             </div>
                             <ul className="sidebar-menu-list">
+                                <li className="sidebar-menu-list__item px-3 py-2">
+                                    <button type="button" className="btn btn-sm btn-outline--secondary w-100" onClick={toggleNavMode}>
+                                        {isSimple ? 'Show all menu items' : 'Simple menu'}
+                                    </button>
+                                </li>
                                 <SidebarLink
                                     href={homeHref}
                                     icon="las la-home"
@@ -106,14 +120,14 @@ export default function MasterLayout({ children, pageTitle, backUrl }) {
                                 <SidebarLink
                                     href={browseHref}
                                     icon="las la-search"
-                                    label="Browse Requests"
+                                    label="Find Jobs"
                                     cta
                                     active={isNavActive(url, browseHref)}
                                 />
                                 <SidebarLink
                                     href={bidsHref}
                                     icon="las la-gavel"
-                                    label="All Bids"
+                                    label="My Quotes"
                                     active={isNavActive(url, bidsHref)}
                                 />
                                 <SidebarLink
@@ -122,6 +136,8 @@ export default function MasterLayout({ children, pageTitle, backUrl }) {
                                     label="My Projects"
                                     active={isNavActive(url, projectsHref)}
                                 />
+                                {!isSimple && (
+                                    <>
                                 <SidebarLink
                                     href={disputesHref}
                                     icon="las la-exclamation-triangle"
@@ -167,7 +183,7 @@ export default function MasterLayout({ children, pageTitle, backUrl }) {
                                     <SidebarLink
                                         href={leadCreditsHref}
                                         icon="las la-coins"
-                                        label="Lead Credits"
+                                        label="Quote Tokens"
                                         active={isNavActive(url, leadCreditsHref)}
                                     />
                                 )}
@@ -177,6 +193,8 @@ export default function MasterLayout({ children, pageTitle, backUrl }) {
                                     label="Verification"
                                     active={isNavActive(url, verificationHref)}
                                 />
+                                    </>
+                                )}
                                 <SidebarLink
                                     href={conversationHref}
                                     icon="lab la-rocketchat"
@@ -258,7 +276,7 @@ export default function MasterLayout({ children, pageTitle, backUrl }) {
                                             icon: 'fas fa-lock',
                                         },
                                         {
-                                            label: '2FA Security',
+                                            label: 'Extra Login Protection',
                                             href: routes.userTwofactor ?? '/freelancer/twofactor',
                                             icon: 'fas fa-key',
                                         },
