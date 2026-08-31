@@ -1,4 +1,4 @@
-import { Link, useForm } from '@inertiajs/react';
+import { Link, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import StatusBadge from '@/Components/Shared/StatusBadge';
 import StructuredReviewForm from '@/Components/Shared/StructuredReviewForm';
@@ -32,6 +32,25 @@ export default function ProjectDetail({
 
     const completeForm = useForm({ review: '', scores: {} });
     const reportForm = useForm({ report_reason: '', dispute_type: 'other' });
+    const milestoneForm = useForm({
+        milestones: [{ title: '', amount: '' }, { title: '', amount: '' }],
+    });
+
+    const submitMilestones = (event) => {
+        event.preventDefault();
+        if (!project.milestoneStoreUrl) return;
+        milestoneForm.post(project.milestoneStoreUrl, { preserveScroll: true });
+    };
+
+    const approveMilestone = (milestoneId) => {
+        if (!project.milestoneApproveUrl) return;
+        router.post(project.milestoneApproveUrl.replace('__ID__', milestoneId), {}, { preserveScroll: true });
+    };
+
+    const submitMilestoneWork = (milestoneId) => {
+        if (!project.milestoneSubmitUrl) return;
+        router.post(project.milestoneSubmitUrl.replace('__ID__', milestoneId), {}, { preserveScroll: true });
+    };
 
     const submitComplete = (event) => {
         event.preventDefault();
@@ -200,6 +219,82 @@ export default function ProjectDetail({
                             {disputeDetailRoute && (
                                 <Link href={disputeDetailRoute} className="btn btn--sm btn--base ms-2">View Dispute</Link>
                             )}
+                        </div>
+                    )}
+
+                    {project.milestones?.length > 0 && (
+                        <div className="card custom--card mt-4">
+                            <div className="card-header"><h6 className="mb-0">Payment Milestones</h6></div>
+                            <div className="card-body">
+                                <ul className="list-group list-group-flush">
+                                    {project.milestones.map((milestone) => (
+                                        <li key={milestone.id} className="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                            <div>
+                                                <strong>{milestone.title}</strong>
+                                                <span className="text-muted ms-2">{milestone.amount}</span>
+                                                <div className="small text-muted">{milestone.statusLabel}</div>
+                                            </div>
+                                            <div className="d-flex gap-2">
+                                                {role === 'freelancer' && milestone.status === 0 && (
+                                                    <button type="button" className="btn btn-sm btn-outline--base" onClick={() => submitMilestoneWork(milestone.id)}>
+                                                        Mark Complete
+                                                    </button>
+                                                )}
+                                                {role === 'buyer' && milestone.status === 1 && (
+                                                    <button type="button" className="btn btn-sm btn--base" onClick={() => approveMilestone(milestone.id)}>
+                                                        Approve
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    )}
+
+                    {role === 'buyer' && project.status?.label === 'Running' && !project.milestones?.length && project.milestoneStoreUrl && (
+                        <div className="card custom--card mt-4">
+                            <div className="card-header"><h6 className="mb-0">Split into Milestones (optional)</h6></div>
+                            <div className="card-body">
+                                <p className="text-muted small">Break larger jobs into payment steps.</p>
+                                <form onSubmit={submitMilestones}>
+                                    {milestoneForm.data.milestones.map((row, index) => (
+                                        <div className="row g-2 mb-2" key={index}>
+                                            <div className="col-md-7">
+                                                <input
+                                                    className="form-control form--control"
+                                                    placeholder="Milestone title"
+                                                    value={row.title}
+                                                    onChange={(e) => {
+                                                        const milestones = [...milestoneForm.data.milestones];
+                                                        milestones[index] = { ...milestones[index], title: e.target.value };
+                                                        milestoneForm.setData('milestones', milestones);
+                                                    }}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="col-md-5">
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    step="0.01"
+                                                    className="form-control form--control"
+                                                    placeholder="Amount"
+                                                    value={row.amount}
+                                                    onChange={(e) => {
+                                                        const milestones = [...milestoneForm.data.milestones];
+                                                        milestones[index] = { ...milestones[index], amount: e.target.value };
+                                                        milestoneForm.setData('milestones', milestones);
+                                                    }}
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <button type="submit" className="btn btn--base btn-sm" disabled={milestoneForm.processing}>Save Milestones</button>
+                                </form>
+                            </div>
                         </div>
                     )}
 

@@ -131,6 +131,7 @@ Route::middleware('auth')->name('user.')->group(function () {
 
                 Route::post('store/review-rating/{project_id}', 'storeReviewRating')->name('store.review-rating');
                 Route::post('report/{project_id}', 'report')->name('report');
+                Route::post('milestones/{project_id}/submit/{milestone_id}', 'submitMilestone')->name('milestones.submit');
             });
 
             Route::controller('DisputeController')->prefix('disputes')->name('disputes.')->group(function () {

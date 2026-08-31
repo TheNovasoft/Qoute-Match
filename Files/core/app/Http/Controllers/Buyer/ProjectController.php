@@ -12,6 +12,8 @@ use App\Models\Dispute;
 use App\Models\Message;
 use App\Models\Job;
 use App\Models\Project;
+use App\Models\ProjectMilestone;
+use App\Lib\MilestoneService;
 use App\Models\Review;
 use Illuminate\Support\Str;
 use App\Models\Transaction;
@@ -40,7 +42,7 @@ class ProjectController extends Controller
         $pageTitle = 'Project Details';
         $buyer = auth()->guard('buyer')->user();
         $project = Project::where('status', '!=', Status::PROJECT_REJECTED)
-            ->with(['job', 'bid', 'user.providerVerifications', 'buyer', 'review', 'buyerReview'])
+            ->with(['job', 'bid', 'user.providerVerifications', 'buyer', 'review', 'buyerReview', 'milestones'])
             ->where('buyer_id', $buyer->id)
             ->where('id', $id)
             ->firstOrFail();
@@ -51,13 +53,58 @@ class ProjectController extends Controller
 
         return Inertia::render('Buyer/Projects/Detail', [
             'pageTitle' => $pageTitle,
-            'project' => DashboardResource::projectDetail($project, 'buyer'),
+            'project' => DashboardResource::projectDetail($project, 'buyer', [
+                'milestones' => MilestoneService::resourceCollection($project),
+                'milestoneStoreUrl' => route('buyer.project.milestones.store', $project->id),
+                'milestoneApproveUrl' => route('buyer.project.milestones.approve', [$project->id, '__ID__']),
+            ]),
             'canReport' => $canReport,
             'dispute' => $dispute ? ['id' => $dispute->id, 'subject' => $dispute->subject] : null,
             'disputeDetailRoute' => $disputeDetailRoute,
             'reviewDimensions' => DashboardResource::reviewDimensions(),
             'disputeTypes' => DashboardResource::disputeTypes(),
         ]);
+    }
+
+    public function storeMilestones(Request $request, $id)
+    {
+        $request->validate([
+            'milestones' => 'required|array|min:1|max:5',
+            'milestones.*.title' => 'required|string|max:190',
+            'milestones.*.amount' => 'required|numeric|min:0',
+        ]);
+
+        $buyer = auth()->guard('buyer')->user();
+        $project = Project::where('buyer_id', $buyer->id)
+            ->where('status', Status::PROJECT_RUNNING)
+            ->findOrFail($id);
+
+        if ($project->milestones()->exists()) {
+            $notify[] = ['error', 'Milestones are already set for this project.'];
+            return back()->withNotify($notify);
+        }
+
+        MilestoneService::createForProject($project, $request->milestones);
+        $notify[] = ['success', 'Payment milestones saved.'];
+
+        return back()->withNotify($notify);
+    }
+
+    public function approveMilestone($projectId, $milestoneId)
+    {
+        $buyer = auth()->guard('buyer')->user();
+        $project = Project::where('buyer_id', $buyer->id)->findOrFail($projectId);
+        $milestone = ProjectMilestone::where('project_id', $project->id)->findOrFail($milestoneId);
+
+        try {
+            MilestoneService::approve($milestone);
+        } catch (\InvalidArgumentException $e) {
+            $notify[] = ['error', $e->getMessage()];
+            return back()->withNotify($notify);
+        }
+
+        $notify[] = ['success', 'Milestone approved.'];
+        return back()->withNotify($notify);
     }
 
     public function rehire($id)
