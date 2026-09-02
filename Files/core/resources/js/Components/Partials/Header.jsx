@@ -1,4 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
+import HeaderAuthLinks from '@/Components/Partials/HeaderAuthLinks';
+import LanguageSwitcher from '@/Components/Partials/LanguageSwitcher';
 import { isNavActive } from '@/utils/helpers';
 
 export default function Header() {
@@ -93,53 +95,18 @@ export default function Header() {
                                 <Link className={navClass(routes.contact, true)} href={routes.contact}>Contact</Link>
                             </li>
 
-                            <li className="nav-item d-flex justify-content-between w-100 d-xl-none">
-                                <div className="top-button w-100">
-                                    <ul className="login-registration-list d-flex align-items-center flex-wrap gap-3 mb-0">
-                                        <li className="login-registration-list__item d-flex gap-3">
-                                            {auth?.user ? (
-                                                <Link href={routes.userHome} className="login-registration-list__link">Provider Dashboard</Link>
-                                            ) : auth?.buyer ? (
-                                                <Link href={routes.buyerHome} className="login-registration-list__link">Customer Dashboard</Link>
-                                            ) : (
-                                                <>
-                                                    <Link href={routes.buyerLogin} className="login-registration-list__link">Customer Login</Link>
-                                                    <Link href={routes.userLogin} className="login-registration-list__link">Provider Login</Link>
-                                                </>
-                                            )}
-                                        </li>
-                                    </ul>
-                                </div>
+                            <li className="nav-item d-xl-none w-100">
+                                <LanguageSwitcher className="mb-3" />
+                                <HeaderAuthLinks routes={routes} auth={auth} compact />
                             </li>
                         </ul>
                     </div>
 
                     <div className="d-xl-block d-none header-actions">
-                        <div className="top-button d-flex align-items-center">
-                            <ul className="login-registration-list d-flex align-items-center flex-nowrap mb-0">
-                                {auth?.user ? (
-                                    <li className="login-registration-list__item">
-                                        <Link href={routes.userHome} className="login-registration-list__link">Provider Dashboard</Link>
-                                    </li>
-                                ) : auth?.buyer ? (
-                                    <li className="login-registration-list__item">
-                                        <Link href={routes.buyerHome} className="login-registration-list__link">Customer Dashboard</Link>
-                                    </li>
-                                ) : (
-                                    <>
-                                        <li className="login-registration-list__item">
-                                            <Link href={routes.buyerLogin} className="login-registration-list__link">Customer Login</Link>
-                                        </li>
-                                        <li className="login-registration-list__item">
-                                            <Link href={routes.userLogin} className="login-registration-list__link">Provider Login</Link>
-                                        </li>
-                                    </>
-                                )}
-
-                                <li className="login-registration-list__item">
-                                    <Link href={postJobUrl} className="btn btn--base header-post-job-btn">Post Job</Link>
-                                </li>
-                            </ul>
+                        <div className="top-button d-flex align-items-center gap-3">
+                            <LanguageSwitcher />
+                            <HeaderAuthLinks routes={routes} auth={auth} />
+                            <Link href={postJobUrl} className="btn btn--base header-post-job-btn">Post Job</Link>
                         </div>
                     </div>
                 </nav>

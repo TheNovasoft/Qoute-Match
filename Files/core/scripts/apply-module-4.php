@@ -57,6 +57,7 @@ $freightForm = upsertRequestForm('request_freight', [
     ['name' => 'Destination City', 'type' => 'city', 'required' => true, 'width' => '6', 'location_group' => 'destination', 'depends_on' => 'destination_country'],
     ['name' => 'HS Code', 'type' => 'text', 'required' => true, 'width' => '6', 'instruction' => 'Harmonized System code for your goods (e.g. 8471.30)'],
     ['name' => 'Gross Weight kg', 'type' => 'number', 'required' => true, 'width' => '6', 'instruction' => 'Approximate total weight in kilograms'],
+    ['name' => 'Container Type', 'type' => 'radio', 'required' => true, 'width' => '12', 'options' => ['Full Container', 'LCL'], 'instruction' => 'Full Container (FCL) for a whole container, or LCL for a shared load.'],
     ['name' => 'Dimensions CBM', 'type' => 'cbm', 'required' => false, 'width' => '12', 'instruction' => 'Enter package dimensions to calculate cubic metres (CBM).'],
 ]);
 

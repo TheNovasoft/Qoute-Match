@@ -12,24 +12,65 @@ function slugFromTitle(title) {
         .replace(/[^\w-]+/g, '');
 }
 
-function budgetSuggestionForCategory(categoryId, categories = []) {
+function isFreightCategory(categoryId, categories = []) {
     const category = categories.find((item) => String(item.id) === String(categoryId));
     const name = (category?.name || '').toLowerCase();
+    return name.includes('freight') || name.includes('logistic') || name.includes('shipping');
+}
 
-    if (name.includes('web') || name.includes('software') || name.includes('app')) {
-        return { low: 500, mid: 2500, high: 10000, label: 'Web & software projects' };
+function hasContainerTypeField(fields = []) {
+    return fields.some((field) => {
+        const label = (field.label || '').toLowerCase();
+        const name = (field.name || '').toLowerCase();
+        return label.includes('container') || name.includes('container');
+    });
+}
+
+function formatPreviewValue(value) {
+    if (value === null || value === undefined || value === '') {
+        return '—';
     }
-    if (name.includes('design') || name.includes('logo') || name.includes('creative')) {
-        return { low: 100, mid: 500, high: 2500, label: 'Design work' };
+    if (Array.isArray(value)) {
+        return value.length ? value.join(', ') : '—';
     }
-    if (name.includes('freight') || name.includes('logistic') || name.includes('shipping')) {
-        return { low: 200, mid: 1200, high: 8000, label: 'Freight & logistics' };
+    if (typeof value === 'object') {
+        return '—';
     }
-    if (name.includes('build') || name.includes('construction') || name.includes('renovation')) {
-        return { low: 500, mid: 3500, high: 20000, label: 'Building & renovation' };
+    return String(value);
+}
+
+function buildPreviewItems(data, categories, categoryForms, { includeContact = true } = {}) {
+    const items = [];
+    const category = categories.find((item) => String(item.id) === String(data.category_id));
+    const subcategory = category?.subcategories?.find((item) => String(item.id) === String(data.subcategory_id));
+
+    items.push({ label: 'Category', value: `${category?.name || '—'}${subcategory ? ` › ${subcategory.name}` : ''}` });
+    items.push({ label: 'Title', value: data.title });
+    items.push({ label: 'Description', value: data.description });
+
+    const dynamicFields = categoryForms?.[data.category_id] || [];
+    dynamicFields.forEach((field) => {
+        const value = data[field.label];
+        if (field.type === 'file') {
+            items.push({ label: field.name, value: value ? 'File attached' : '—' });
+            return;
+        }
+        items.push({ label: field.name, value: formatPreviewValue(value) });
+    });
+
+    if (data.container_type && !dynamicFields.some((field) => field.label === 'container_type')) {
+        items.push({ label: 'Container Type', value: data.container_type });
     }
 
-    return { low: 50, mid: 350, high: 1500, label: 'General projects' };
+    if (includeContact) {
+        items.push({ label: 'Contact Name', value: `${data.firstname || ''} ${data.lastname || ''}`.trim() || '—' });
+        items.push({ label: 'Email', value: data.email });
+        if (data.phone) {
+            items.push({ label: 'Phone', value: data.phone });
+        }
+    }
+
+    return items;
 }
 
 function valuesFromFields(fields = []) {
@@ -231,25 +272,20 @@ function buildScreens(categories, categoryForms, categoryId, { includeContact = 
         }
     });
 
-    screens.push(
-        {
-            id: 'budget',
-            phase: 2,
-            question: 'What is your budget?',
-            hint: 'Enter the amount you are willing to pay.',
-            type: 'number',
-            field: 'budget',
-            placeholder: '0.00',
-        },
-        {
-            id: 'deadline',
-            phase: 2,
-            question: 'When do you need this done by?',
-            hint: 'Pick the latest date you need the work completed.',
-            type: 'date',
-            field: 'deadline',
-        },
-    );
+    if (isFreightCategory(categoryId, categories) && !hasContainerTypeField(dynamicFields)) {
+        screens.push({
+            id: 'container-type',
+            phase: 0,
+            question: 'What type of shipment do you need?',
+            hint: 'Full Container (FCL) for a whole container, or LCL for a shared load.',
+            type: 'cards-single',
+            field: 'container_type',
+            options: [
+                { value: 'Full Container', label: 'Full Container (FCL)' },
+                { value: 'LCL', label: 'LCL (Less than Container Load)' },
+            ],
+        });
+    }
 
     if (includeContact) {
         screens.push(
@@ -338,9 +374,6 @@ function screenIsValid(screen, data) {
     if (screen.required === false) {
         return true;
     }
-    if (screen.field === 'budget' && String(data.custom_budget) === '1') {
-        return true;
-    }
     const field = screen.field;
     const value = data[field];
 
@@ -418,10 +451,9 @@ export default function JobPostWizard({
         job_longevity: draft.job_longevity ? String(draft.job_longevity) : '',
         skill_level: draft.skill_level ? String(draft.skill_level) : '',
         budget: draft.budget || '',
-        custom_budget: draft.custom_budget !== undefined && draft.custom_budget !== null && draft.custom_budget !== ''
-            ? String(draft.custom_budget)
-            : '1',
+        custom_budget: '1',
         deadline: draft.deadline || '',
+        container_type: draft.container_type || '',
         firstname: draft.contact_firstname || '',
         lastname: draft.contact_lastname || '',
         email: draft.contact_email || '',
@@ -556,7 +588,9 @@ export default function JobPostWizard({
     const publishJob = () => {
         form.transform((data) => ({
             ...data,
-            custom_budget: data.custom_budget || '1',
+            custom_budget: '1',
+            budget: '0',
+            deadline: data.deadline || '',
             status: data.status || '1',
         }));
         form.post(budgetStoreUrl, {
@@ -739,6 +773,8 @@ export default function JobPostWizard({
                         <CbmCalculator
                             value={form.data[screen.cbmField] || ''}
                             onChange={(nextValue) => form.setData(screen.cbmField, nextValue)}
+                            weightKg={form.data[screen.weightField] || ''}
+                            hideWeightInput
                         />
                         {form.errors[screen.cbmField] && (
                             <small className="text-danger d-block mt-1">{form.errors[screen.cbmField]}</small>
@@ -779,79 +815,24 @@ export default function JobPostWizard({
             );
         }
 
-        if (screen.type === 'number' && screen.field === 'budget') {
-            const suggestions = budgetSuggestionForCategory(form.data.category_id, categories);
-            const openToQuotes = String(form.data.custom_budget) === '1' && !form.data.budget;
-
-            return (
-                <div>
-                    <div className="job-wizard-budget-helper mb-3 p-3 rounded border bg-light">
-                        <p className="mb-2 small text-muted">
-                            Typical {suggestions.label.toLowerCase()} often range between{' '}
-                            <strong>{suggestions.low.toLocaleString()}</strong> and{' '}
-                            <strong>{suggestions.high.toLocaleString()}</strong> {currencyText}.
-                        </p>
-                        <div className="d-flex flex-wrap gap-2">
-                            {[suggestions.low, suggestions.mid, suggestions.high].map((amount) => (
-                                <button
-                                    key={amount}
-                                    type="button"
-                                    className="btn btn-sm btn-outline--base"
-                                    onClick={() => form.setData({ ...form.data, budget: String(amount), custom_budget: '0' })}
-                                >
-                                    {amount.toLocaleString()} {currencyText}
-                                </button>
-                            ))}
-                            <button
-                                type="button"
-                                className={`btn btn-sm ${openToQuotes ? 'btn--base' : 'btn-outline--secondary'}`}
-                                onClick={() => form.setData({ ...form.data, budget: '', custom_budget: '1' })}
-                            >
-                                Open to quotes
-                            </button>
-                        </div>
-                    </div>
-                    {!openToQuotes && (
-                        <div className="input-group input-group-lg">
-                            <input
-                                type="number"
-                                className="form-control form--control"
-                                placeholder={screen.placeholder}
-                                value={form.data.budget}
-                                onChange={(e) => form.setData({ ...form.data, budget: e.target.value, custom_budget: '0' })}
-                                min="0"
-                                step="0.01"
-                            />
-                            <span className="input-group-text">{currencyText}</span>
-                        </div>
-                    )}
-                    {openToQuotes && (
-                        <p className="text-muted small mb-0">Providers will propose their own prices.</p>
-                    )}
-                </div>
-            );
-        }
-
         if (screen.type === 'preview') {
-            const category = categories.find((item) => String(item.id) === String(form.data.category_id));
-            const subcategory = category?.subcategories?.find((item) => String(item.id) === String(form.data.subcategory_id));
-            const budgetLabel = String(form.data.custom_budget) === '1' && !form.data.budget
-                ? 'Open to quotes'
-                : `${form.data.budget || '0'} ${currencyText}`;
+            const previewItems = buildPreviewItems(form.data, categories, categoryForms, {
+                includeContact: !isBuyer,
+            });
 
             return (
                 <div className="job-wizard-preview border rounded p-3 bg-light">
                     <dl className="mb-0">
-                        <dt className="text-muted small">Category</dt>
-                        <dd>{category?.name || '—'}{subcategory ? ` › ${subcategory.name}` : ''}</dd>
-                        <dt className="text-muted small">Title</dt>
-                        <dd>{form.data.title || '—'}</dd>
-                        <dt className="text-muted small">Description</dt>
-                        <dd className="mb-2">{(form.data.description || '—').slice(0, 280)}{(form.data.description?.length > 280 ? '…' : '')}</dd>
-                        <dt className="text-muted small">Budget</dt>
-                        <dd>{budgetLabel}</dd>
-                        <dt className="text-muted small">Deadline</dt>
-                        <dd className="mb-0">{form.data.deadline || '—'}</dd>
+                        {previewItems.map((item) => (
+                            <div key={item.label}>
+                                <dt className="text-muted small">{item.label}</dt>
+                                <dd className="mb-2">
+                                    {item.label === 'Description'
+                                        ? `${String(item.value || '—').slice(0, 500)}${String(item.value || '').length > 500 ? '…' : ''}`
+                                        : formatPreviewValue(item.value)}
+                                </dd>
+                            </div>
+                        ))}
                     </dl>
                 </div>
             );
@@ -864,7 +845,6 @@ export default function JobPostWizard({
                 placeholder={screen.placeholder || ''}
                 value={form.data[screen.field] || ''}
                 onChange={(e) => form.setData(screen.field, e.target.value)}
-                min={screen.type === 'date' ? new Date().toISOString().split('T')[0] : undefined}
             />
         );
     };

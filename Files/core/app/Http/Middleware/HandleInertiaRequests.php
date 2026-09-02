@@ -102,6 +102,9 @@ class HandleInertiaRequests extends Middleware
                     'code' => $lang->code,
                     'name' => $lang->name,
                     'image' => $lang->image,
+                    'imageUrl' => $lang->image
+                        ? getImage(getFilePath('language') . '/' . $lang->image, getFileSize('language'))
+                        : null,
                     'is_default' => (bool) $lang->is_default,
                 ]),
             ],
@@ -197,6 +200,7 @@ class HandleInertiaRequests extends Middleware
                 'buyerKycData' => route('buyer.kyc.data'),
                 'buyerJobPostDetails' => url('/customer/job/post/job-details'),
                 'buyerJobPostDetailsStore' => url('/customer/job/post/job-details'),
+                'buyerJobPostCompleteStore' => url('/customer/job/post/complete'),
                 'buyerJobPostCheckSlug' => url('/customer/job/post/check-slug'),
                 'buyerJobPostPreferences' => url('/customer/job/post/provider-details'),
                 'buyerJobPostPreferencesStore' => url('/customer/job/post/provider-details'),
@@ -209,6 +213,7 @@ class HandleInertiaRequests extends Middleware
                 'pricing' => url('/pricing'),
                 'trustSafety' => url('/trust-and-safety'),
                 'faq' => route('faq'),
+                'changeLang' => url('/change'),
                 'cookieAccept' => route('cookie.accept'),
                 'cookiePolicy' => route('cookie.policy'),
                 'adminLogin' => route('admin.login'),

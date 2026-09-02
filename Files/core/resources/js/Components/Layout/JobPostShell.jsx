@@ -1,6 +1,17 @@
 import FrontendLayout from '@/Components/Layout/FrontendLayout';
 import BuyerMasterLayout from '@/Components/Layout/BuyerMasterLayout';
 
+function FlowIntro() {
+    return (
+        <div className="post-job-flow-intro text-center mb-4">
+            <h1 className="post-job-flow-intro__title mb-2">Tell us what you need done</h1>
+            <p className="post-job-flow-intro__text mb-0 text-muted">
+                Answer a few questions — your previous answers stay visible below and can be edited anytime.
+            </p>
+        </div>
+    );
+}
+
 function WizardIntro() {
     return (
         <div className="post-job-wizard-intro text-center mb-4">
@@ -12,13 +23,16 @@ function WizardIntro() {
     );
 }
 
-export default function JobPostShell({ children, pageTitle, guestMode = false, wizard = false }) {
+export default function JobPostShell({ children, pageTitle, guestMode = false, wizard = false, flow = false }) {
+    const sectionClass = flow ? ' post-job-section--flow' : wizard ? ' post-job-section--wizard' : '';
+    const containerClass = flow || wizard ? 'container container--narrow' : 'container';
+
     if (guestMode) {
         return (
             <FrontendLayout pageTitle={pageTitle}>
-                <section className={`post-job-section py-5${wizard ? ' post-job-section--wizard' : ''}`}>
-                    <div className={wizard ? 'container container--narrow' : 'container'}>
-                        {!wizard && (
+                <section className={`post-job-section py-5${sectionClass}`}>
+                    <div className={containerClass}>
+                        {!wizard && !flow && (
                             <div className="post-job-hero mb-4">
                                 <p className="post-job-hero__eyebrow mb-2">Free to post</p>
                                 <h1 className="post-job-hero__title mb-2">Post your job and get quotes</h1>
@@ -27,6 +41,7 @@ export default function JobPostShell({ children, pageTitle, guestMode = false, w
                                 </p>
                             </div>
                         )}
+                        {flow && <FlowIntro />}
                         {wizard && <WizardIntro />}
                         {children}
                     </div>
@@ -37,10 +52,11 @@ export default function JobPostShell({ children, pageTitle, guestMode = false, w
 
     return (
         <BuyerMasterLayout pageTitle={pageTitle}>
-            {wizard ? (
-                <section className="post-job-section post-job-section--wizard py-4">
+            {flow || wizard ? (
+                <section className={`post-job-section${sectionClass} py-4`}>
                     <div className="container container--narrow px-0">
-                        <WizardIntro />
+                        {flow && <FlowIntro />}
+                        {wizard && <WizardIntro />}
                         {children}
                     </div>
                 </section>

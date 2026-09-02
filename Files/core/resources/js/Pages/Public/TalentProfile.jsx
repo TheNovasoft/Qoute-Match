@@ -183,25 +183,64 @@ export default function TalentProfile({
                                         {reviews.links?.length > 3 && <Pagination links={reviews.links} />}
                                     </div>
 
-                                    {portfolios?.length > 0 && (
-                                        <div className="portfolio">
-                                            <h6 className="portfolio__title">My Portfolio</h6>
-                                            <div className="portfolio-wrapper">
-                                                {portfolios.map((portfolio) => (
-                                                    <div key={portfolio.id} className="portfolio-item">
-                                                        <div className="portfolio-item__thumb">
-                                                            <img src={portfolio.image} alt="" />
-                                                        </div>
-                                                        <div className="portfolio-item__content">
-                                                            <h6 className="portfolio-item__title">
-                                                                <span className="portfolio-item__title-link">{portfolio.title}</span>
-                                                            </h6>
+                                    {portfolios?.length > 0 && (() => {
+                                        const projects = portfolios.filter((item) => item.item_type !== 'certificate');
+                                        const certificates = portfolios.filter((item) => item.item_type === 'certificate');
+
+                                        return (
+                                            <>
+                                                {projects.length > 0 && (
+                                                    <div className="portfolio">
+                                                        <h6 className="portfolio__title">Projects</h6>
+                                                        <div className="portfolio-wrapper">
+                                                            {projects.map((portfolio) => (
+                                                                <div key={portfolio.id} className="portfolio-item">
+                                                                    <div className="portfolio-item__thumb">
+                                                                        <img src={portfolio.image} alt="" />
+                                                                    </div>
+                                                                    <div className="portfolio-item__content">
+                                                                        <h6 className="portfolio-item__title">
+                                                                            <span className="portfolio-item__title-link">{portfolio.title}</span>
+                                                                        </h6>
+                                                                        {portfolio.description && (
+                                                                            <p className="portfolio-item__text mb-0">{portfolio.description}</p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
                                                         </div>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
+                                                )}
+
+                                                {certificates.length > 0 && (
+                                                    <div className="portfolio mt-4">
+                                                        <h6 className="portfolio__title">Certificates</h6>
+                                                        <div className="portfolio-wrapper">
+                                                            {certificates.map((portfolio) => (
+                                                                <div key={portfolio.id} className="portfolio-item portfolio-item--certificate">
+                                                                    <div className="portfolio-item__thumb">
+                                                                        <img src={portfolio.image} alt="" />
+                                                                    </div>
+                                                                    <div className="portfolio-item__content">
+                                                                        <span className="badge badge--info mb-2">Certificate</span>
+                                                                        <h6 className="portfolio-item__title">
+                                                                            <span className="portfolio-item__title-link">{portfolio.title}</span>
+                                                                        </h6>
+                                                                        {portfolio.role && (
+                                                                            <p className="text-muted small mb-1">{portfolio.role}</p>
+                                                                        )}
+                                                                        {portfolio.description && (
+                                                                            <p className="portfolio-item__text mb-0">{portfolio.description}</p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </>
+                                        );
+                                    })()}
                                 </div>
 
                                 <div className="profile-wrapper__bottom">

@@ -288,6 +288,7 @@ class ProfileController extends Controller
                 'title' => $portfolio->title,
                 'role' => $portfolio->role,
                 'description' => $portfolio->description,
+                'item_type' => $portfolio->item_type ?? 'project',
                 'skill_ids' => $portfolio->skill_ids ?? [],
                 'status' => (bool) $portfolio->status,
                 'image' => getImage(getFilePath('portfolio') . '/' . $portfolio->image, getFileSize('portfolio')),
@@ -304,6 +305,7 @@ class ProfileController extends Controller
             'title'        => 'required|string',
             'role'         => 'nullable|string',
             'description'  => 'required|string',
+            'item_type'    => 'required|in:project,certificate',
             'skill_ids'   => 'required|array',
             'skill_ids.*' => 'exists:skills,id',
             'image'       => ["$imageRule", new FileTypeValidate(['jpg', 'jpeg', 'png'])],
@@ -327,6 +329,7 @@ class ProfileController extends Controller
         }
 
         $portfolio->user_id     = $user->id;
+        $portfolio->item_type   = $request->item_type;
         $portfolio->title       = $request->title;
         $portfolio->role        = $request->role;
         $portfolio->description = $request->description;

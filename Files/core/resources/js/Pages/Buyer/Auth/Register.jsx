@@ -1,18 +1,18 @@
 import { useForm, usePage } from '@inertiajs/react';
 import AuthLayout, { AuthShell, AuthLogo, RegisterTypeSwitch } from '@/Components/Layout/AuthLayout';
 
-export default function Register({ pageTitle, authContent, registrationEnabled, requireAgree, policies }) {
+export default function Register({ pageTitle, authContent, registrationEnabled, requireAgree, policies, prefill = {} }) {
     const { site, routes } = usePage().props;
 
     const { data, setData, post, processing, errors } = useForm({
-        firstname: '',
-        lastname: '',
-        email: '',
+        firstname: prefill.firstname || '',
+        lastname: prefill.lastname || '',
+        email: prefill.email || '',
         password: '',
         password_confirmation: '',
         customer_type: 'individual',
         company_name: '',
-        phone: '',
+        phone: prefill.phone || '',
         agree: false,
     });
 

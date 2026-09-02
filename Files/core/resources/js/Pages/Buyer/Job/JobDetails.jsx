@@ -1,5 +1,5 @@
 import JobPostShell from '@/Components/Layout/JobPostShell';
-import JobPostWizard from '@/Components/Jobs/JobPostWizard';
+import JobPostFlow from '@/Components/Jobs/JobPostFlow';
 
 export default function JobDetails({
     pageTitle,
@@ -8,7 +8,6 @@ export default function JobDetails({
     categoryForms,
     skills = [],
     currencyText = 'USD',
-    wizardPhase = 0,
     guestMode = false,
 }) {
     const draft = {
@@ -29,9 +28,9 @@ export default function JobDetails({
     };
 
     return (
-        <JobPostShell pageTitle={pageTitle} guestMode={guestMode} wizard>
-            <div className="job-post-content job-post-content--wizard">
-                <JobPostWizard
+        <JobPostShell pageTitle={pageTitle} guestMode={guestMode} flow>
+            <div className="job-post-content job-post-content--flow">
+                <JobPostFlow
                     mode={guestMode ? 'guest' : 'buyer'}
                     jobId={job?.id || null}
                     categories={categories}
@@ -39,7 +38,6 @@ export default function JobDetails({
                     skills={skills}
                     draft={draft}
                     currencyText={currencyText}
-                    wizardPhase={wizardPhase}
                 />
             </div>
         </JobPostShell>

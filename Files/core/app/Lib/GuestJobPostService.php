@@ -5,6 +5,7 @@ namespace App\Lib;
 use App\Constants\Status;
 use App\Models\AdminNotification;
 use App\Models\Buyer;
+use App\Models\Category;
 use App\Models\Job;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,7 @@ class GuestJobPostService
         return [
             'details' => route('post.job.details'),
             'detailsStore' => route('post.job.details.store'),
+            'completeStore' => route('post.job.complete'),
             'preferences' => route('post.job.preferences'),
             'preferencesStore' => route('post.job.preferences.store'),
             'budget' => route('post.job.budget'),
@@ -55,7 +57,69 @@ class GuestJobPostService
             && filled($draft['description'] ?? null);
     }
 
+    public static function isFreightCategory(Category|int|null $category): bool
+    {
+        if ($category === null) {
+            return false;
+        }
+
+        if (is_int($category)) {
+            $category = Category::find($category);
+        }
+
+        if (!$category instanceof Category) {
+            return false;
+        }
+
+        $name = strtolower($category->name ?? '');
+
+        return str_contains($name, 'freight')
+            || str_contains($name, 'logistic')
+            || str_contains($name, 'shipping');
+    }
+
     public static function defaultPreferences(int $categoryId): array
+    {
+        $skillIds = self::skillIdsForCategory($categoryId);
+
+        return [
+            'skill_ids' => $skillIds,
+            'project_scope' => 2,
+            'job_longevity' => 2,
+            'skill_level' => 3,
+        ];
+    }
+
+    /**
+     * Resolve skills for a job post without requiring the user to pick them in the UI.
+     *
+     * @param  array<int>|null  $requestedIds
+     * @return array<int>
+     */
+    public static function resolveSkillIds(int $categoryId, ?array $requestedIds = null): array
+    {
+        $requestedIds = array_values(array_filter(array_map('intval', $requestedIds ?? [])));
+
+        if ($requestedIds !== []) {
+            $matched = \App\Models\Skill::active()
+                ->forCategory($categoryId)
+                ->whereIn('id', $requestedIds)
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+
+            if ($matched !== []) {
+                return $matched;
+            }
+        }
+
+        return self::skillIdsForCategory($categoryId);
+    }
+
+    /**
+     * @return array<int>
+     */
+    private static function skillIdsForCategory(int $categoryId): array
     {
         $skillIds = \App\Models\Skill::active()
             ->forCategory($categoryId)
@@ -71,12 +135,7 @@ class GuestJobPostService
                 ->all();
         }
 
-        return [
-            'skill_ids' => $skillIds,
-            'project_scope' => 2,
-            'job_longevity' => 2,
-            'skill_level' => 3,
-        ];
+        return $skillIds;
     }
 
     public static function applyDefaultPreferencesToDraft(): void
@@ -111,7 +170,9 @@ class GuestJobPostService
         }
         $buyer->customer_type = 'individual';
         $buyer->username = suggestUsername($email);
-        $buyer->password = Hash::make(Str::random(16));
+        $buyer->password = Hash::make(
+            filled($contact['password'] ?? null) ? $contact['password'] : Str::random(16)
+        );
         $buyer->status = Status::USER_ACTIVE;
         $buyer->profile_complete = Status::YES;
         $buyer->kv = gs('kv') ? Status::NO : Status::YES;
@@ -131,6 +192,42 @@ class GuestJobPostService
         $adminNotification->save();
 
         return $buyer;
+    }
+
+    public static function hasPendingPublish(): bool
+    {
+        $draft = self::draft();
+
+        return (bool) ($draft['pending_publish'] ?? false) && self::hasDetailsStep();
+    }
+
+    public static function publishPendingForBuyer(Buyer $buyer): ?Job
+    {
+        if (! self::hasPendingPublish()) {
+            return null;
+        }
+
+        $draft = self::draft();
+        $budgetData = $draft['pending_budget'] ?? [
+            'budget' => 0,
+            'custom_budget' => '1',
+            'deadline' => null,
+            'questions' => [],
+            'status' => Status::JOB_PUBLISH,
+        ];
+
+        return self::publishDraft($buyer, $budgetData);
+    }
+
+    public static function successPayloadForJob(Job $job, bool $needsAccount = false): array
+    {
+        return [
+            'job_id' => $job->id,
+            'title' => $job->title,
+            'published' => (int) $job->status === Status::JOB_PUBLISH,
+            'approved' => (int) $job->is_approved === Status::JOB_APPROVED,
+            'needsAccount' => $needsAccount,
+        ];
     }
 
     public static function publishDraft(Buyer $buyer, array $budgetData): Job
