@@ -7,6 +7,7 @@ const emptyPortfolio = () => ({
     title: '',
     role: '',
     description: '',
+    item_type: 'project',
     skill_ids: [],
     image: null,
 });
@@ -29,6 +30,7 @@ export default function Portfolio({ pageTitle, user, portfolios, skills, workPro
             title: portfolio.title || '',
             role: portfolio.role || '',
             description: portfolio.description || '',
+            item_type: portfolio.item_type || 'project',
             skill_ids: portfolio.skill_ids || [],
             image: null,
         });
@@ -116,7 +118,37 @@ export default function Portfolio({ pageTitle, user, portfolios, skills, workPro
 
                                             <form onSubmit={submitPortfolio}>
                                                 <div className="form-group">
-                                                    <label className="form-label">Project Title</label>
+                                                    <label className="form-label">Type</label>
+                                                    <div className="d-flex flex-wrap gap-3">
+                                                        <label className="form--check d-flex align-items-center gap-2 mb-0">
+                                                            <input
+                                                                type="radio"
+                                                                className="form-check-input"
+                                                                name="item_type"
+                                                                value="project"
+                                                                checked={data.item_type === 'project'}
+                                                                onChange={() => setData('item_type', 'project')}
+                                                            />
+                                                            <span>Project</span>
+                                                        </label>
+                                                        <label className="form--check d-flex align-items-center gap-2 mb-0">
+                                                            <input
+                                                                type="radio"
+                                                                className="form-check-input"
+                                                                name="item_type"
+                                                                value="certificate"
+                                                                checked={data.item_type === 'certificate'}
+                                                                onChange={() => setData('item_type', 'certificate')}
+                                                            />
+                                                            <span>Certificate</span>
+                                                        </label>
+                                                    </div>
+                                                    {errors.item_type && <small className="text-danger">{errors.item_type}</small>}
+                                                </div>
+                                                <div className="form-group">
+                                                    <label className="form-label">
+                                                        {data.item_type === 'certificate' ? 'Certificate Title' : 'Project Title'}
+                                                    </label>
                                                     <input
                                                         className="form-control form--control"
                                                         value={data.title}
@@ -126,7 +158,9 @@ export default function Portfolio({ pageTitle, user, portfolios, skills, workPro
                                                     {errors.title && <small className="text-danger">{errors.title}</small>}
                                                 </div>
                                                 <div className="form-group">
-                                                    <label className="form-label">Your Role (Optional)</label>
+                                                    <label className="form-label">
+                                                        {data.item_type === 'certificate' ? 'Issuing Body / Role (Optional)' : 'Your Role (Optional)'}
+                                                    </label>
                                                     <input
                                                         className="form-control form--control"
                                                         value={data.role}
@@ -134,7 +168,9 @@ export default function Portfolio({ pageTitle, user, portfolios, skills, workPro
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label className="form-label">Project Description</label>
+                                                    <label className="form-label">
+                                                        {data.item_type === 'certificate' ? 'Certificate Details' : 'Project Description'}
+                                                    </label>
                                                     <textarea
                                                         className="form-control form--control"
                                                         rows={4}
@@ -167,7 +203,8 @@ export default function Portfolio({ pageTitle, user, portfolios, skills, workPro
                                                 </div>
                                                 <div className="form-group">
                                                     <label className="form-label">
-                                                        Project Image {editingId ? '(leave empty to keep current)' : ''}
+                                                        {data.item_type === 'certificate' ? 'Certificate Image' : 'Project Image'}
+                                                        {editingId ? ' (leave empty to keep current)' : ''}
                                                     </label>
                                                     <input
                                                         type="file"
@@ -203,6 +240,7 @@ export default function Portfolio({ pageTitle, user, portfolios, skills, workPro
                                             <thead>
                                                 <tr>
                                                     <th>Image</th>
+                                                    <th>Type</th>
                                                     <th>Title</th>
                                                     <th>Role</th>
                                                     <th>Status</th>
@@ -212,7 +250,7 @@ export default function Portfolio({ pageTitle, user, portfolios, skills, workPro
                                             <tbody>
                                                 {portfolios.length === 0 ? (
                                                     <tr>
-                                                        <td colSpan={5} className="text-center">
+                                                        <td colSpan={6} className="text-center">
                                                             No portfolios yet. Add your first project above.
                                                         </td>
                                                     </tr>
@@ -223,6 +261,11 @@ export default function Portfolio({ pageTitle, user, portfolios, skills, workPro
                                                                 <div className="avatar avatar--sm">
                                                                     <img src={portfolio.image} alt="" />
                                                                 </div>
+                                                            </td>
+                                                            <td>
+                                                                <span className={`badge ${portfolio.item_type === 'certificate' ? 'badge--info' : 'badge--base'}`}>
+                                                                    {portfolio.item_type === 'certificate' ? 'Certificate' : 'Project'}
+                                                                </span>
                                                             </td>
                                                             <td>
                                                                 <span className="clamping">{portfolio.title}</span>

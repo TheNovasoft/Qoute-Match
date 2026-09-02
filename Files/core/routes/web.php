@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('pusher/auth/{socketId}/{channelName}', 'SiteController@pusher')->name('pusher');
 
+Route::post('tools/cbm/calculate', 'CbmCalculatorController@calculate')->name('tools.cbm.calculate');
+Route::post('tools/translate', 'TranslateController@translate')->name('tools.translate');
+
 Route::get('/clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
 });
@@ -26,6 +29,7 @@ Route::get('app/deposit/confirm/{hash}', 'Gateway\PaymentController@appDepositCo
 Route::controller('GuestJobController')->prefix('post-job')->name('post.job.')->group(function () {
     Route::get('/', 'details')->name('details');
     Route::post('/', 'storeDetails')->name('details.store');
+    Route::post('/complete', 'storeComplete')->name('complete');
     Route::get('preferences', 'preferences')->name('preferences');
     Route::post('preferences', 'storePreferences')->name('preferences.store');
     Route::get('budget', 'budget')->name('budget');

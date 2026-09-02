@@ -426,6 +426,9 @@ class JobExploreController extends Controller
             'portfolios' => $freelancer->portfolios->where('status', Status::ENABLE)->map(fn ($portfolio) => [
                 'id' => $portfolio->id,
                 'title' => __($portfolio->title),
+                'description' => __($portfolio->description),
+                'role' => $portfolio->role ? __($portfolio->role) : null,
+                'item_type' => $portfolio->item_type ?? 'project',
                 'image' => getImage(getFilePath('portfolio') . '/' . $portfolio->image, getFileSize('portfolio')),
             ])->values()->all(),
             'templateIcons' => [

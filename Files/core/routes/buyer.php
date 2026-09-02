@@ -87,6 +87,7 @@ Route::middleware('buyer')->name('buyer.')->group(function () {
                 // Step 1: Job Details
                 Route::get('job-details/{id?}', 'createJobDetails')->name('details');
                 Route::post('job-details/{id?}','storeJobDetails')->name('details.store');
+                Route::post('complete/{id?}', 'storeComplete')->name('complete');
 
                 // Step 2: Freelancer Details
                 Route::get('provider-details/{id}', 'createFreelancerDetails')->name('freelancer.details');

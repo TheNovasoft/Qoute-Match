@@ -93,6 +93,19 @@ class GuestJobController extends Controller
             );
         }
 
+        if ($request->filled('container_type')) {
+            $request->validate([
+                'container_type' => 'string|in:Full Container,LCL',
+            ]);
+            $requestData = RequestFormService::mergeExtraField(
+                $requestData ?? [],
+                'container_type',
+                'Container Type',
+                'radio',
+                $request->container_type
+            );
+        }
+
         GuestJobPostService::putDraft([
             'title' => $request->title,
             'slug' => $request->slug,
@@ -103,6 +116,152 @@ class GuestJobController extends Controller
         ]);
 
         return redirect()->route('post.job.details');
+    }
+
+    public function storeComplete(Request $request)
+    {
+        if ($redirect = GuestJobPostService::redirectIfAuthenticatedBuyer()) {
+            return $redirect;
+        }
+
+        $base = \Illuminate\Support\Str::slug(
+            filled($request->slug) ? $request->slug : ($request->title ?? 'job')
+        ) ?: 'job';
+        $slug = $base;
+        $i = 1;
+        while (Job::where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $i;
+            $i++;
+        }
+        $request->merge(['slug' => $slug]);
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'slug' => ['required', 'string', 'max:255', Rule::unique('jobs', 'slug')],
+            'category_id' => ['required', 'integer', 'gt:0', Rule::exists('categories', 'id')->where(fn ($query) => $query->where('status', Status::YES))],
+            'description' => 'required|string',
+            'skill_ids' => 'nullable|array',
+            'skill_ids.*' => 'exists:skills,id',
+            'project_scope' => 'required|in:1,2,3',
+            'job_longevity' => 'required|in:1,2,3,4',
+            'skill_level' => 'required|in:1,2,3,4',
+            'budget' => 'nullable|numeric|gte:0',
+            'custom_budget' => 'required|in:0,1',
+            'deadline' => 'nullable|date',
+            'password' => 'nullable|string|min:6',
+        ]);
+
+        $category = Category::active()->with(['requestForm', 'subcategories' => fn ($q) => $q->active()])->findOrFail($request->category_id);
+        $isFreight = GuestJobPostService::isFreightCategory($category);
+
+        $request->validate($isFreight ? [
+            'firstname' => 'nullable|string|max:40',
+            'lastname' => 'nullable|string|max:40',
+            'email' => 'nullable|string|email|max:100',
+            'phone' => 'nullable|string|max:30',
+        ] : [
+            'firstname' => 'required|string|max:40',
+            'lastname' => 'required|string|max:40',
+            'email' => 'required|string|email|max:100',
+            'phone' => 'nullable|string|max:30',
+        ]);
+
+        $subcategoryId = self::resolveSubcategoryId($category, $request->subcategory_id);
+        $request->merge(['subcategory_id' => $subcategoryId]);
+        $request->validate([
+            'subcategory_id' => ['required', 'integer', 'gt:0', Rule::exists('subcategories', 'id')->where(fn ($query) => $query->where('status', Status::YES))],
+        ]);
+
+        if ($category->requestForm) {
+            $request->validate(RequestFormService::validationRules(
+                $category->requestForm->form_data,
+                $request->except(['_token', '_method']),
+                null,
+                true
+            ));
+        }
+
+        $requestData = null;
+        if ($category->requestForm) {
+            $requestData = RequestFormService::processSubmission(
+                $request,
+                $category->requestForm->form_data,
+                null,
+                true
+            );
+        }
+
+        if ($request->filled('container_type')) {
+            $request->validate([
+                'container_type' => 'string|in:Full Container,LCL',
+            ]);
+            $requestData = RequestFormService::mergeExtraField(
+                $requestData ?? [],
+                'container_type',
+                'Container Type',
+                'radio',
+                $request->container_type
+            );
+        }
+
+        $skillIds = GuestJobPostService::resolveSkillIds(
+            (int) $request->category_id,
+            $request->skill_ids
+        );
+
+        if ($skillIds === []) {
+            return back()->withErrors([
+                'skill_ids' => 'No skills are configured for this category yet. Please contact support.',
+            ])->withInput();
+        }
+
+        $email = filled($request->email) ? strtolower(trim($request->email)) : '';
+
+        GuestJobPostService::putDraft([
+            'title' => $request->title,
+            'slug' => $request->slug,
+            'category_id' => (int) $request->category_id,
+            'subcategory_id' => (int) $request->subcategory_id,
+            'description' => $request->description,
+            'request_data' => $requestData,
+            'skill_ids' => $skillIds,
+            'project_scope' => (int) $request->project_scope,
+            'job_longevity' => (int) $request->job_longevity,
+            'skill_level' => (int) $request->skill_level,
+            'contact_firstname' => $request->firstname,
+            'contact_lastname' => $request->lastname,
+            'contact_email' => $email,
+            'contact_phone' => $request->phone,
+            'pending_publish' => true,
+            'pending_budget' => [
+                'budget' => $request->custom_budget == '1' ? 0 : ($request->budget ?? 0),
+                'custom_budget' => $request->custom_budget,
+                'deadline' => $request->deadline ?: null,
+                'questions' => [],
+                'status' => Status::JOB_PUBLISH,
+            ],
+        ]);
+
+        if ($email !== '' && Buyer::where('email', $email)->exists()) {
+            return back()->withErrors([
+                'email' => 'An account with this email already exists. Please log in as a customer to publish your job.',
+            ])->withInput();
+        }
+
+        session([
+            'post_job_success' => [
+                'title' => $request->title,
+                'email' => $email,
+                'firstname' => $request->firstname,
+                'lastname' => $request->lastname,
+                'phone' => $request->phone,
+                'needsAccount' => true,
+                'published' => false,
+                'approved' => false,
+            ],
+        ]);
+
+        return redirect()->route('post.job.success');
     }
 
     public function preferences()
@@ -125,7 +284,7 @@ class GuestJobController extends Controller
         }
 
         $request->validate([
-            'skill_ids' => 'required|array',
+            'skill_ids' => 'nullable|array',
             'skill_ids.*' => 'exists:skills,id',
             'project_scope' => 'required|in:1,2,3',
             'job_longevity' => 'required|in:1,2,3,4',
@@ -133,16 +292,14 @@ class GuestJobController extends Controller
         ]);
 
         $draft = GuestJobPostService::draft();
-        $skillIds = Skill::active()
-            ->forCategory($draft['category_id'] ?? null)
-            ->whereIn('id', $request->skill_ids)
-            ->pluck('id')
-            ->map(fn ($id) => (int) $id)
-            ->all();
+        $skillIds = GuestJobPostService::resolveSkillIds(
+            (int) ($draft['category_id'] ?? 0),
+            $request->skill_ids
+        );
 
-        if (empty($skillIds)) {
+        if ($skillIds === []) {
             return back()->withErrors([
-                'skill_ids' => 'Please choose at least one skill that matches this job category.',
+                'skill_ids' => 'No skills are configured for this category yet. Please contact support.',
             ])->withInput();
         }
 
@@ -178,9 +335,9 @@ class GuestJobController extends Controller
         GuestJobPostService::applyDefaultPreferencesToDraft();
 
         $request->validate([
-            'budget' => 'required|numeric|gt:0',
+            'budget' => 'nullable|numeric|gte:0',
             'custom_budget' => 'required|in:0,1',
-            'deadline' => 'required|date|after_or_equal:today',
+            'deadline' => 'nullable|date',
             'questions' => 'nullable|array|max:5',
             'questions.*' => 'nullable|string',
             'status' => 'required|in:0,1',
@@ -189,6 +346,9 @@ class GuestJobController extends Controller
             'email' => 'required|string|email|max:100',
             'phone' => 'nullable|string|max:30',
         ]);
+
+        $budget = $request->custom_budget == '1' ? 0 : ($request->budget ?? 0);
+        $deadline = $request->deadline ?: null;
 
         $email = strtolower(trim($request->email));
         if (Buyer::where('email', $email)->exists()) {
@@ -211,9 +371,9 @@ class GuestJobController extends Controller
         }
 
         $job = GuestJobPostService::publishDraft($buyer, [
-            'budget' => $request->budget,
+            'budget' => $budget,
             'custom_budget' => $request->custom_budget,
-            'deadline' => $request->deadline,
+            'deadline' => $deadline,
             'questions' => array_values(array_filter($request->questions ?? [])),
             'status' => $request->status,
         ]);

@@ -260,10 +260,155 @@ class ManageJobController extends Controller
             $job->request_data = null;
         }
 
+        if ($request->filled('container_type')) {
+            $request->validate([
+                'container_type' => 'string|in:Full Container,LCL',
+            ]);
+            $job->request_data = RequestFormService::mergeExtraField(
+                $job->request_data ?? [],
+                'container_type',
+                'Container Type',
+                'radio',
+                $request->container_type
+            );
+        }
+
         $job->save();
 
         $notify[] = ['success', 'Request details saved. Continue to the next questions.'];
         return to_route('buyer.job.post.details', $job->id)->withNotify($notify);
+    }
+
+    public function storeComplete(Request $request, $id = 0)
+    {
+        $request->merge([
+            'slug' => $this->uniqueJobSlug($request->title ?? '', $id, $request->slug),
+        ]);
+
+        $request->validate([
+            'title'          => 'required|string|max:255',
+            'slug'           => ['required', 'string', 'max:255', Rule::unique('jobs', 'slug')->ignore($id)],
+            'category_id' => ['required', 'integer', 'gt:0', Rule::exists('categories', 'id')->where(function ($query) {
+                $query->where('status', Status::YES);
+            }),],
+            'description'    => 'required|string',
+            'skill_ids'      => 'nullable|array',
+            'skill_ids.*'    => 'exists:skills,id',
+            'project_scope'  => 'required|in:1,2,3',
+            'job_longevity'  => 'required|in:1,2,3,4',
+            'skill_level'    => 'required|in:1,2,3,4',
+            'budget'         => 'nullable|numeric|gte:0',
+            'custom_budget'  => 'required|in:0,1',
+            'deadline'       => 'nullable|date',
+        ]);
+
+        $category = Category::active()->with(['requestForm', 'subcategories' => fn ($q) => $q->active()])->findOrFail($request->category_id);
+        $subcategoryId = $this->resolveSubcategoryId($category, $request->subcategory_id);
+        $request->merge(['subcategory_id' => $subcategoryId]);
+        $request->validate([
+            'subcategory_id' => ['required', 'integer', 'gt:0', Rule::exists('subcategories', 'id')->where(function ($query) {
+                $query->where('status', Status::YES);
+            }),],
+        ]);
+
+        $buyer = auth()->guard('buyer')->user();
+
+        if ($id) {
+            $existingJob = Job::where('buyer_id', $buyer->id)->findOrFail($id);
+            if (!$this->buyerCanEditJob($existingJob)) {
+                $notify[] = ['error', 'This request can no longer be edited because a provider has already been hired.'];
+                return back()->withNotify($notify);
+            }
+        }
+
+        $job = $id ? Job::where('buyer_id', $buyer->id)->findOrFail($id) : new Job();
+        $existingRequestData = $job->request_data;
+
+        if ($category->requestForm) {
+            $request->validate(RequestFormService::validationRules(
+                $category->requestForm->form_data,
+                $request->except(['_token', '_method']),
+                $existingRequestData,
+                true
+            ));
+        }
+
+        $job->buyer_id = $buyer->id;
+        $job->title = $request->title;
+        $job->slug = $request->slug;
+        $job->category_id = $request->category_id;
+        $job->subcategory_id = $request->subcategory_id;
+        $job->description = $request->description;
+
+        if ($category->requestForm) {
+            $job->request_data = RequestFormService::processSubmission(
+                $request,
+                $category->requestForm->form_data,
+                $existingRequestData,
+                true
+            );
+        } else {
+            $job->request_data = null;
+        }
+
+        if ($request->filled('container_type')) {
+            $request->validate([
+                'container_type' => 'string|in:Full Container,LCL',
+            ]);
+            $job->request_data = RequestFormService::mergeExtraField(
+                $job->request_data ?? [],
+                'container_type',
+                'Container Type',
+                'radio',
+                $request->container_type
+            );
+        }
+
+        $skillIds = GuestJobPostService::resolveSkillIds(
+            (int) $request->category_id,
+            $request->skill_ids
+        );
+
+        if ($skillIds === []) {
+            return back()->withErrors([
+                'skill_ids' => 'No skills are configured for this category yet. Please contact support.',
+            ])->withInput();
+        }
+
+        $wasPublished = $job->exists && (int) $job->status === Status::JOB_PUBLISH;
+
+        $job->project_scope = (int) $request->project_scope;
+        $job->job_longevity = (int) $request->job_longevity;
+        $job->skill_level = (int) $request->skill_level;
+        $job->budget = $request->custom_budget == '1' ? 0 : ($request->budget ?? 0);
+        $job->custom_budget = $request->custom_budget;
+        $job->deadline = $request->deadline ?: null;
+        $job->questions = [];
+        $job->status = Status::JOB_PUBLISH;
+        $job->is_approved = Status::JOB_APPROVED;
+
+        $job->save();
+        $job->skills()->sync($skillIds);
+
+        if (!$wasPublished) {
+            \App\Lib\InvoiceService::forJobPublished($job);
+
+            $adminNotification = new AdminNotification();
+            $adminNotification->buyer_id = $buyer->id;
+            $adminNotification->title = 'New job posted by ' . $buyer->fullname;
+            $adminNotification->click_url = urlPath('admin.jobs.details', $job->id);
+            $adminNotification->save();
+
+            $job->loadMissing('buyer');
+            if ((int) $job->is_approved === Status::JOB_APPROVED) {
+                \App\Lib\JobPostNotificationService::notifyApproved($job);
+            } else {
+                \App\Lib\JobPostNotificationService::notifySubmittedForReview($job);
+            }
+        }
+
+        $notify[] = ['success', $id ? 'Job post updated successfully' : 'Job post created successfully'];
+        return to_route('buyer.job.post.view', $job->id)->withNotify($notify);
     }
 
     public function createFreelancerDetails($id)
@@ -320,9 +465,9 @@ class ManageJobController extends Controller
     public function storeBudget(Request $request, $id)
     {
         $request->validate([
-            'budget'        => 'required|numeric|gt:0',
+            'budget'        => 'nullable|numeric|gte:0',
             'custom_budget' => 'required|in:0,1',
-            'deadline'      => 'required|date|after_or_equal:today',
+            'deadline'      => 'nullable|date',
             'questions'     => 'nullable|array|max:5',
             'questions.*'   => 'nullable|string',
             'status'        => 'nullable|in:0,1',
@@ -349,9 +494,9 @@ class ManageJobController extends Controller
         $wasPublished = (int) $job->status === Status::JOB_PUBLISH;
         $status = $request->filled('status') ? (int) $request->status : Status::JOB_PUBLISH;
 
-        $job->budget = $request->budget;
+        $job->budget = $request->custom_budget == '1' ? 0 : ($request->budget ?? 0);
         $job->custom_budget = $request->custom_budget;
-        $job->deadline = $request->deadline;
+        $job->deadline = $request->deadline ?: null;
         $job->questions = $request->questions;
         $job->status = $status;
 

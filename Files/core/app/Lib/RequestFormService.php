@@ -96,13 +96,42 @@ class RequestFormService
         return in_array($currentValue, $allowedValues, true);
     }
 
-    public static function validationRules(mixed $formData, array $inputValues, ?array $existing = null): array
+    public static function isSkippedJobPostFlowField(object $field): bool
+    {
+        $name = strtolower($field->name ?? '');
+        $label = strtolower(str_replace('_', ' ', $field->label ?? ''));
+
+        if (str_contains($name, 'additional requirement')
+            || str_contains($label, 'additional requirement')
+            || str_contains($name, 'other note')
+            || str_contains($label, 'other note')) {
+            return true;
+        }
+
+        if (str_contains($name, 'property type') || str_contains($label, 'property type')) {
+            return true;
+        }
+
+        if (str_contains($name, 'timeline')
+            || str_contains($name, 'urgency')
+            || str_contains($label, 'project timeline')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function validationRules(mixed $formData, array $inputValues, ?array $existing = null, bool $jobPostFlow = false): array
     {
         $formProcessor = new FormProcessor();
         $existingByLabel = collect($existing ?? [])->keyBy('label');
         $rules = [];
 
         foreach (self::visibleFields($formData, $inputValues) as $field) {
+            if ($jobPostFlow && self::isSkippedJobPostFlowField($field)) {
+                continue;
+            }
+
             $fieldRules = $formProcessor->valueValidation([$field->label => $field]);
             $rule = $fieldRules[$field->label] ?? ['nullable'];
 
@@ -116,13 +145,17 @@ class RequestFormService
         return $rules;
     }
 
-    public static function processSubmission(Request $request, mixed $formData, ?array $existing = null): array
+    public static function processSubmission(Request $request, mixed $formData, ?array $existing = null, bool $jobPostFlow = false): array
     {
         $existingByLabel = collect($existing ?? [])->keyBy('label');
         $requestForm = [];
         $inputValues = $request->except(['_token', '_method']);
 
         foreach (self::visibleFields($formData, $inputValues) as $data) {
+            if ($jobPostFlow && self::isSkippedJobPostFlowField($data)) {
+                continue;
+            }
+
             $label = $data->label;
 
             if ($data->type === 'file') {
@@ -146,6 +179,27 @@ class RequestFormService
                 'value' => $value,
             ];
         }
+
+        return $requestForm;
+    }
+
+    public static function mergeExtraField(array $requestForm, string $label, string $name, string $type, mixed $value): array
+    {
+        if ($value === null || $value === '') {
+            return $requestForm;
+        }
+
+        $requestForm = array_values(array_filter(
+            $requestForm,
+            fn ($item) => ($item['label'] ?? '') !== $label
+        ));
+
+        $requestForm[] = [
+            'name' => $name,
+            'label' => $label,
+            'type' => $type,
+            'value' => $value,
+        ];
 
         return $requestForm;
     }

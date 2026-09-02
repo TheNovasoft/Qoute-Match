@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Buyer\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Lib\GuestJobPostService;
 use App\Lib\Intended;
 use Inertia\Inertia;
 use App\Constants\Status;
@@ -46,6 +47,9 @@ class LoginController extends Controller
                 'heading' => __(@$login->heading),
                 'image' => frontendImage('login', @$login->image, '770x670'),
                 'bannerShape' => frontendImage('banner', @$banner->shape, '475x630'),
+            ],
+            'prefill' => [
+                'username' => (string) request('email', request('username', '')),
             ],
         ]);
     }
@@ -177,6 +181,14 @@ class LoginController extends Controller
         $userLogin->browser = @$userAgent['browser'];
         $userLogin->os = @$userAgent['os_platform'];
         $userLogin->save();
+
+        if ($job = GuestJobPostService::publishPendingForBuyer($user)) {
+            session([
+                'post_job_success' => GuestJobPostService::successPayloadForJob($job),
+            ]);
+
+            return to_route('post.job.success');
+        }
 
         $redirection = Intended::getRedirection();
         return $redirection ? $redirection : to_route('buyer.home');

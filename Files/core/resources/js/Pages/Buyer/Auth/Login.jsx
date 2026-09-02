@@ -2,9 +2,9 @@ import { useForm } from '@inertiajs/react';
 import AuthLayout, { AuthShell, AuthLogo, UserTypeSwitch } from '@/Components/Layout/AuthLayout';
 import PasswordInput from '@/Components/Shared/PasswordInput';
 
-export default function Login({ pageTitle, authContent }) {
+export default function Login({ pageTitle, authContent, prefill = {} }) {
     const { data, setData, post, processing, errors } = useForm({
-        username: '',
+        username: prefill.username || '',
         password: '',
         remember: false,
     });

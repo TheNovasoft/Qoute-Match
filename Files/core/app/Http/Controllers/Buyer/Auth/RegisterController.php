@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Buyer\Auth;
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Lib\AuthPageData;
+use App\Lib\GuestJobPostService;
 use App\Lib\Intended;
 use App\Models\AdminNotification;
 use App\Models\Buyer;
@@ -36,6 +37,12 @@ class RegisterController extends Controller
             'registrationEnabled' => (bool) gs('buyer_registration'),
             'requireAgree' => (bool) gs('agree'),
             'policies' => $this->policyLinks(),
+            'prefill' => [
+                'firstname' => (string) request('firstname', ''),
+                'lastname' => (string) request('lastname', ''),
+                'email' => (string) request('email', ''),
+                'phone' => (string) request('phone', ''),
+            ],
         ]);
     }
 
@@ -184,8 +191,16 @@ class RegisterController extends Controller
         return response($exist);
     }
 
-    public function registered()
+    public function registered(Request $request, Buyer $buyer)
     {
+        if ($job = GuestJobPostService::publishPendingForBuyer($buyer)) {
+            session([
+                'post_job_success' => GuestJobPostService::successPayloadForJob($job),
+            ]);
+
+            return to_route('post.job.success');
+        }
+
         return to_route('buyer.home');
     }
 
