@@ -1,12 +1,15 @@
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import JobPostFlowField from '@/Components/Jobs/JobPostFlowField';
+import JobPostFormTranslateButton from '@/Components/Jobs/JobPostFormTranslateButton';
+import { JobPostFormTranslationProvider, useJobPostFormTranslation } from '@/Components/Jobs/JobPostFormTranslationProvider';
+import { collectJobPostFormStrings } from '@/utils/jobPostFormStrings';
+import { stepFieldKeys, validateStep } from '@/utils/jobPostFlowValidation';
 import {
     buildFlowSteps,
     generateDescription,
     generateTitle,
     skillsForCategory,
-    stepIsValid,
     stepIsVisible,
     suggestSkillIds,
     summarizeStep,
@@ -43,7 +46,17 @@ function scrollToStep(element) {
 
 const AUTO_ADVANCE_TYPES = new Set(['category', 'subcategory', 'cards-single']);
 
-export default function JobPostFlow({
+export default function JobPostFlow(props) {
+    const { formTranslateLocale } = usePage().props;
+
+    return (
+        <JobPostFormTranslationProvider locale={formTranslateLocale}>
+            <JobPostFlowInner {...props} />
+        </JobPostFormTranslationProvider>
+    );
+}
+
+function JobPostFlowInner({
     categories,
     categoryForms,
     skills = [],
@@ -53,6 +66,7 @@ export default function JobPostFlow({
     jobId = null,
 }) {
     const { routes, jobPostRoutes } = usePage().props;
+    const { tx } = useJobPostFormTranslation();
     const isBuyer = mode === 'buyer';
     const dynamicDefaults = valuesFromFields(categoryForms?.[draft.category_id] || []);
 
@@ -108,6 +122,7 @@ export default function JobPostFlow({
 
     const [completedIds, setCompletedIds] = useState([]);
     const [editingId, setEditingId] = useState(null);
+    const [clientErrors, setClientErrors] = useState({});
     const [titleManual, setTitleManual] = useState(Boolean(draft.title));
     const [descManual, setDescManual] = useState(Boolean(draft.description));
     const stepRefs = useRef({});
@@ -147,12 +162,55 @@ export default function JobPostFlow({
         }
     }, [activeStepId, form.data.category_id, form.data.subcategory_id]);
 
+    const fieldErrors = useMemo(
+        () => ({ ...clientErrors, ...form.errors }),
+        [clientErrors, form.errors],
+    );
+
+    const clearClientError = useCallback((field) => {
+        if (!field) {
+            return;
+        }
+        setClientErrors((prev) => {
+            if (!prev[field]) {
+                return prev;
+            }
+            const next = { ...prev };
+            delete next[field];
+            return next;
+        });
+    }, []);
+
+    const clearStepClientErrors = useCallback((step) => {
+        const keys = stepFieldKeys(step);
+        if (!keys.length) {
+            return;
+        }
+        setClientErrors((prev) => {
+            const next = { ...prev };
+            let changed = false;
+            keys.forEach((key) => {
+                if (next[key]) {
+                    delete next[key];
+                    changed = true;
+                }
+            });
+            return changed ? next : prev;
+        });
+    }, []);
     const flowData = useMemo(() => ({
         ...form.data,
         category_id: form.data.category_id || coreRef.current.category_id,
         subcategory_id: form.data.subcategory_id || coreRef.current.subcategory_id,
         skill_ids: Array.isArray(form.data.skill_ids) ? form.data.skill_ids : [],
     }), [form.data]);
+
+    const formStrings = useMemo(() => collectJobPostFormStrings({
+        categories,
+        categoryForms,
+        steps: allSteps,
+        isBuyer,
+    }), [categories, categoryForms, allSteps, isBuyer]);
 
     const completeStoreUrl = isBuyer
         ? (jobId
@@ -242,9 +300,14 @@ export default function JobPostFlow({
 
     const completeStep = (step, dataOverride = null) => {
         const payload = dataOverride || flowData;
-        if (!stepIsValid(step, payload)) {
+        const validation = validateStep(step, payload);
+
+        if (!validation.valid) {
+            setClientErrors((prev) => ({ ...prev, ...validation.errors }));
             return;
         }
+
+        clearStepClientErrors(step);
 
         if (step.id === 'title-description') {
             const patch = {};
@@ -278,6 +341,7 @@ export default function JobPostFlow({
     };
 
     const handleFieldChange = (field, value, { manual = false } = {}) => {
+        clearClientError(field);
         if (field === 'title' && manual) {
             setTitleManual(true);
         }
@@ -291,6 +355,7 @@ export default function JobPostFlow({
         const activeStep = visibleSteps.find((s) => s.id === activeStepId);
 
         if (field === 'category_id') {
+            clearClientError('category_id');
             const cat = categories.find((c) => String(c.id) === String(value));
             const subs = cat?.subcategories || [];
             const dynamicPatch = clearDynamicFields(value);
@@ -325,6 +390,7 @@ export default function JobPostFlow({
         }
 
         if (field === 'subcategory_id') {
+            clearClientError('subcategory_id');
             const subId = String(value);
             coreRef.current.subcategory_id = subId;
             const nextData = { ...form.data, subcategory_id: subId };
@@ -334,6 +400,7 @@ export default function JobPostFlow({
         }
 
         form.setData((current) => ({ ...current, [field]: value }));
+        clearClientError(field);
         maybeAutoAdvance(activeStep, { ...form.data, [field]: value });
     };
 
@@ -416,9 +483,9 @@ export default function JobPostFlow({
             {visibleSteps.filter((s) => s.type !== 'review').map((step) => (
                 <div key={step.id} className="job-flow-review__row">
                     <div className="job-flow-review__head">
-                        <strong>{step.question}</strong>
+                        <strong>{tx(step.question)}</strong>
                         <button type="button" className="job-flow-edit-btn" onClick={() => startEdit(step.id)}>
-                            Edit
+                            {tx('Edit')}
                         </button>
                     </div>
                     <p className="job-flow-review__value">{summarizeStep(step, flowData, categories)}</p>
@@ -430,13 +497,21 @@ export default function JobPostFlow({
                 onClick={submitJob}
                 disabled={form.processing}
             >
-                {form.processing ? 'Posting…' : (isBuyer ? 'Post job' : 'Post job free')}
+                {form.processing ? tx('Posting…') : tx(isBuyer ? 'Post job' : 'Post job free')}
             </button>
         </div>
     );
 
     return (
         <div className="job-flow">
+            <div className="post-job-flow-intro text-center mb-3 position-relative">
+                <JobPostFormTranslateButton strings={formStrings} />
+                <h1 className="post-job-flow-intro__title mb-2">{tx('Tell us what you need done')}</h1>
+                <p className="post-job-flow-intro__text mb-0 text-muted">
+                    {tx('Answer a few questions — your previous answers stay visible below and can be edited anytime.')}
+                </p>
+            </div>
+
             <div className="job-flow__steps">
                 {visibleSteps.map((step) => {
                     const isCompleted = completedIds.includes(step.id) && editingId !== step.id;
@@ -454,8 +529,8 @@ export default function JobPostFlow({
                                 ref={(el) => { stepRefs.current[step.id] = el; }}
                                 className="job-flow-step job-flow-step--active"
                             >
-                                <h2 className="job-flow-step__question">{step.question}</h2>
-                                {step.hint && <p className="job-flow-step__hint">{step.hint}</p>}
+                                <h2 className="job-flow-step__question">{tx(step.question)}</h2>
+                                {step.hint && <p className="job-flow-step__hint">{tx(step.hint)}</p>}
                                 {renderReview()}
                             </section>
                         );
@@ -465,9 +540,9 @@ export default function JobPostFlow({
                         return (
                             <section key={step.id} className="job-flow-step job-flow-step--done">
                                 <div className="job-flow-step__done-head">
-                                    <span className="job-flow-step__done-label">{step.question}</span>
+                                    <span className="job-flow-step__done-label">{tx(step.question)}</span>
                                     <button type="button" className="job-flow-edit-btn" onClick={() => startEdit(step.id)}>
-                                        Edit
+                                        {tx('Edit')}
                                     </button>
                                 </div>
                                 <p className="job-flow-step__done-value">{summarizeStep(step, flowData, categories)}</p>
@@ -481,18 +556,19 @@ export default function JobPostFlow({
                             ref={(el) => { stepRefs.current[step.id] = el; }}
                             className="job-flow-step job-flow-step--active"
                         >
-                            <h2 className="job-flow-step__question">{step.question}</h2>
-                            {step.hint && <p className="job-flow-step__hint">{step.hint}</p>}
+                            <h2 className="job-flow-step__question">{tx(step.question)}</h2>
+                            {step.hint && <p className="job-flow-step__hint">{tx(step.hint)}</p>}
                             <div className="job-flow-step__body">
                                 <JobPostFlowField
                                     step={step}
                                     data={flowData}
-                                    errors={form.errors}
+                                    errors={fieldErrors}
                                     categories={categories}
                                     loginUrl={routes?.buyerLogin ?? '/customer/login'}
                                     onChange={handleFieldChange}
                                     onSelectSingle={handleCategorySelect}
                                     onToggleMulti={(field, value) => {
+                                        clearClientError(field);
                                         form.setData((current) => {
                                             const selected = current[field] || [];
                                             const exists = selected.some((v) => String(v) === String(value));
@@ -505,6 +581,8 @@ export default function JobPostFlow({
                                         });
                                     }}
                                     onSetCountryCity={(countryField, cityField, country) => {
+                                        clearClientError(countryField);
+                                        clearClientError(cityField);
                                         form.setData((current) => ({
                                             ...current,
                                             [countryField]: country,
@@ -512,18 +590,26 @@ export default function JobPostFlow({
                                         }));
                                     }}
                                 />
-                                {step.field && form.errors[step.field] && (
-                                    <small className="text-danger d-block mt-2">{form.errors[step.field]}</small>
+                                {step.type === 'cards-single' && fieldErrors[step.field] && (
+                                    <small className="text-danger d-block mt-2">{fieldErrors[step.field]}</small>
+                                )}
+                                {step.type === 'cards-multi' && fieldErrors[step.field] && (
+                                    <small className="text-danger d-block mt-2">{fieldErrors[step.field]}</small>
+                                )}
+                                {step.type === 'cargo-details' && fieldErrors.container_type && (
+                                    <small className="text-danger d-block mt-2">{fieldErrors.container_type}</small>
+                                )}
+                                {step.field && !['cards-single', 'cards-multi', 'title-description', 'contact', 'cargo-details', 'origin-destination', 'country-city'].includes(step.type) && fieldErrors[step.field] && (
+                                    <small className="text-danger d-block mt-2">{fieldErrors[step.field]}</small>
                                 )}
                             </div>
                             {step.type !== 'review' && !AUTO_ADVANCE_TYPES.has(step.type) && (
                                 <button
                                     type="button"
                                     className="btn btn--base job-flow-continue"
-                                    disabled={!stepIsValid(step, flowData)}
                                     onClick={() => completeStepHandler(step)}
                                 >
-                                    Continue
+                                    {tx('Continue')}
                                 </button>
                             )}
                         </section>

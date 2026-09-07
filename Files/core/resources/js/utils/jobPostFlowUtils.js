@@ -1,3 +1,5 @@
+import { validateStep } from '@/utils/jobPostFlowValidation';
+
 export function isFreightCategory(categoryId, categories = []) {
     const category = categories.find((item) => String(item.id) === String(categoryId));
     const name = (category?.name || '').toLowerCase();
@@ -216,71 +218,8 @@ export function stepIsValid(step, data) {
     if (step.type === 'review') {
         return true;
     }
-    if (step.type === 'category') {
-        return Boolean(data.category_id);
-    }
-    if (step.type === 'subcategory') {
-        return Boolean(data.subcategory_id);
-    }
-    if (step.type === 'title-description') {
-        return Boolean(String(data.title || '').trim() && String(data.description || '').trim());
-    }
-    if (step.type === 'title') {
-        return Boolean(String(data.title || '').trim());
-    }
-    if (step.type === 'description') {
-        return Boolean(String(data.description || '').trim());
-    }
-    if (step.type === 'skills') {
-        return Array.isArray(data.skill_ids) && data.skill_ids.length > 0;
-    }
-    if (step.type === 'contact') {
-        return Boolean(data.firstname?.trim() && data.email?.trim());
-    }
-    if (step.type === 'name-split') {
-        return Boolean(data.firstname?.trim() && data.lastname?.trim());
-    }
-    if (step.type === 'country-city') {
-        if (!step.required) {
-            return true;
-        }
-        return Boolean(data[step.countryField]?.trim() && data[step.cityField]?.trim());
-    }
-    if (step.type === 'origin-destination') {
-        if (!step.required) {
-            return true;
-        }
-        const originOk = Boolean(
-            data[step.origin.countryField]?.trim() && data[step.origin.cityField]?.trim(),
-        );
-        const destOk = Boolean(
-            data[step.destination.countryField]?.trim() && data[step.destination.cityField]?.trim(),
-        );
-        return originOk && destOk;
-    }
-    if (step.type === 'cargo-details') {
-        const containerOk = !step.includeContainerType || Boolean(data.container_type);
-        const hsOk = !step.hsMeta?.isRequired || Boolean(String(data[step.hsField] ?? '').trim());
-        const weightVal = data[step.weightField];
-        const weightOk = !step.weightMeta?.isRequired || (weightVal !== '' && weightVal != null);
-        const cbmOk = !step.cbmMeta?.isRequired || Boolean(String(data[step.cbmField] ?? '').trim());
-        return containerOk && hsOk && weightOk && cbmOk;
-    }
-    if (step.optional || step.required === false) {
-        return true;
-    }
-    const field = step.field;
-    const value = data[field];
-    if (step.type === 'cards-multi') {
-        return (Array.isArray(value) ? value : []).length >= (step.minSelections ?? 1);
-    }
-    if (step.type === 'file') {
-        return step.required ? Boolean(value) : true;
-    }
-    if (!field) {
-        return true;
-    }
-    return value !== '' && value != null;
+
+    return validateStep(step, data).valid;
 }
 
 export function summarizeStep(step, data, categories) {

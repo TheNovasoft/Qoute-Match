@@ -6,6 +6,7 @@ Route::post('pusher/auth/{socketId}/{channelName}', 'SiteController@pusher')->na
 
 Route::post('tools/cbm/calculate', 'CbmCalculatorController@calculate')->name('tools.cbm.calculate');
 Route::post('tools/translate', 'TranslateController@translate')->name('tools.translate');
+Route::post('tools/translate/batch', 'TranslateController@translateBatch')->name('tools.translate.batch');
 
 Route::get('/clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');

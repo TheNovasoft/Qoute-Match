@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Constants\Status;
+use App\Lib\FormTranslateLocale;
 use App\Lib\GuestJobPostService;
 use App\Lib\RequestFormService;
 use App\Models\Buyer;
@@ -41,6 +42,7 @@ class GuestJobController extends Controller
             'categoryForms' => self::categoryFormsMap($categories, $draft),
             'skills' => $skills,
             'currencyText' => gs('cur_text'),
+            'formTranslateLocale' => FormTranslateLocale::forRequest(request()),
         ]);
     }
 
