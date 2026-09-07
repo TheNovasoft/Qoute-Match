@@ -3,9 +3,9 @@
 namespace App\Http\Middleware;
 
 use App\Constants\Status;
+use App\Lib\FrontendNavigation;
 use App\Models\Frontend;
 use App\Models\Language;
-use App\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Inertia\Middleware;
@@ -90,12 +90,7 @@ class HandleInertiaRequests extends Middleware
                 'name' => activeTemplateName(),
                 'assetPath' => rtrim(asset(activeTemplate(true)), '/') . '/',
             ],
-            'navigation' => [
-                'pages' => Page::where('is_default', Status::NO)
-                    ->where('tempname', activeTemplate())
-                    ->orderBy('id', 'DESC')
-                    ->get(['id', 'name', 'slug']),
-            ],
+            'navigation' => FrontendNavigation::data(),
             'locale' => [
                 'current' => $currentLang?->code ?? config('app.locale'),
                 'languages' => $languages->map(fn ($lang) => [
