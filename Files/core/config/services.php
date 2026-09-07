@@ -31,4 +31,13 @@ return [
         ],
     ],
 
+    'mymemory' => [
+        'email' => env('MYMEMORY_EMAIL'),
+    ],
+
+    'libretranslate' => [
+        'url' => env('LIBRETRANSLATE_URL'),
+        'key' => env('LIBRETRANSLATE_API_KEY'),
+    ],
+
 ];

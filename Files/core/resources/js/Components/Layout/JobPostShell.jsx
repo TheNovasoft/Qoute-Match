@@ -41,7 +41,6 @@ export default function JobPostShell({ children, pageTitle, guestMode = false, w
                                 </p>
                             </div>
                         )}
-                        {flow && <FlowIntro />}
                         {wizard && <WizardIntro />}
                         {children}
                     </div>
@@ -55,7 +54,6 @@ export default function JobPostShell({ children, pageTitle, guestMode = false, w
             {flow || wizard ? (
                 <section className={`post-job-section${sectionClass} py-4`}>
                     <div className="container container--narrow px-0">
-                        {flow && <FlowIntro />}
                         {wizard && <WizardIntro />}
                         {children}
                     </div>

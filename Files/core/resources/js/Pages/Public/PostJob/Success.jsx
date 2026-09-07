@@ -1,5 +1,13 @@
 import { Link, usePage } from '@inertiajs/react';
+import { useMemo } from 'react';
 import FrontendLayout from '@/Components/Layout/FrontendLayout';
+import JobPostFormTranslateButton from '@/Components/Jobs/JobPostFormTranslateButton';
+import {
+    JobPostFormAutoTranslate,
+    JobPostFormTranslationProvider,
+    useJobPostFormTranslation,
+} from '@/Components/Jobs/JobPostFormTranslationProvider';
+import { collectJobPostSuccessStrings } from '@/utils/jobPostSuccessStrings';
 
 function authQuery(params) {
     const search = new URLSearchParams();
@@ -12,8 +20,9 @@ function authQuery(params) {
     return query ? `?${query}` : '';
 }
 
-export default function Success({ pageTitle, job, buyerLoggedIn }) {
+function SuccessContent({ job, buyerLoggedIn }) {
     const { routes } = usePage().props;
+    const { tx } = useJobPostFormTranslation();
     const needsAccount = Boolean(job?.needsAccount);
     const email = job?.email || '';
     const firstname = job?.firstname || '';
@@ -23,11 +32,20 @@ export default function Success({ pageTitle, job, buyerLoggedIn }) {
     const registerUrl = `/customer/register${authQuery({ email, firstname, lastname, phone })}`;
     const loginUrl = `/customer/login${authQuery({ email })}`;
 
+    const successStrings = useMemo(
+        () => collectJobPostSuccessStrings({ email, title: job?.title }),
+        [email, job?.title],
+    );
+
     return (
-        <FrontendLayout pageTitle={pageTitle}>
+        <>
+            <JobPostFormAutoTranslate strings={successStrings} />
             <section className="post-job-section py-5">
                 <div className="container">
-                    <div className="post-job-success card shadow-sm border-0 mx-auto" style={{ maxWidth: '640px' }}>
+                    <div className="post-job-success card shadow-sm border-0 mx-auto position-relative" style={{ maxWidth: '640px' }}>
+                        <div className="job-flow-translate-one position-absolute top-0 end-0 m-3">
+                            <JobPostFormTranslateButton strings={successStrings} />
+                        </div>
                         <div className="card-body p-4 p-md-5 text-center">
                             <div className="post-job-success__icon mb-3">
                                 <i className="las la-check-circle" aria-hidden="true" />
@@ -35,34 +53,35 @@ export default function Success({ pageTitle, job, buyerLoggedIn }) {
 
                             {needsAccount ? (
                                 <>
-                                    <h1 className="h3 mb-2">Your project is ready</h1>
+                                    <h1 className="h3 mb-2">{tx('Your project is ready')}</h1>
                                     <p className="text-muted mb-4">
-                                        We saved your job details. Create a free account or log in to publish your
-                                        project and start receiving quotes from providers.
+                                        {tx('We saved your job details. Create a free account or log in to publish your project and start receiving quotes from providers.')}
                                         {email && (
                                             <>
                                                 {' '}
-                                                Your email <strong>{email}</strong> will be used for your account.
+                                                {tx('Your email')} <strong>{email}</strong> {tx('will be used for your account.')}
                                             </>
                                         )}
                                     </p>
                                 </>
                             ) : (
                                 <>
-                                    <h1 className="h3 mb-2">Your job has been posted</h1>
+                                    <h1 className="h3 mb-2">{tx('Your job has been posted')}</h1>
                                     <p className="text-muted mb-4">
-                                        {!job.published
-                                            ? 'Your job has been saved as a draft. Log in to your customer dashboard to publish it when you are ready.'
-                                            : job.approved
-                                                ? 'Your request is live on Find Jobs. Providers can now send you quotes. Check your email for confirmation and manage everything from your customer account.'
-                                                : 'Thanks — your request is in review. You will get an email as soon as it is approved and appears on Find Jobs. Manage it anytime from your customer account.'}
+                                        {tx(
+                                            !job.published
+                                                ? 'Your job has been saved as a draft. Log in to your customer dashboard to publish it when you are ready.'
+                                                : job.approved
+                                                    ? 'Your request is live on Find Jobs. Providers can now send you quotes. Check your email for confirmation and manage everything from your customer account.'
+                                                    : 'Thanks — your request is in review. You will get an email as soon as it is approved and appears on Find Jobs. Manage it anytime from your customer account.',
+                                        )}
                                     </p>
                                 </>
                             )}
 
                             {job.title && (
                                 <p className="mb-4">
-                                    <strong>{job.title}</strong>
+                                    <strong>{tx(job.title)}</strong>
                                 </p>
                             )}
 
@@ -70,32 +89,44 @@ export default function Success({ pageTitle, job, buyerLoggedIn }) {
                                 {needsAccount ? (
                                     <>
                                         <Link href={registerUrl} className="btn btn--base">
-                                            Create free account
+                                            {tx('Create free account')}
                                         </Link>
                                         <Link href={loginUrl} className="btn btn-outline--base">
-                                            Log in
+                                            {tx('Log in')}
                                         </Link>
                                     </>
                                 ) : (
                                     buyerLoggedIn && (
                                         <Link href={routes.buyerJobList ?? '/customer/job/post/index'} className="btn btn--base">
-                                            View my jobs
+                                            {tx('View my jobs')}
                                         </Link>
                                     )
                                 )}
                                 {!needsAccount && (
                                     <Link href={routes.freelanceJobs ?? '/jobs'} className="btn btn-outline--base">
-                                        Browse requests
+                                        {tx('Browse requests')}
                                     </Link>
                                 )}
                                 <Link href={routes.home ?? '/'} className="btn btn-outline--dark">
-                                    Back to home
+                                    {tx('Back to home')}
                                 </Link>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
+        </>
+    );
+}
+
+export default function Success({ pageTitle, job, buyerLoggedIn }) {
+    const { formTranslateLocale } = usePage().props;
+
+    return (
+        <FrontendLayout pageTitle={pageTitle}>
+            <JobPostFormTranslationProvider locale={formTranslateLocale}>
+                <SuccessContent job={job} buyerLoggedIn={buyerLoggedIn} />
+            </JobPostFormTranslationProvider>
         </FrontendLayout>
     );
 }

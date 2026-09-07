@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Buyer;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Lib\FormTranslateLocale;
 use App\Lib\GuestJobPostService;
 use App\Lib\QuoteMessagingService;
 use App\Lib\RequestFormService;
@@ -155,6 +156,7 @@ class ManageJobController extends Controller
             'skills' => $skills,
             'currencyText' => gs('cur_text'),
             'wizardPhase' => $this->wizardPhaseForJob($job),
+            'formTranslateLocale' => FormTranslateLocale::forRequest(request()),
         ]);
     }
 

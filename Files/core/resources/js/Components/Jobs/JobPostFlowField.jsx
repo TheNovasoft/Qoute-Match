@@ -1,289 +1,685 @@
 import CbmCalculator from '@/Components/Jobs/CbmCalculator';
+
 import CountryCityFields from '@/Components/Jobs/CountryCityFields';
+
+import { useJobPostFormTranslation } from '@/Components/Jobs/JobPostFormTranslationProvider';
+
 import WizardOptionCard from '@/Components/Jobs/WizardOptionCard';
 
-export default function JobPostFlowField({
-    step,
-    data,
-    errors,
-    categories,
-    loginUrl = '/customer/login',
-    onChange,
-    onSelectSingle,
-    onToggleMulti,
-    onSetCountryCity,
-}) {
-    if (step.type === 'category') {
-        return (
-            <div className="job-wizard-cards">
-                {categories.map((cat) => (
-                    <WizardOptionCard
-                        key={cat.id}
-                        label={cat.name}
-                        selected={String(data.category_id) === String(cat.id)}
-                        onClick={() => onSelectSingle('category_id', String(cat.id))}
-                    />
-                ))}
-            </div>
-        );
+
+
+function FieldError({ message, tx }) {
+    if (!message) {
+        return null;
     }
+
+    return <small className="text-danger d-block mt-1">{tx ? tx(message) : message}</small>;
+}
+
+
+
+function inputClass(hasError) {
+
+    return `form-control form--control${hasError ? ' is-invalid' : ''}`;
+
+}
+
+
+
+export default function JobPostFlowField({
+
+    step,
+
+    data,
+
+    errors,
+
+    categories,
+
+    loginUrl = '/customer/login',
+
+    onChange,
+
+    onSelectSingle,
+
+    onToggleMulti,
+
+    onSetCountryCity,
+
+}) {
+
+    const { tx } = useJobPostFormTranslation();
+
+
+
+    if (step.type === 'category') {
+
+        return (
+
+            <div className="job-wizard-cards">
+
+                {categories.map((cat) => (
+
+                    <WizardOptionCard
+
+                        key={cat.id}
+
+                        label={tx(cat.name)}
+
+                        selected={String(data.category_id) === String(cat.id)}
+
+                        onClick={() => onSelectSingle('category_id', String(cat.id))}
+
+                    />
+
+                ))}
+
+                <FieldError message={errors.category_id} tx={tx} />
+
+            </div>
+
+        );
+
+    }
+
+
 
     if (step.type === 'subcategory') {
+
         const cat = categories.find((c) => String(c.id) === String(data.category_id));
+
         const subs = cat?.subcategories || [];
+
         return (
+
             <div className="job-wizard-cards">
+
                 {subs.map((sub) => (
+
                     <WizardOptionCard
+
                         key={sub.id}
-                        label={sub.name}
+
+                        label={tx(sub.name)}
+
                         selected={String(data.subcategory_id) === String(sub.id)}
+
                         onClick={() => onSelectSingle('subcategory_id', String(sub.id))}
+
                     />
+
                 ))}
+
+                <FieldError message={errors.subcategory_id} tx={tx} />
+
             </div>
+
         );
+
     }
+
+
 
     if (step.type === 'title-description') {
+
         return (
+
             <div className="job-flow-title-desc">
-                <label className="job-flow-title-desc__label">Job title</label>
+
+                <label className="job-flow-title-desc__label">{tx('Job title')}</label>
+
                 <input
+
                     type="text"
-                    className="form-control form--control mb-3"
+
+                    className={`${inputClass(errors.title)} mb-1`}
+
                     value={data.title || ''}
+
                     onChange={(e) => onChange('title', e.target.value, { manual: true })}
+
                 />
-                <label className="job-flow-title-desc__label">Job description</label>
+
+                <FieldError message={errors.title} tx={tx} />
+
+                <label className="job-flow-title-desc__label mt-3">{tx('Job description')}</label>
+
                 <textarea
-                    className="form-control form--control job-flow-textarea"
+
+                    className={`${inputClass(errors.description)} job-flow-textarea`}
+
                     rows={10}
+
                     value={data.description || ''}
+
                     onChange={(e) => onChange('description', e.target.value, { manual: true })}
+
                 />
+
+                <FieldError message={errors.description} tx={tx} />
+
             </div>
+
         );
+
     }
+
+
 
     if (step.type === 'title' || step.type === 'description') {
+
         const isDesc = step.type === 'description';
+
+        const field = isDesc ? 'description' : 'title';
+
         return (
-            <textarea
-                className="form-control form--control job-flow-textarea"
-                rows={isDesc ? 8 : 2}
-                value={data[step.field] || ''}
-                onChange={(e) => onChange(step.field, e.target.value, { manual: true })}
-            />
+
+            <div>
+
+                <textarea
+
+                    className={`${inputClass(errors[field])} job-flow-textarea`}
+
+                    rows={isDesc ? 8 : 2}
+
+                    value={data[field] || ''}
+
+                    onChange={(e) => onChange(field, e.target.value, { manual: true })}
+
+                />
+
+                <FieldError message={errors[field]} tx={tx} />
+
+            </div>
+
         );
+
     }
+
+
 
     if (step.type === 'origin-destination') {
+
         return (
+
             <div className="row g-3 job-flow-route">
+
                 <div className="col-6">
-                    <p className="job-flow-route__label mb-2">From</p>
+
+                    <p className="job-flow-route__label mb-2">{tx('From')}</p>
+
                     <CountryCityFields
+
                         countryValue={data[step.origin.countryField] || ''}
+
                         cityValue={data[step.origin.cityField] || ''}
+
                         onCountryChange={(country) => onSetCountryCity(step.origin.countryField, step.origin.cityField, country)}
+
                         onCityChange={(city) => onChange(step.origin.cityField, city)}
+
                         countryError={errors[step.origin.countryField]}
+
                         cityError={errors[step.origin.cityField]}
+
                     />
+
                 </div>
+
                 <div className="col-6">
-                    <p className="job-flow-route__label mb-2">To</p>
+
+                    <p className="job-flow-route__label mb-2">{tx('To')}</p>
+
                     <CountryCityFields
+
                         countryValue={data[step.destination.countryField] || ''}
+
                         cityValue={data[step.destination.cityField] || ''}
+
                         onCountryChange={(country) => onSetCountryCity(step.destination.countryField, step.destination.cityField, country)}
+
                         onCityChange={(city) => onChange(step.destination.cityField, city)}
+
                         countryError={errors[step.destination.countryField]}
+
                         cityError={errors[step.destination.cityField]}
+
                     />
+
                 </div>
+
             </div>
+
         );
+
     }
+
+
 
     if (step.type === 'contact') {
+
         return (
+
             <div>
+
                 <div className="row g-3">
+
                     <div className="col-md-6">
+
                         <input
+
                             type="text"
-                            className="form-control form--control"
-                            placeholder="Your name"
+
+                            className={inputClass(errors.firstname)}
+
+                            placeholder={tx('Your name')}
+
                             value={data.firstname || ''}
+
                             onChange={(e) => onChange('firstname', e.target.value)}
+
                         />
-                        {errors.firstname && <small className="text-danger">{errors.firstname}</small>}
+
+                        <FieldError message={errors.firstname} tx={tx} />
+
                     </div>
+
                     <div className="col-md-6">
+
                         <input
+
                             type="email"
-                            className="form-control form--control"
-                            placeholder="Email"
+
+                            className={inputClass(errors.email)}
+
+                            placeholder={tx('Email')}
+
                             value={data.email || ''}
+
                             onChange={(e) => onChange('email', e.target.value)}
+
                         />
-                        {errors.email && <small className="text-danger">{errors.email}</small>}
+
+                        <FieldError message={errors.email} tx={tx} />
+
                     </div>
+
                     <div className="col-md-6">
+
                         <input
+
                             type="text"
-                            className="form-control form--control"
-                            placeholder="Phone (optional)"
+
+                            className={inputClass(errors.phone)}
+
+                            placeholder={tx('Phone (optional)')}
+
                             value={data.phone || ''}
+
                             onChange={(e) => onChange('phone', e.target.value)}
+
                         />
+
+                        <FieldError message={errors.phone} tx={tx} />
+
                     </div>
+
                 </div>
+
                 <p className="job-flow-login-prompt mt-3 mb-0">
-                    Already a member?{' '}
-                    <a href={loginUrl}>Log in to your account</a>
+
+                    {tx('Already a member?')}{' '}
+
+                    <a href={loginUrl}>{tx('Log in to your account')}</a>
+
                 </p>
+
             </div>
+
         );
+
     }
+
+
 
     if (step.type === 'cards-single') {
+
         return (
+
             <div className="job-wizard-cards">
+
                 {step.options.map((opt) => (
+
                     <WizardOptionCard
+
                         key={opt.value}
-                        label={opt.label}
+
+                        label={tx(opt.label)}
+
                         selected={String(data[step.field]) === String(opt.value)}
+
                         onClick={() => onSelectSingle(step.field, opt.value)}
+
                     />
+
                 ))}
+
             </div>
+
         );
+
     }
+
+
 
     if (step.type === 'cards-multi') {
+
         const selected = data[step.field] || [];
+
         return (
+
             <div className="job-wizard-cards">
+
                 {step.options.map((opt) => {
+
                     const isSelected = selected.some((item) => String(item) === String(opt.value));
+
                     return (
+
                         <WizardOptionCard
+
                             key={opt.value}
-                            label={opt.label}
+
+                            label={tx(opt.label)}
+
                             selected={isSelected}
+
                             multi
+
                             onClick={() => onToggleMulti(step.field, opt.value)}
+
                         />
+
                     );
+
                 })}
+
             </div>
+
         );
+
     }
+
+
 
     if (step.type === 'country-city') {
+
         return (
+
             <CountryCityFields
+
                 countryValue={data[step.countryField] || ''}
+
                 cityValue={data[step.cityField] || ''}
+
                 onCountryChange={(country) => onSetCountryCity(step.countryField, step.cityField, country)}
+
                 onCityChange={(city) => onChange(step.cityField, city)}
+
                 countryError={errors[step.countryField]}
+
                 cityError={errors[step.cityField]}
+
             />
+
         );
+
     }
+
+
 
     if (step.type === 'cargo-details') {
+
         return (
+
             <div className="row g-3">
+
                 {step.includeContainerType && (
+
                     <div className="col-12">
-                        <label className="job-flow-title-desc__label mb-2">Container type</label>
+
+                        <label className="job-flow-title-desc__label mb-2">{tx('Container type')}</label>
+
                         <div className="job-wizard-cards">
+
                             {[
+
                                 { value: 'Full Container', label: 'Full Container (FCL)' },
+
                                 { value: 'LCL', label: 'LCL (Less than Container Load)' },
+
                             ].map((opt) => (
+
                                 <WizardOptionCard
+
                                     key={opt.value}
-                                    label={opt.label}
+
+                                    label={tx(opt.label)}
+
                                     selected={String(data.container_type) === opt.value}
+
                                     onClick={() => onSelectSingle('container_type', opt.value)}
+
                                 />
+
                             ))}
+
                         </div>
+
                     </div>
+
                 )}
+
                 <div className="col-md-6">
+
                     <input
+
                         type="text"
-                        className="form-control form--control"
-                        placeholder="HS code"
+
+                        className={inputClass(errors[step.hsField])}
+
+                        placeholder={tx('HS code')}
+
                         value={data[step.hsField] || ''}
+
                         onChange={(e) => onChange(step.hsField, e.target.value)}
+
                     />
+
+                    <FieldError message={errors[step.hsField]} tx={tx} />
+
                 </div>
+
                 <div className="col-md-6">
+
                     <input
+
                         type="number"
-                        className="form-control form--control"
-                        placeholder="Weight (kg)"
+
+                        min="0"
+
+                        step="any"
+
+                        className={inputClass(errors[step.weightField])}
+
+                        placeholder={tx('Weight (kg)')}
+
                         value={data[step.weightField] || ''}
+
                         onChange={(e) => onChange(step.weightField, e.target.value)}
+
                     />
+
+                    <FieldError message={errors[step.weightField]} tx={tx} />
+
                 </div>
+
                 <div className="col-12">
+
                     <CbmCalculator
+
                         value={data[step.cbmField] || ''}
+
                         onChange={(v) => onChange(step.cbmField, v)}
+
                         weightKg={data[step.weightField] || ''}
+
                         hideWeightInput
+
                     />
+
+                    <FieldError message={errors[step.cbmField]} tx={tx} />
+
                 </div>
+
             </div>
+
         );
+
     }
+
+
 
     if (step.type === 'cbm') {
+
         return (
-            <CbmCalculator
-                value={data[step.field] || ''}
-                onChange={(v) => onChange(step.field, v)}
-            />
+
+            <div>
+
+                <CbmCalculator
+
+                    value={data[step.field] || ''}
+
+                    onChange={(v) => onChange(step.field, v)}
+
+                    instruction={step.hint ? tx(step.hint) : undefined}
+
+                />
+
+                <FieldError message={errors[step.field]} tx={tx} />
+
+            </div>
+
         );
+
     }
+
+
 
     if (step.type === 'textarea') {
+
         return (
-            <textarea
-                className="form-control form--control job-flow-textarea"
-                rows={4}
-                value={data[step.field] || ''}
-                onChange={(e) => onChange(step.field, e.target.value)}
-            />
+
+            <div>
+
+                <textarea
+
+                    className={`${inputClass(errors[step.field])} job-flow-textarea`}
+
+                    rows={4}
+
+                    value={data[step.field] || ''}
+
+                    onChange={(e) => onChange(step.field, e.target.value)}
+
+                />
+
+                <FieldError message={errors[step.field]} tx={tx} />
+
+            </div>
+
         );
+
     }
+
+
 
     if (step.type === 'file') {
+
         return (
-            <input
-                type="file"
-                className="form-control form--control"
-                onChange={(e) => onChange(step.field, e.target.files[0] || null)}
-            />
+
+            <div>
+
+                <input
+
+                    type="file"
+
+                    className={inputClass(errors[step.field])}
+
+                    onChange={(e) => onChange(step.field, e.target.files[0] || null)}
+
+                />
+
+                <FieldError message={errors[step.field]} tx={tx} />
+
+            </div>
+
         );
+
     }
 
+
+
+    if (step.type === 'number' || step.type === 'date') {
+
+        return (
+
+            <div>
+
+                <input
+
+                    type={step.type}
+
+                    className={inputClass(errors[step.field])}
+
+                    value={data[step.field] || ''}
+
+                    onChange={(e) => onChange(step.field, e.target.value)}
+
+                />
+
+                <FieldError message={errors[step.field]} tx={tx} />
+
+            </div>
+
+        );
+
+    }
+
+
+
     return (
-        <input
-            type={step.type === 'number' ? 'number' : step.type === 'date' ? 'date' : 'text'}
-            className="form-control form--control"
-            value={data[step.field] || ''}
-            onChange={(e) => onChange(step.field, e.target.value)}
-        />
+
+        <div>
+
+            <input
+
+                type={step.type === 'email' ? 'email' : 'text'}
+
+                className={inputClass(errors[step.field])}
+
+                value={data[step.field] || ''}
+
+                onChange={(e) => onChange(step.field, e.target.value)}
+
+            />
+
+            <FieldError message={errors[step.field]} tx={tx} />
+
+        </div>
+
     );
+
 }
+
+

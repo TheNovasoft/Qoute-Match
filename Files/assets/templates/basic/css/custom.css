@@ -4548,6 +4548,292 @@ h6.mb-2 {
   }
 }
 
+.job-flow-translate-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.05rem;
+  border: 1px solid hsl(var(--base) / 0.18);
+  border-radius: 14px;
+  background: linear-gradient(135deg, hsl(var(--base) / 0.07), hsl(var(--section-bg) / 0.55));
+}
+
+.job-flow-translate-bar__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: hsl(var(--base) / 0.12);
+  color: hsl(var(--base));
+  font-size: 1.35rem;
+  flex: 0 0 auto;
+}
+
+.job-flow-translate-bar__main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.job-flow-translate-bar__row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.job-flow-translate-bar__label {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: hsl(var(--heading-color));
+}
+
+.job-flow-translate-bar__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  background: hsl(var(--base) / 0.14);
+  color: hsl(var(--base));
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.job-flow-translate-bar__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.job-flow-translate-bar__btn {
+  min-width: 180px;
+}
+
+.job-flow-translate-bar__select {
+  width: auto;
+  min-width: 210px;
+  max-width: 100%;
+}
+
+.job-flow-translate-bar__auto-btn {
+  border: 0;
+  background: transparent;
+  color: hsl(var(--base));
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.job-flow-translate-bar__auto-btn:hover {
+  color: hsl(var(--heading-color));
+}
+
+.job-flow-translate-bar__hint {
+  display: block;
+  margin-top: 0.45rem;
+  color: hsl(var(--body-color) / 0.78);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.job-flow-translate-one {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+}
+
+.job-flow-translate-one__btn {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.65rem;
+}
+
+.post-job-flow-intro.position-relative {
+  padding-top: 0.15rem;
+  padding-right: 6.5rem;
+}
+
+@media (max-width: 575px) {
+  .post-job-flow-intro.position-relative {
+    padding-right: 0;
+    padding-top: 2.1rem;
+  }
+
+  .job-flow-translate-one {
+    top: 0;
+    right: 50%;
+    transform: translateX(50%);
+  }
+}
+
+.translatable-line {
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  max-width: 100%;
+}
+
+.translatable-line--block {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.translatable-line__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+
+.translatable-line__btn,
+.translatable-field__btn {
+  flex: 0 0 auto;
+  border: 1px solid hsl(var(--base) / 0.35);
+  background: #fff;
+  color: hsl(var(--base));
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.35;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.translatable-line__btn:hover:not(:disabled),
+.translatable-field__btn:hover:not(:disabled) {
+  border-color: hsl(var(--base));
+  background: hsl(var(--base) / 0.08);
+}
+
+.translatable-line__btn:disabled,
+.translatable-field__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.job-wizard-card__label .translatable-line {
+  display: flex;
+  width: 100%;
+}
+
+.post-job-flow-intro .translatable-line--block {
+  justify-content: center;
+  text-align: left;
+}
+
+.post-job-flow-intro .translatable-line__text {
+  text-align: center;
+}
+
+.job-flow-step__question.translatable-line--block,
+.job-flow-step__hint.translatable-line--block {
+  margin-bottom: 0.35rem;
+}
+
+.translatable-field {
+  width: 100%;
+}
+
+.translatable-field__control {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.translatable-field__control input,
+.translatable-field__control textarea {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.translatable-field__panel {
+  margin-top: 0.5rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid hsl(var(--base) / 0.25);
+  border-radius: 10px;
+  background: hsl(var(--base) / 0.05);
+}
+
+.translatable-field__panel-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: hsl(var(--base));
+}
+
+.translatable-field__panel-text {
+  color: hsl(var(--heading-color));
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.translatable-field__btn,
+.translatable-text__btn {
+  flex: 0 0 auto;
+  border: 1px solid hsl(var(--border-color) / 0.65);
+  background: #fff;
+  color: hsl(var(--base));
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.translatable-field__btn:hover:not(:disabled),
+.translatable-text__btn:hover:not(:disabled) {
+  border-color: hsl(var(--base));
+  background: hsl(var(--base) / 0.06);
+}
+
+.translatable-field__btn:disabled,
+.translatable-text__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.translatable-text {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+}
+
+.translatable-text--inline {
+  display: inline-flex;
+}
+
+.translatable-text__content {
+  display: inline;
+}
+
+.translatable-text__error {
+  display: block;
+  width: 100%;
+  color: #dc3545;
+  font-size: 0.75rem;
+}
+
+.job-wizard-card__label .translatable-text,
+.job-wizard-card__desc .translatable-text {
+  align-items: center;
+}
+
 /* Skill tags — readable padding (Bootstrap .badge was crushing them) */
 .skill-pill,
 .skill-expert-wrapper .badge,
