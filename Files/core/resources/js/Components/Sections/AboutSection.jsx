@@ -1,6 +1,6 @@
 export default function AboutSection({ data }) {
     return (
-        <div className="about-section my-120">
+        <div className="about-section my-120" id="about">
             <div className="container">
                 <div className="row gy-4 align-items-center">
                     <div className="col-lg-5 pe-xl-5">

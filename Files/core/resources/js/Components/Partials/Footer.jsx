@@ -3,7 +3,6 @@ import { quotePostUrl } from '@/utils/quotePostUrl';
 
 export default function Footer() {
     const { site, navigation, routes, auth, footerData: data = {} } = usePage().props;
-    const pages = navigation?.pages || [];
     const postJobUrl = quotePostUrl(routes, auth);
 
     return (
@@ -37,18 +36,27 @@ export default function Footer() {
                         <h5 className="footer-item__title">Navigation</h5>
                         <ul className="footer-menu">
                             <li className="footer-menu__item"><Link href={routes.home} className="footer-menu__link">Home</Link></li>
-                            <li className="footer-menu__item"><Link href={routes.categories} className="footer-menu__link">Categories</Link></li>
-                            <li className="footer-menu__item"><Link href={routes.locations} className="footer-menu__link">Locations</Link></li>
-                            <li className="footer-menu__item"><Link href={routes.freelanceJobs} className="footer-menu__link">Browse Requests</Link></li>
-                            <li className="footer-menu__item"><Link href={routes.allFreelancers} className="footer-menu__link">Find Providers</Link></li>
-                            {pages.map((page) => (
+                            <li className="footer-menu__item">
+                                <Link
+                                    href={navigation?.aboutPage ? `/${navigation.aboutPage.slug}` : `${routes.home}#about`}
+                                    className="footer-menu__link"
+                                >
+                                    {navigation?.aboutPage?.name || 'About'}
+                                </Link>
+                            </li>
+                            <li className="footer-menu__item"><Link href={routes.categories} className="footer-menu__link">Category</Link></li>
+                            <li className="footer-menu__item"><Link href={routes.blogs} className="footer-menu__link">Blogs</Link></li>
+                            <li className="footer-menu__item"><Link href={routes.contact} className="footer-menu__link">Contact</Link></li>
+                            {(navigation?.extraLinks || []).map((item) => (
+                                <li key={item.href} className="footer-menu__item">
+                                    <Link href={item.href} className="footer-menu__link">{item.label}</Link>
+                                </li>
+                            ))}
+                            {(navigation?.extraPages || navigation?.pages || []).map((page) => (
                                 <li key={page.id} className="footer-menu__item">
                                     <Link href={`/${page.slug}`} className="footer-menu__link">{page.name}</Link>
                                 </li>
                             ))}
-                            <li className="footer-menu__item"><Link href={routes.blogs} className="footer-menu__link">Blogs</Link></li>
-                            <li className="footer-menu__item"><Link href={routes.contact} className="footer-menu__link">Contact Us</Link></li>
-                            <li className="footer-menu__item"><Link href={routes.faq ?? '/faq'} className="footer-menu__link">FAQ</Link></li>
                         </ul>
                     </div>
 

@@ -3,9 +3,9 @@
 namespace App\Http\Middleware;
 
 use App\Constants\Status;
+use App\Lib\FrontendNavigation;
 use Closure;
 use Illuminate\Http\Request;
-use App\Models\Page;
 use Illuminate\Support\Facades\View;
 
 class ActiveTemplateMiddleware {
@@ -19,8 +19,12 @@ class ActiveTemplateMiddleware {
     public function handle(Request $request, Closure $next) {
 
         view()->composer(['Template::partials.header', 'Template::partials.footer'], function ($view) {
+            $navigation = FrontendNavigation::data();
             $view->with([
-                'pages' => Page::where('is_default', Status::NO)->where('tempname', activeTemplate())->orderBy('id', 'DESC')->get()
+                'pages' => $navigation['pages'],
+                'aboutPage' => $navigation['aboutPage'],
+                'extraPages' => $navigation['extraPages'],
+                'extraLinks' => $navigation['extraLinks'],
             ]);
         });
 
