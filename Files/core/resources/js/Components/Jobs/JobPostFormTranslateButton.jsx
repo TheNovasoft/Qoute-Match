@@ -1,7 +1,7 @@
 import { useJobPostFormTranslation } from '@/Components/Jobs/JobPostFormTranslationProvider';
 
 export default function JobPostFormTranslateButton({ strings = [] }) {
-    const { active, loading, error, langLabel, translateForm } = useJobPostFormTranslation();
+    const { active, loading, error, langLabel, translateForm, tx } = useJobPostFormTranslation();
 
     return (
         <div className="job-flow-translate-one">
@@ -13,7 +13,11 @@ export default function JobPostFormTranslateButton({ strings = [] }) {
             >
                 {loading ? '…' : active ? 'Original' : `Translate (${langLabel})`}
             </button>
-            {error && <small className="text-danger d-block mt-1">{error}</small>}
+            {error && (
+                <small className={`d-block mt-1 ${error === 'Translation service is busy. Form labels are shown in Urdu where available.' ? 'text-warning' : 'text-danger'}`}>
+                    {tx(error)}
+                </small>
+            )}
         </div>
     );
 }

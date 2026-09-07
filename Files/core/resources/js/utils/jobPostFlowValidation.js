@@ -1,3 +1,5 @@
+import { VALIDATION_MSG } from '@/utils/jobPostValidationMessages';
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const URL_RE = /^https?:\/\/.+/i;
 
@@ -30,14 +32,14 @@ export function validateStep(step, data) {
 
     if (step.type === 'category') {
         if (!data.category_id) {
-            setError(errors, 'category_id', 'Please choose a category.');
+            setError(errors, 'category_id', VALIDATION_MSG.CHOOSE_CATEGORY);
         }
         return { valid: Object.keys(errors).length === 0, errors };
     }
 
     if (step.type === 'subcategory') {
         if (!data.subcategory_id) {
-            setError(errors, 'subcategory_id', 'Please choose a speciality.');
+            setError(errors, 'subcategory_id', VALIDATION_MSG.CHOOSE_SPECIALITY);
         }
         return { valid: Object.keys(errors).length === 0, errors };
     }
@@ -47,17 +49,17 @@ export function validateStep(step, data) {
         const description = trim(data.description);
 
         if (!title) {
-            setError(errors, 'title', 'Job title is required.');
+            setError(errors, 'title', VALIDATION_MSG.TITLE_REQUIRED);
         } else if (title.length < 3) {
-            setError(errors, 'title', 'Job title must be at least 3 characters.');
+            setError(errors, 'title', VALIDATION_MSG.TITLE_MIN);
         } else if (title.length > 255) {
-            setError(errors, 'title', 'Job title must be 255 characters or less.');
+            setError(errors, 'title', VALIDATION_MSG.TITLE_MAX);
         }
 
         if (!description) {
-            setError(errors, 'description', 'Job description is required.');
+            setError(errors, 'description', VALIDATION_MSG.DESCRIPTION_REQUIRED);
         } else if (description.length < 20) {
-            setError(errors, 'description', 'Please add a bit more detail (at least 20 characters).');
+            setError(errors, 'description', VALIDATION_MSG.DESCRIPTION_MIN);
         }
 
         return { valid: Object.keys(errors).length === 0, errors };
@@ -65,14 +67,14 @@ export function validateStep(step, data) {
 
     if (step.type === 'title') {
         if (!trim(data.title)) {
-            setError(errors, 'title', 'Job title is required.');
+            setError(errors, 'title', VALIDATION_MSG.TITLE_REQUIRED);
         }
         return { valid: Object.keys(errors).length === 0, errors };
     }
 
     if (step.type === 'description') {
         if (!trim(data.description)) {
-            setError(errors, 'description', 'Job description is required.');
+            setError(errors, 'description', VALIDATION_MSG.DESCRIPTION_REQUIRED);
         }
         return { valid: Object.keys(errors).length === 0, errors };
     }
@@ -83,21 +85,21 @@ export function validateStep(step, data) {
         const phone = trim(data.phone);
 
         if (!name) {
-            setError(errors, 'firstname', 'Your name is required.');
+            setError(errors, 'firstname', VALIDATION_MSG.NAME_REQUIRED);
         } else if (name.length > 40) {
-            setError(errors, 'firstname', 'Name must be 40 characters or less.');
+            setError(errors, 'firstname', VALIDATION_MSG.NAME_MAX);
         }
 
         if (!email) {
-            setError(errors, 'email', 'Email is required.');
+            setError(errors, 'email', VALIDATION_MSG.EMAIL_REQUIRED);
         } else if (!EMAIL_RE.test(email)) {
-            setError(errors, 'email', 'Please enter a valid email address.');
+            setError(errors, 'email', VALIDATION_MSG.EMAIL_INVALID);
         } else if (email.length > 100) {
-            setError(errors, 'email', 'Email must be 100 characters or less.');
+            setError(errors, 'email', VALIDATION_MSG.EMAIL_MAX);
         }
 
         if (phone && phone.length > 30) {
-            setError(errors, 'phone', 'Phone must be 30 characters or less.');
+            setError(errors, 'phone', VALIDATION_MSG.PHONE_MAX);
         }
 
         return { valid: Object.keys(errors).length === 0, errors };
@@ -106,10 +108,10 @@ export function validateStep(step, data) {
     if (step.type === 'country-city') {
         if (step.required !== false) {
             if (!trim(data[step.countryField])) {
-                setError(errors, step.countryField, 'Please select a country.');
+                setError(errors, step.countryField, VALIDATION_MSG.COUNTRY_REQUIRED);
             }
             if (!trim(data[step.cityField])) {
-                setError(errors, step.cityField, 'Please select or enter a city.');
+                setError(errors, step.cityField, VALIDATION_MSG.CITY_REQUIRED);
             }
         }
         return { valid: Object.keys(errors).length === 0, errors };
@@ -118,16 +120,16 @@ export function validateStep(step, data) {
     if (step.type === 'origin-destination') {
         if (step.required !== false) {
             if (!trim(data[step.origin.countryField])) {
-                setError(errors, step.origin.countryField, 'Please select an origin country.');
+                setError(errors, step.origin.countryField, VALIDATION_MSG.ORIGIN_COUNTRY_REQUIRED);
             }
             if (!trim(data[step.origin.cityField])) {
-                setError(errors, step.origin.cityField, 'Please select or enter an origin city.');
+                setError(errors, step.origin.cityField, VALIDATION_MSG.ORIGIN_CITY_REQUIRED);
             }
             if (!trim(data[step.destination.countryField])) {
-                setError(errors, step.destination.countryField, 'Please select a destination country.');
+                setError(errors, step.destination.countryField, VALIDATION_MSG.DESTINATION_COUNTRY_REQUIRED);
             }
             if (!trim(data[step.destination.cityField])) {
-                setError(errors, step.destination.cityField, 'Please select or enter a destination city.');
+                setError(errors, step.destination.cityField, VALIDATION_MSG.DESTINATION_CITY_REQUIRED);
             }
         }
         return { valid: Object.keys(errors).length === 0, errors };
@@ -135,25 +137,25 @@ export function validateStep(step, data) {
 
     if (step.type === 'cargo-details') {
         if (step.includeContainerType && !trim(data.container_type)) {
-            setError(errors, 'container_type', 'Please choose a container type.');
+            setError(errors, 'container_type', VALIDATION_MSG.CONTAINER_REQUIRED);
         }
 
         if (step.hsMeta?.isRequired && !trim(data[step.hsField])) {
-            setError(errors, step.hsField, 'HS code is required.');
+            setError(errors, step.hsField, VALIDATION_MSG.HS_REQUIRED);
         } else if (trim(data[step.hsField]) && !/^[\d.\s-]{2,20}$/.test(trim(data[step.hsField]))) {
-            setError(errors, step.hsField, 'Please enter a valid HS code.');
+            setError(errors, step.hsField, VALIDATION_MSG.HS_INVALID);
         }
 
         const weightRaw = data[step.weightField];
         const weightText = trim(weightRaw);
         if (step.weightMeta?.isRequired && weightText === '') {
-            setError(errors, step.weightField, 'Weight is required.');
+            setError(errors, step.weightField, VALIDATION_MSG.WEIGHT_REQUIRED);
         } else if (weightText !== '' && (Number.isNaN(Number(weightRaw)) || Number(weightRaw) <= 0)) {
-            setError(errors, step.weightField, 'Please enter a valid weight in kg.');
+            setError(errors, step.weightField, VALIDATION_MSG.WEIGHT_INVALID);
         }
 
         if (step.cbmMeta?.isRequired && !trim(data[step.cbmField])) {
-            setError(errors, step.cbmField, 'Please enter cargo dimensions or volume.');
+            setError(errors, step.cbmField, VALIDATION_MSG.CBM_REQUIRED);
         }
 
         return { valid: Object.keys(errors).length === 0, errors };
@@ -169,21 +171,21 @@ export function validateStep(step, data) {
     if (step.type === 'cards-multi') {
         const selected = Array.isArray(value) ? value : [];
         if (selected.length < (step.minSelections ?? 1)) {
-            setError(errors, field, 'Please choose at least one option.');
+            setError(errors, field, VALIDATION_MSG.CHOOSE_ONE_OPTION);
         }
         return { valid: Object.keys(errors).length === 0, errors };
     }
 
     if (step.type === 'cards-single') {
         if (isEmpty(value)) {
-            setError(errors, field, 'Please choose an option.');
+            setError(errors, field, VALIDATION_MSG.CHOOSE_OPTION);
         }
         return { valid: Object.keys(errors).length === 0, errors };
     }
 
     if (step.type === 'file') {
         if (step.required && !value) {
-            setError(errors, field, 'Please attach a file.');
+            setError(errors, field, VALIDATION_MSG.FILE_REQUIRED);
         }
         return { valid: Object.keys(errors).length === 0, errors };
     }
@@ -195,9 +197,9 @@ export function validateStep(step, data) {
     if (step.type === 'email') {
         const email = trim(value);
         if (!email) {
-            setError(errors, field, 'This field is required.');
+            setError(errors, field, VALIDATION_MSG.FIELD_REQUIRED);
         } else if (!EMAIL_RE.test(email)) {
-            setError(errors, field, 'Please enter a valid email address.');
+            setError(errors, field, VALIDATION_MSG.EMAIL_INVALID);
         }
         return { valid: Object.keys(errors).length === 0, errors };
     }
@@ -205,18 +207,18 @@ export function validateStep(step, data) {
     if (step.type === 'number') {
         const text = trim(value);
         if (!text) {
-            setError(errors, field, 'This field is required.');
+            setError(errors, field, VALIDATION_MSG.FIELD_REQUIRED);
         } else if (Number.isNaN(Number(value))) {
-            setError(errors, field, 'Please enter a valid number.');
+            setError(errors, field, VALIDATION_MSG.NUMBER_INVALID);
         }
         return { valid: Object.keys(errors).length === 0, errors };
     }
 
     if (step.type === 'date') {
         if (!trim(value)) {
-            setError(errors, field, 'Please choose a date.');
+            setError(errors, field, VALIDATION_MSG.DATE_REQUIRED);
         } else if (Number.isNaN(Date.parse(value))) {
-            setError(errors, field, 'Please enter a valid date.');
+            setError(errors, field, VALIDATION_MSG.DATE_INVALID);
         }
         return { valid: Object.keys(errors).length === 0, errors };
     }
@@ -224,25 +226,25 @@ export function validateStep(step, data) {
     if (step.type === 'textarea' || step.type === 'text') {
         const text = trim(value);
         if (!text) {
-            setError(errors, field, 'This field is required.');
+            setError(errors, field, VALIDATION_MSG.FIELD_REQUIRED);
         } else if (step.type === 'textarea' && text.length < 2) {
-            setError(errors, field, 'Please enter at least 2 characters.');
+            setError(errors, field, VALIDATION_MSG.TEXTAREA_MIN);
         }
         return { valid: Object.keys(errors).length === 0, errors };
     }
 
     if (step.type === 'cbm') {
         if (!trim(value)) {
-            setError(errors, field, 'Please enter dimensions or volume.');
+            setError(errors, field, VALIDATION_MSG.DIMENSIONS_REQUIRED);
         }
         return { valid: Object.keys(errors).length === 0, errors };
     }
 
     const text = trim(value);
     if (!text) {
-        setError(errors, field, 'This field is required.');
+        setError(errors, field, VALIDATION_MSG.FIELD_REQUIRED);
     } else if (step.type === 'url' && !URL_RE.test(text)) {
-        setError(errors, field, 'Please enter a valid URL (starting with http:// or https://).');
+        setError(errors, field, VALIDATION_MSG.URL_INVALID);
     }
 
     return { valid: Object.keys(errors).length === 0, errors };

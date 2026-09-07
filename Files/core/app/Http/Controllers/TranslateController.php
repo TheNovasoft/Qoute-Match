@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Lib\FormTranslationCache;
+use App\Lib\FormStaticTranslations;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,7 +21,7 @@ class TranslateController extends Controller
             'to' => 'nullable|string|max:12',
         ]);
 
-        $from = $this->normalizeLangCode($validated['from'] ?? 'auto');
+        $from = $this->normalizeLangCode($validated['from'] ?? 'en');
         $to = $this->normalizeLangCode($validated['to'] ?? 'en');
         $text = trim($validated['text']);
 
@@ -35,6 +37,8 @@ class TranslateController extends Controller
             ], 503);
         }
 
+        FormTranslationCache::put($from, $to, $text, $translation);
+
         return response()->json(['translation' => $translation]);
     }
 
@@ -47,7 +51,7 @@ class TranslateController extends Controller
             'to' => 'nullable|string|max:12',
         ]);
 
-        $from = $this->normalizeLangCode($validated['from'] ?? 'auto');
+        $from = $this->normalizeLangCode($validated['from'] ?? 'en');
         $to = $this->normalizeLangCode($validated['to'] ?? 'en');
         $texts = collect($validated['texts'])
             ->map(fn ($text) => trim((string) $text))
@@ -62,34 +66,67 @@ class TranslateController extends Controller
             ]);
         }
 
-        $translations = [];
-        $poolSize = 15;
+        $translations = FormTranslationCache::getMany($from, $to, $texts);
+        $pending = array_values(array_filter($texts, fn ($text) => ! array_key_exists($text, $translations)));
 
-        foreach (array_chunk($texts, $poolSize) as $chunk) {
-            $expanded = [];
+        if ($pending !== []) {
+            $poolSize = 15;
 
-            foreach ($chunk as $text) {
-                foreach ($this->splitTextForTranslation($text) as $piece) {
-                    $expanded[] = $piece;
+            foreach (array_chunk($pending, $poolSize) as $chunk) {
+                $expanded = [];
+
+                foreach ($chunk as $text) {
+                    foreach ($this->splitTextForTranslation($text) as $piece) {
+                        $expanded[] = $piece;
+                    }
                 }
-            }
 
-            $pieceTranslations = $this->translateMany($expanded, $from, $to);
-
-            foreach ($chunk as $text) {
-                $pieces = $this->splitTextForTranslation($text);
-                $translated = implode('', array_map(
-                    fn ($piece) => $pieceTranslations[$piece] ?? $piece,
-                    $pieces,
+                $expandedPending = array_values(array_filter(
+                    $expanded,
+                    fn ($piece) => FormTranslationCache::get($from, $to, $piece) === null,
                 ));
+                $pieceTranslations = $expandedPending !== []
+                    ? $this->translateMany($expandedPending, $from, $to)
+                    : [];
 
-                $translations[$text] = ($translated !== '' && $translated !== $text)
-                    ? $translated
-                    : ($this->translateText($text, $from, $to) ?? $text);
+                foreach ($expanded as $piece) {
+                    if (! array_key_exists($piece, $pieceTranslations)) {
+                        $cachedPiece = FormTranslationCache::get($from, $to, $piece);
+                        if ($cachedPiece !== null) {
+                            $pieceTranslations[$piece] = $cachedPiece;
+                        }
+                    }
+                }
+
+                $fresh = [];
+
+                foreach ($chunk as $text) {
+                    $pieces = $this->splitTextForTranslation($text);
+                    $translated = implode('', array_map(
+                        fn ($piece) => $pieceTranslations[$piece] ?? $piece,
+                        $pieces,
+                    ));
+
+                    if ($translated !== '' && $translated !== $text) {
+                        $fresh[$text] = $translated;
+                        continue;
+                    }
+
+                    $fallback = $this->resolveTranslation($text, $from, $to);
+                    $fresh[$text] = $fallback ?? $text;
+                }
+
+                FormTranslationCache::putMany($from, $to, $fresh);
+                $translations = array_merge($translations, $fresh);
             }
         }
 
-        return response()->json(['translations' => $translations]);
+        $meta = $this->buildBatchMeta($texts, $translations, $from, $to);
+
+        return response()->json([
+            'translations' => $translations,
+            'meta' => $meta,
+        ]);
     }
 
     /**
@@ -98,20 +135,32 @@ class TranslateController extends Controller
      */
     private function translateMany(array $texts, string $from, string $to): array
     {
-        $responses = Http::pool(function ($pool) use ($texts, $from, $to) {
-            foreach ($texts as $index => $text) {
-                $pool->as((string) $index)->timeout(12)->get('https://api.mymemory.translated.net/get', [
-                    'q' => $text,
-                    'langpair' => "{$from}|{$to}",
-                ]);
+        if ($texts === []) {
+            return [];
+        }
+
+        $translations = FormTranslationCache::getMany($from, $to, $texts);
+        $pending = array_values(array_filter($texts, fn ($text) => ! array_key_exists($text, $translations)));
+
+        if ($pending === []) {
+            return $translations;
+        }
+
+        $responses = Http::pool(function ($pool) use ($pending, $from, $to) {
+            foreach ($pending as $index => $text) {
+                $pool->as((string) $index)->timeout(12)->get('https://api.mymemory.translated.net/get', $this->myMemoryQuery($text, $from, $to));
             }
         });
 
-        $translations = [];
-
-        foreach ($texts as $index => $text) {
+        foreach ($pending as $index => $text) {
             $translation = $this->extractTranslation($responses[(string) $index] ?? null);
-            $translations[$text] = $translation ?? $text;
+
+            if ($translation === null || $translation === $text) {
+                $translation = $this->resolveTranslation($text, $from, $to) ?? $text;
+            }
+
+            $translations[$text] = $translation;
+            FormTranslationCache::put($from, $to, $text, $translation);
         }
 
         return $translations;
@@ -209,13 +258,113 @@ class TranslateController extends Controller
             || str_contains($upper, 'PLEASE USE POST INSTEAD');
     }
 
+    private function resolveTranslation(string $text, string $from, string $to): ?string
+    {
+        if ($text === '') {
+            return '';
+        }
+
+        $static = FormStaticTranslations::get($to, $text);
+        if ($static !== null && $static !== $text) {
+            return $static;
+        }
+
+        return $this->fetchFromLibreTranslate($text, $from, $to);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function myMemoryQuery(string $text, string $from, string $to): array
+    {
+        $query = [
+            'q' => $text,
+            'langpair' => $this->sourceLangForApi($from).'|'.$to,
+        ];
+
+        $email = config('services.mymemory.email');
+        if (is_string($email) && $email !== '') {
+            $query['de'] = $email;
+        }
+
+        return $query;
+    }
+
+    private function fetchFromLibreTranslate(string $text, string $from, string $to): ?string
+    {
+        $url = config('services.libretranslate.url');
+        if (! is_string($url) || $url === '') {
+            return null;
+        }
+
+        $source = $this->sourceLangForApi($from);
+        $target = strtolower($to) === 'zh-cn' ? 'zh' : $to;
+
+        $payload = [
+            'q' => $text,
+            'source' => $source,
+            'target' => $target,
+            'format' => 'text',
+        ];
+
+        $apiKey = config('services.libretranslate.key');
+        if (is_string($apiKey) && $apiKey !== '') {
+            $payload['api_key'] = $apiKey;
+        }
+
+        $response = Http::timeout(15)->post(rtrim($url, '/').'/translate', $payload);
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        $translation = data_get($response->json(), 'translatedText');
+
+        return is_string($translation) && trim($translation) !== '' && $translation !== $text
+            ? $translation
+            : null;
+    }
+
+    private function sourceLangForApi(string $from): string
+    {
+        $code = strtolower(trim($from));
+
+        if (in_array($code, ['auto', 'autodetect'], true)) {
+            return 'en';
+        }
+
+        return $code === 'zh-cn' ? 'zh-CN' : $from;
+    }
+
+    /**
+     * @param  array<int, string>  $texts
+     * @param  array<string, string>  $translations
+     * @return array<string, mixed>
+     */
+    private function buildBatchMeta(array $texts, array $translations, string $from, string $to): array
+    {
+        $changed = 0;
+        foreach ($texts as $text) {
+            $translation = $translations[$text] ?? $text;
+            if ($translation !== $text) {
+                $changed++;
+            }
+        }
+
+        return [
+            'changed' => $changed,
+            'total' => count($texts),
+            'used_static_fallback' => $changed > 0 && FormStaticTranslations::getMany($to, $texts) !== [],
+        ];
+    }
+
     private function normalizeLangCode(string $code): string
     {
         $code = strtolower(trim($code));
 
         return match ($code) {
             'zh', 'zh-cn' => 'zh-CN',
-            'auto', 'autodetect' => 'Autodetect',
+            'auto', 'autodetect' => 'en',
             default => $code,
         };
     }
@@ -224,6 +373,11 @@ class TranslateController extends Controller
     {
         if ($text === '') {
             return '';
+        }
+
+        $cached = FormTranslationCache::get($from, $to, $text);
+        if ($cached !== null) {
+            return $cached;
         }
 
         $chunks = $this->splitTextForTranslation($text);
@@ -239,6 +393,9 @@ class TranslateController extends Controller
             $translatedChunks[] = $result;
         }
 
-        return implode('', $translatedChunks);
+        $translation = implode('', $translatedChunks);
+        FormTranslationCache::put($from, $to, $text, $translation);
+
+        return $translation;
     }
 }

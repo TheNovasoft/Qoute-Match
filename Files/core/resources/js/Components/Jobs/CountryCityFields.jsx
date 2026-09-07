@@ -30,7 +30,7 @@ export default function CountryCityFields({
                         </option>
                     ))}
                 </select>
-                {countryError && <small className="text-danger d-block mt-1">{countryError}</small>}
+                {countryError && <small className="text-danger d-block mt-1">{tx(countryError)}</small>}
             </div>
             <div className="col-12">
                 <label className="form-label">{tx('City')}</label>
@@ -59,7 +59,7 @@ export default function CountryCityFields({
                         ))}
                     </select>
                 )}
-                {cityError && <small className="text-danger d-block mt-1">{cityError}</small>}
+                {cityError && <small className="text-danger d-block mt-1">{tx(cityError)}</small>}
             </div>
         </div>
     );

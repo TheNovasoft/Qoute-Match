@@ -1,6 +1,15 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { detectLanguageFromBrowser } from '@/utils/formTranslateLanguages';
 import { translateBatch } from '@/utils/translateClient';
+import {
+    clearTranslationSession,
+    loadTranslationSession,
+    saveTranslationSession,
+} from '@/utils/jobPostTranslationSession';
+
+const TRANSLATE_ERROR = 'Could not translate. Try again.';
+const TRANSLATE_BUSY = 'Translation service is busy. Form labels are shown in Urdu where available.';
+const BATCH_SIZE = 40;
 
 const JobPostFormTranslationContext = createContext(null);
 
@@ -24,16 +33,38 @@ function countChangedTranslations(map) {
     )).length;
 }
 
+async function translateAllStrings(strings, targetLang) {
+    const unique = [...new Set((strings || []).map((item) => String(item || '').trim()).filter(Boolean))];
+    if (!unique.length) {
+        return {};
+    }
+
+    let merged = {};
+
+    for (let index = 0; index < unique.length; index += BATCH_SIZE) {
+        const chunk = unique.slice(index, index + BATCH_SIZE);
+        const chunkMap = await translateBatch(chunk, targetLang);
+        merged = { ...merged, ...chunkMap };
+    }
+
+    return merged;
+}
+
+function readInitialSession() {
+    return loadTranslationSession();
+}
+
 export function JobPostFormTranslationProvider({ locale, children }) {
-    const targetLang = resolveTargetLang(locale);
+    const initialSession = useMemo(() => readInitialSession(), []);
+    const targetLang = initialSession?.targetLang || resolveTargetLang(locale);
     const langLabel = locale?.lang && locale.lang !== 'en'
         ? locale.lang_label
         : (targetLang === 'ur' ? 'Urdu' : locale?.lang_label || 'Urdu');
 
-    const [active, setActive] = useState(false);
+    const [active, setActive] = useState(() => Boolean(initialSession?.translations && countChangedTranslations(initialSession.translations)));
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [translations, setTranslations] = useState({});
+    const [translations, setTranslations] = useState(() => initialSession?.translations || {});
     const requestIdRef = useRef(0);
 
     const tx = useCallback((text) => {
@@ -45,15 +76,44 @@ export function JobPostFormTranslationProvider({ locale, children }) {
         return translations[key] ?? text;
     }, [active, translations]);
 
+    const applyTranslations = useCallback((map, lang = targetLang) => {
+        setTranslations(map);
+        setActive(countChangedTranslations(map) > 0);
+        if (countChangedTranslations(map) > 0) {
+            saveTranslationSession(lang, map);
+        } else {
+            clearTranslationSession();
+        }
+    }, [targetLang]);
+
+    const ensureTranslated = useCallback(async (strings) => {
+        const unique = [...new Set((strings || []).map((item) => String(item || '').trim()).filter(Boolean))];
+        if (!unique.length) {
+            return;
+        }
+
+        try {
+            const map = await translateAllStrings(unique, targetLang);
+            if (!countChangedTranslations(map)) {
+                return;
+            }
+
+            setTranslations((current) => {
+                const next = { ...current, ...map };
+                saveTranslationSession(targetLang, next);
+                return next;
+            });
+            setActive(true);
+        } catch {
+            // Keep existing translations when supplemental batch fails.
+        }
+    }, [targetLang]);
+
     const translateForm = useCallback(async (strings) => {
         if (active) {
             setActive(false);
             setError('');
-            return;
-        }
-
-        const unique = [...new Set((strings || []).map((item) => String(item || '').trim()).filter(Boolean))];
-        if (!unique.length) {
+            clearTranslationSession();
             return;
         }
 
@@ -61,37 +121,23 @@ export function JobPostFormTranslationProvider({ locale, children }) {
         setLoading(true);
         setError('');
 
-        const priorityCount = Math.min(unique.length, 40);
-        const priority = unique.slice(0, priorityCount);
-        const remainder = unique.slice(priorityCount);
-
         try {
-            const priorityMap = await translateBatch(priority, targetLang);
+            const allMap = await translateAllStrings(strings, targetLang);
 
             if (requestId !== requestIdRef.current) {
                 return;
             }
 
-            if (!countChangedTranslations(priorityMap)) {
+            if (!countChangedTranslations(allMap)) {
                 throw new Error('Translation returned no changes');
             }
 
-            setTranslations(priorityMap);
-            setActive(true);
-            setLoading(false);
+            applyTranslations(allMap, targetLang);
 
-            if (remainder.length) {
-                try {
-                    const restMap = await translateBatch(remainder, targetLang);
-
-                    if (requestId !== requestIdRef.current) {
-                        return;
-                    }
-
-                    setTranslations((current) => ({ ...current, ...restMap }));
-                } catch {
-                    // Keep partial translations visible when background batch fails.
-                }
+            const uniqueCount = new Set((strings || []).map((item) => String(item || '').trim()).filter(Boolean)).size;
+            const changedCount = countChangedTranslations(allMap);
+            if (uniqueCount > 0 && changedCount / uniqueCount < 0.75) {
+                setError(TRANSLATE_BUSY);
             }
         } catch {
             if (requestId !== requestIdRef.current) {
@@ -99,10 +145,14 @@ export function JobPostFormTranslationProvider({ locale, children }) {
             }
 
             setActive(false);
-            setError('Could not translate. Try again.');
-            setLoading(false);
+            setError(TRANSLATE_ERROR);
+            clearTranslationSession();
+        } finally {
+            if (requestId === requestIdRef.current) {
+                setLoading(false);
+            }
         }
-    }, [active, targetLang]);
+    }, [active, targetLang, applyTranslations]);
 
     const value = useMemo(() => ({
         locale,
@@ -113,7 +163,8 @@ export function JobPostFormTranslationProvider({ locale, children }) {
         error,
         tx,
         translateForm,
-    }), [locale, targetLang, langLabel, active, loading, error, tx, translateForm]);
+        ensureTranslated,
+    }), [locale, targetLang, langLabel, active, loading, error, tx, translateForm, ensureTranslated]);
 
     return (
         <JobPostFormTranslationContext.Provider value={value}>
@@ -134,5 +185,20 @@ export function useJobPostFormTranslation() {
         error: '',
         tx: (text) => text,
         translateForm: async () => {},
+        ensureTranslated: async () => {},
     };
+}
+
+export function JobPostFormAutoTranslate({ strings = [] }) {
+    const { active, ensureTranslated } = useJobPostFormTranslation();
+
+    useEffect(() => {
+        if (!active || !strings.length) {
+            return;
+        }
+
+        ensureTranslated(strings);
+    }, [active, strings, ensureTranslated]);
+
+    return null;
 }

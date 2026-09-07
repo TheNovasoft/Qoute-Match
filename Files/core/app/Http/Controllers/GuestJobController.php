@@ -410,6 +410,7 @@ class GuestJobController extends Controller
             'pageTitle' => 'Job Posted Successfully',
             'job' => $payload,
             'buyerLoggedIn' => Auth::guard('buyer')->check(),
+            'formTranslateLocale' => FormTranslateLocale::forRequest(request()),
         ]);
     }
 

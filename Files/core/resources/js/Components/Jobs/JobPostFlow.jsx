@@ -488,7 +488,7 @@ function JobPostFlowInner({
                             {tx('Edit')}
                         </button>
                     </div>
-                    <p className="job-flow-review__value">{summarizeStep(step, flowData, categories)}</p>
+                    <p className="job-flow-review__value">{tx(summarizeStep(step, flowData, categories))}</p>
                 </div>
             ))}
             <button
@@ -545,7 +545,7 @@ function JobPostFlowInner({
                                         {tx('Edit')}
                                     </button>
                                 </div>
-                                <p className="job-flow-step__done-value">{summarizeStep(step, flowData, categories)}</p>
+                                <p className="job-flow-step__done-value">{tx(summarizeStep(step, flowData, categories))}</p>
                             </section>
                         );
                     }
@@ -591,16 +591,16 @@ function JobPostFlowInner({
                                     }}
                                 />
                                 {step.type === 'cards-single' && fieldErrors[step.field] && (
-                                    <small className="text-danger d-block mt-2">{fieldErrors[step.field]}</small>
+                                    <small className="text-danger d-block mt-2">{tx(fieldErrors[step.field])}</small>
                                 )}
                                 {step.type === 'cards-multi' && fieldErrors[step.field] && (
-                                    <small className="text-danger d-block mt-2">{fieldErrors[step.field]}</small>
+                                    <small className="text-danger d-block mt-2">{tx(fieldErrors[step.field])}</small>
                                 )}
                                 {step.type === 'cargo-details' && fieldErrors.container_type && (
-                                    <small className="text-danger d-block mt-2">{fieldErrors.container_type}</small>
+                                    <small className="text-danger d-block mt-2">{tx(fieldErrors.container_type)}</small>
                                 )}
                                 {step.field && !['cards-single', 'cards-multi', 'title-description', 'contact', 'cargo-details', 'origin-destination', 'country-city'].includes(step.type) && fieldErrors[step.field] && (
-                                    <small className="text-danger d-block mt-2">{fieldErrors[step.field]}</small>
+                                    <small className="text-danger d-block mt-2">{tx(fieldErrors[step.field])}</small>
                                 )}
                             </div>
                             {step.type !== 'review' && !AUTO_ADVANCE_TYPES.has(step.type) && (

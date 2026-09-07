@@ -1,3 +1,9 @@
+import { CBM_UI_STRINGS } from '@/utils/jobPostCbmStrings';
+import { JOB_POST_DYNAMIC_FORM_STRINGS } from '@/utils/jobPostDynamicFormStrings';
+import { JOB_POST_FLOW_UI_STRINGS } from '@/utils/jobPostFlowUiStrings';
+import { JOB_POST_SUCCESS_STRINGS } from '@/utils/jobPostSuccessStrings';
+import { ALL_VALIDATION_MESSAGES } from '@/utils/jobPostValidationMessages';
+
 function addString(set, value) {
     const text = String(value ?? '').trim();
     if (text) {
@@ -14,6 +20,12 @@ export function collectJobPostFormStrings({
 }) {
     const priority = new Set();
     const strings = new Set();
+
+    ALL_VALIDATION_MESSAGES.forEach((text) => addString(strings, text));
+    CBM_UI_STRINGS.forEach((text) => addString(strings, text));
+    JOB_POST_FLOW_UI_STRINGS.forEach((text) => addString(strings, text));
+    JOB_POST_DYNAMIC_FORM_STRINGS.forEach((text) => addString(strings, text));
+    JOB_POST_SUCCESS_STRINGS.forEach((text) => addString(strings, text));
 
     if (priorityFirst) {
         [
@@ -42,7 +54,12 @@ export function collectJobPostFormStrings({
             isBuyer ? 'Post job' : 'Post job free',
         ].forEach((text) => addString(priority, text));
 
-        steps.slice(0, 3).forEach((step) => {
+        ALL_VALIDATION_MESSAGES.forEach((text) => addString(priority, text));
+        JOB_POST_FLOW_UI_STRINGS.forEach((text) => addString(priority, text));
+        JOB_POST_DYNAMIC_FORM_STRINGS.forEach((text) => addString(priority, text));
+        JOB_POST_SUCCESS_STRINGS.forEach((text) => addString(priority, text));
+
+        steps.forEach((step) => {
             addString(priority, step.question);
             addString(priority, step.hint);
             step.options?.forEach((option) => addString(priority, option.label));
@@ -50,7 +67,10 @@ export function collectJobPostFormStrings({
 
         categories.forEach((category) => {
             addString(priority, category.name);
+            category.subcategories?.forEach((sub) => addString(priority, sub.name));
         });
+
+        CBM_UI_STRINGS.slice(0, 12).forEach((text) => addString(priority, text));
     }
 
     steps.forEach((step) => {
@@ -98,23 +118,9 @@ export function collectJobPostFormStrings({
         'Continue',
         'Edit',
         'Posting…',
-        'Translate form',
-        'Show original',
-        'Translating form…',
+        'Could not translate. Try again.',
+        'Translation service is busy. Form labels are shown in Urdu where available.',
         isBuyer ? 'Post job' : 'Post job free',
-        'Dimensions',
-        'Unit of measure',
-        'Length',
-        'Width',
-        'Height',
-        'Quantity',
-        'Weight',
-        'Calculate CBM',
-        'CBM',
-        'Volume (Cubic Meter)',
-        'Volume (Cubic Feet)',
-        'Volumetric weight (kg)',
-        'Live calculation unavailable. Showing local estimate.',
     ].forEach((text) => addString(strings, text));
 
     if (!priorityFirst) {
