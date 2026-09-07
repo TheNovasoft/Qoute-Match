@@ -47,7 +47,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link" href="javascript:void(0)" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">
-                                @lang('Extra') <span class="nav-item__icon"><i class="las la-angle-down"></i></span>
+                                @lang('Explore') <span class="nav-item__icon"><i class="las la-angle-down"></i></span>
                             </a>
                             <ul class="dropdown-menu">
                                 @foreach ($extraLinks ?? [] as $item)

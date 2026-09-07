@@ -76,7 +76,7 @@ export default function Header() {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                     >
-                                        Extra <span className="nav-item__icon"><i className="las la-angle-down"></i></span>
+                                        Explore <span className="nav-item__icon"><i className="las la-angle-down"></i></span>
                                     </a>
                                     <ul className="dropdown-menu">
                                         {extraLinks.map((item) => (
