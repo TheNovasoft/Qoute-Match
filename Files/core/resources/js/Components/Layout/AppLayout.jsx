@@ -2,13 +2,14 @@ import { Head } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
 import { applyHighlights } from '@/utils/helpers';
+import { formatToastMessage } from '@/utils/friendlyMessages';
 import { initTemplateSliders } from '@/utils/sliders';
 import { initTemplateInteractions, patchBootstrapModalBridge } from '@/utils/templateInteractions';
 import NotifyScripts from '@/Components/Shared/NotifyScripts';
 import CookieBanner from '@/Components/Shared/CookieBanner';
 
 export default function AppLayout({ children, pageTitle, seo, showPreloader = true }) {
-    const { site, template, seoDefaults, flash, errors } = usePage().props;
+    const { site, template, seoDefaults, flash, errors, routes } = usePage().props;
 
     useEffect(() => {
         applyHighlights();
@@ -18,13 +19,15 @@ export default function AppLayout({ children, pageTitle, seo, showPreloader = tr
         if (typeof window.triggerToaster !== 'function') return;
 
         (flash?.notify || []).forEach(([status, message]) => {
-            window.triggerToaster(status, message);
+            const formatted = formatToastMessage(status, message, routes || {});
+            window.triggerToaster(status, formatted.message, formatted.title);
         });
 
         Object.values(errors || {}).flat().forEach((message) => {
-            window.triggerToaster('error', message);
+            const formatted = formatToastMessage('error', message, routes || {});
+            window.triggerToaster('error', formatted.message, formatted.title);
         });
-    }, [flash, errors]);
+    }, [flash, errors, routes]);
 
     useEffect(() => {
         // main.js hides preloader on window load, but that event fires before React mounts.

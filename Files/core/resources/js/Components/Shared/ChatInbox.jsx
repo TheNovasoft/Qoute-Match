@@ -1,6 +1,7 @@
 import { Link, router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import VerificationBadges from '@/Components/Shared/VerificationBadges';
+import ConfirmModal from '@/Components/Shared/ConfirmModal';
 import { notify } from '@/utils/helpers';
 
 function formatMessageHtml(value) {
@@ -61,6 +62,7 @@ export default function ChatInbox({
     const [text, setText] = useState('');
     const [files, setFiles] = useState([]);
     const [sending, setSending] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState(false);
     const knownIds = useRef(new Set(initialMessages.map((m) => m.id)));
     const threadRef = useRef(null);
 
@@ -106,11 +108,11 @@ export default function ChatInbox({
     const sendMessage = async (event) => {
         event.preventDefault();
         if (!storeUrl) {
-            notify('error', 'Select a conversation first.');
+            notify('error', 'Choose a conversation before sending a message.');
             return;
         }
         if (!text.trim() && files.length === 0) {
-            notify('error', 'Message field is required');
+            notify('error', 'Type a message or attach a file before sending.');
             return;
         }
 
@@ -132,20 +134,25 @@ export default function ChatInbox({
             } else {
                 const errorMessage = response.data?.message?.error?.[0]
                     || response.data?.message?.error
-                    || 'Failed to send message';
+                    || 'We could not send your message. Try again in a moment.';
                 notify('error', errorMessage);
             }
         } catch (error) {
             const payload = error.response?.data || {};
-            notify('error', payload.message?.error?.[0] || payload.message || 'Failed to send message');
+            notify('error', payload.message?.error?.[0] || payload.message || 'We could not send your message. Check your connection and try again.');
         } finally {
             setSending(false);
         }
     };
 
     const handleDelete = () => {
-        if (!deleteUrl || !window.confirm('Remove this chat from your inbox?')) return;
-        router.post(deleteUrl);
+        if (!deleteUrl) return;
+        setConfirmDelete(true);
+    };
+
+    const confirmDeleteConversation = () => {
+        if (!deleteUrl) return;
+        router.post(deleteUrl, {}, { onFinish: () => setConfirmDelete(false) });
     };
 
     const handleBlock = () => {
@@ -321,6 +328,15 @@ export default function ChatInbox({
                     </div>
                 </div>
             </div>
+            <ConfirmModal
+                show={confirmDelete}
+                title="Remove this chat?"
+                message="This conversation will be removed from your inbox. You can start a new chat later if needed."
+                confirmLabel="Remove chat"
+                confirmClass="btn-outline--danger"
+                onConfirm={confirmDeleteConversation}
+                onCancel={() => setConfirmDelete(false)}
+            />
         </div>
     );
 }

@@ -91,7 +91,7 @@ class LeadCreditService
             return true;
         }
 
-        return [['error', 'Insufficient lead credits. Purchase a credit package or subscribe to submit quotes.']];
+        return [['error', FriendlyNotify::leadCreditsRequired()]];
     }
 
     public static function chargeForQuote(User $user, Bid $bid): void
@@ -196,7 +196,7 @@ class LeadCreditService
         $user->refresh();
 
         if ($user->balance < $amount) {
-            return [['error', 'Insufficient wallet balance. You have ' . showAmount($user->balance) . ' but need ' . showAmount($amount) . '.']];
+            return [['error', FriendlyNotify::walletPurchaseShortfall((float) $user->balance, $amount)]];
         }
 
         $trx = getTrx();
@@ -236,7 +236,7 @@ class LeadCreditService
         $user->refresh();
 
         if ($user->balance < $amount) {
-            return [['error', 'Insufficient wallet balance. You have ' . showAmount($user->balance) . ' but need ' . showAmount($amount) . '.']];
+            return [['error', FriendlyNotify::walletPurchaseShortfall((float) $user->balance, $amount)]];
         }
 
         $trx = getTrx();
