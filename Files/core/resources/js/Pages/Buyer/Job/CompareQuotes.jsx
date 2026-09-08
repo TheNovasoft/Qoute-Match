@@ -1,8 +1,73 @@
 import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import BuyerMasterLayout from '@/Components/Layout/BuyerMasterLayout';
+import ConfirmModal from '@/Components/Shared/ConfirmModal';
+import ModalOverlay from '@/Components/Shared/ModalOverlay';
 import StructuredReviewScores from '@/Components/Shared/StructuredReviewScores';
 import VerificationBadges from '@/Components/Shared/VerificationBadges';
+
+const FILTER_HELP = {
+    sort: 'Recommended balances price, rating, and availability. Use Lowest price when cost matters most.',
+    min_price: 'Hide quotes above this amount. Leave blank to show all prices.',
+    max_price: 'Hide quotes below this amount. Useful when you have a fixed budget cap.',
+    verified: 'Only show providers whose identity has been checked by our team.',
+    insured: 'Only show providers with approved insurance documents on file.',
+    company: 'Only show providers with a verified company registration.',
+    licence: 'Only show providers with an approved trade or industry licence.',
+    shortlisted: 'Show only quotes you saved to your favorites list.',
+};
+
+function FilterHint({ text }) {
+    if (!text) return null;
+    return <small className="text-muted d-block mt-1 compare-filter-hint">{text}</small>;
+}
+
+function SingleQuoteWaitingBanner({ job, onShare }) {
+    const [copied, setCopied] = useState(false);
+
+    const handleShare = async () => {
+        if (!job.publicUrl) return;
+        try {
+            await navigator.clipboard.writeText(job.publicUrl);
+            setCopied(true);
+            window.setTimeout(() => setCopied(false), 2500);
+        } catch {
+            onShare?.(job.publicUrl);
+        }
+    };
+
+    return (
+        <div className="card custom--card mb-4 compare-single-quote-banner border-info">
+            <div className="card-body">
+                <div className="d-flex flex-wrap gap-3 align-items-start">
+                    <div className="compare-single-quote-banner__icon text-info">
+                        <i className="las la-hourglass-half fs-2" aria-hidden="true" />
+                    </div>
+                    <div className="flex-grow-1">
+                        <h5 className="mb-2">You have 1 quote so far</h5>
+                        <p className="text-muted mb-3">
+                            Most jobs receive more quotes within <strong>24–48 hours</strong>. You can review this quote now,
+                            message the provider, or wait for more options before deciding.
+                        </p>
+                        <p className="small mb-3">
+                            <strong>Suggested next steps:</strong> Save to favorites → Message provider → Compare when more quotes arrive → Accept the best fit.
+                        </p>
+                        <div className="d-flex flex-wrap gap-2">
+                            <Link href={job.viewUrl} className="btn btn-sm btn-outline--base">
+                                View job details
+                            </Link>
+                            {job.publicUrl && (
+                                <button type="button" className="btn btn-sm btn-outline--base" onClick={handleShare}>
+                                    {copied ? 'Link copied' : 'Copy share link'}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 function CompareMetricBar({ label, value, percent, tone = 'base', hint }) {
     const safePercent = Math.max(4, Math.min(100, percent || 0));
@@ -78,7 +143,7 @@ function PriceComparisonChart({ bids, job, stats }) {
 
                 {bids.length === 1 && (
                     <p className="text-muted small mb-0 mt-3">
-                        Add more provider quotes to see side-by-side price bars and a full comparison table.
+                        When more providers respond, price bars and the comparison table will update automatically.
                     </p>
                 )}
             </div>
@@ -90,6 +155,30 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
     const { routes } = usePage().props;
     const [localFilters, setLocalFilters] = useState(filters || {});
     const [revisionBidId, setRevisionBidId] = useState(null);
+    const [confirmState, setConfirmState] = useState(null);
+    const [acceptProcessing, setAcceptProcessing] = useState(false);
+    const [rejectProcessing, setRejectProcessing] = useState(false);
+
+    useEffect(() => {
+        setLocalFilters(filters || {});
+    }, [filters]);
+
+    const sortLabels = {
+        recommended: 'Recommended',
+        price_asc: 'Lowest price',
+        price_desc: 'Highest price',
+        rating: 'Highest rating',
+        availability: 'Fastest availability',
+        newest: 'Newest',
+    };
+
+    const navigateWithFilters = (nextFilters) => {
+        router.get(`${routes.buyerJobBids}/${job.id}`, nextFilters, {
+            preserveScroll: true,
+            preserveState: false,
+            replace: true,
+        });
+    };
     const { data: revisionData, setData: setRevisionData, post: postRevision, processing: revisionProcessing, reset: resetRevision, errors: revisionErrors } = useForm({
         note: '',
     });
@@ -114,32 +203,93 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
     }, [bids]);
 
     const applyFilters = (event) => {
-        event.preventDefault();
-        router.get(`${routes.buyerJobBids}/${job.id}`, localFilters, { preserveState: true });
+        if (event) event.preventDefault();
+        navigateWithFilters(localFilters);
+    };
+
+    const updateSort = (sort) => {
+        const next = { ...localFilters, sort };
+        setLocalFilters(next);
+        navigateWithFilters(next);
+    };
+
+    const clearFilters = () => {
+        const reset = { sort: 'recommended' };
+        setLocalFilters(reset);
+        navigateWithFilters(reset);
     };
 
     const toggleShortlist = (bidId) => {
         router.post(`${routes.buyerJobBidsShortlist}/${bidId}/shortlist`, {}, { preserveScroll: true });
     };
 
-    const acceptQuote = (bid) => {
+    const openAcceptConfirm = (bid) => {
         if (hireRequirements?.escrowEnabled && bid.shortfallRaw > 0) {
-            window.alert(`Insufficient balance. Deposit at least ${bid.shortfall} to accept this quote.`);
+            setConfirmState({
+                type: 'deposit',
+                bid,
+                title: 'Add money to accept this quote',
+                message: `Your wallet balance is too low. Deposit at least ${bid.shortfall} to accept this quote.`,
+            });
             return;
         }
-        if (!window.confirm('Accept this quote? Other pending quotes will be rejected.')) return;
+
+        setConfirmState({
+            type: 'accept',
+            bid,
+            title: 'Accept this quote?',
+            message: 'The provider will be hired for this job. All other pending quotes will be rejected.',
+        });
+    };
+
+    const confirmAccept = () => {
+        const bid = confirmState?.bid;
+        if (!bid) return;
+
+        setAcceptProcessing(true);
         const hireUrl = routes.buyerJobHire || '/customer/job/post/hire-talent';
         router.post(`${hireUrl}/${bid.id}`, {}, {
             preserveScroll: true,
-            onError: () => {
-                window.alert('Unable to accept this quote. Please refresh and try again.');
+            onFinish: () => {
+                setAcceptProcessing(false);
+                setConfirmState(null);
+            },
+            onError: (errors) => {
+                setAcceptProcessing(false);
+                const message = errors?.balance || errors?.error || Object.values(errors || {})[0];
+                setConfirmState({
+                    type: 'error',
+                    title: 'Unable to accept quote',
+                    message: message || 'Something went wrong while hiring this provider.',
+                });
             },
         });
     };
 
-    const rejectQuote = (bidId) => {
-        if (!window.confirm('Reject this quote?')) return;
-        router.post(`${routes.buyerJobBidsReject}/${bidId}/reject`, {}, { preserveScroll: true });
+    const openRejectConfirm = (bidId) => {
+        setConfirmState({
+            type: 'reject',
+            bidId,
+            title: 'Reject this quote?',
+            message: 'The provider will be notified. You can still accept other quotes on this job.',
+        });
+    };
+
+    const confirmReject = () => {
+        const bidId = confirmState?.bidId;
+        if (!bidId || rejectProcessing) return;
+
+        setRejectProcessing(true);
+        router.post(`${routes.buyerJobBidsReject}/${bidId}/reject`, {}, {
+            preserveScroll: true,
+            onFinish: () => {
+                setRejectProcessing(false);
+                setConfirmState(null);
+            },
+            onError: () => {
+                setRejectProcessing(false);
+            },
+        });
     };
 
     const openRevision = (bidId) => {
@@ -158,6 +308,8 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
         });
     };
 
+    const depositUrl = routes.buyerDeposit ?? '/customer/deposit';
+
     return (
         <BuyerMasterLayout pageTitle={pageTitle} backUrl={job?.viewUrl}>
             <div className="buyer-panel-content">
@@ -173,12 +325,18 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                     </Link>
                 </div>
 
+                {bids.length > 0 && (
+                    <div className="alert alert-light border mb-4 compare-quotes-flow-tip">
+                        <strong>Recommended flow:</strong> Save to favorites → Message provider → Accept the best quote.
+                    </div>
+                )}
+
                 {hireRequirements?.escrowEnabled && (
                     <div className="alert alert-warning mb-4">
                         Accepting a quote requires your wallet balance to cover the quote amount (escrow is enabled).
                         Your balance: <strong>{hireRequirements.buyerBalance}</strong>.
                         {' '}
-                        <Link href={routes.buyerDeposit ?? '/customer/deposit'} className="alert-link">Deposit funds</Link>
+                        <Link href={depositUrl} className="alert-link">Add money</Link>
                     </div>
                 )}
 
@@ -187,15 +345,18 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                         <div className="col-md-4">
                             <div className="card custom--card h-100">
                                 <div className="card-body">
-                                    <small className="text-muted">Quotes received</small>
+                                    <small className="text-muted">Active quotes</small>
                                     <h4 className="mb-0">{stats.total}</h4>
+                                    {stats.rejected > 0 && (
+                                        <small className="text-muted">{stats.rejected} rejected and hidden</small>
+                                    )}
                                 </div>
                             </div>
                         </div>
                         <div className="col-md-4">
                             <div className="card custom--card h-100">
                                 <div className="card-body">
-                                    <small className="text-muted">Shortlisted</small>
+                                    <small className="text-muted">Saved to favorites</small>
                                     <h4 className="mb-0">{stats.shortlisted}</h4>
                                 </div>
                             </div>
@@ -233,13 +394,26 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
 
                 <form className="card custom--card mb-4 compare-quotes-filters" onSubmit={applyFilters}>
                     <div className="card-body">
+                        <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                            <div>
+                                <h6 className="mb-0">Filter & sort quotes</h6>
+                                {localFilters.sort && (
+                                    <small className="text-muted">
+                                        Sorted by: <strong>{sortLabels[localFilters.sort] || localFilters.sort}</strong>
+                                    </small>
+                                )}
+                            </div>
+                            <button type="button" className="btn btn-sm btn-link text-muted p-0" onClick={clearFilters}>
+                                Clear filters
+                            </button>
+                        </div>
                         <div className="row g-3 align-items-end">
-                            <div className="col-md-3 col-sm-6">
+                            <div className="col-lg-3 col-md-6">
                                 <label className="form--label">Sort</label>
                                 <select
                                     className="form-select form--control"
-                                    value={localFilters.sort || 'price_asc'}
-                                    onChange={(e) => setLocalFilters({ ...localFilters, sort: e.target.value })}
+                                    value={localFilters.sort || 'recommended'}
+                                    onChange={(e) => updateSort(e.target.value)}
                                 >
                                     <option value="recommended">Recommended</option>
                                     <option value="price_asc">Lowest price</option>
@@ -248,31 +422,38 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                     <option value="availability">Fastest availability</option>
                                     <option value="newest">Newest</option>
                                 </select>
+                                <FilterHint text={FILTER_HELP.sort} />
                             </div>
-                            <div className="col-md-2 col-sm-6">
+                            <div className="col-lg-2 col-md-6">
                                 <label className="form--label">Min price</label>
                                 <input
                                     type="number"
+                                    min="0"
                                     className="form-control form--control"
+                                    placeholder="No minimum"
                                     value={localFilters.min_price || ''}
                                     onChange={(e) => setLocalFilters({ ...localFilters, min_price: e.target.value })}
                                 />
+                                <FilterHint text={FILTER_HELP.min_price} />
                             </div>
-                            <div className="col-md-2 col-sm-6">
+                            <div className="col-lg-2 col-md-6">
                                 <label className="form--label">Max price</label>
                                 <input
                                     type="number"
+                                    min="0"
                                     className="form-control form--control"
+                                    placeholder="No maximum"
                                     value={localFilters.max_price || ''}
                                     onChange={(e) => setLocalFilters({ ...localFilters, max_price: e.target.value })}
                                 />
+                                <FilterHint text={FILTER_HELP.max_price} />
                             </div>
-                            <div className="col-md-2 col-sm-6">
-                                <button type="submit" className="btn btn--base w-100">Apply</button>
+                            <div className="col-lg-2 col-md-6">
+                                <button type="submit" className="btn btn--base w-100">Apply filters</button>
                             </div>
                         </div>
-                        <div className="row g-3 mt-1">
-                            <div className="col-auto">
+                        <div className="row g-3 mt-2">
+                            <div className="col-md-4 col-sm-6">
                                 <label className="form-check mb-0">
                                     <input
                                         type="checkbox"
@@ -282,8 +463,9 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                     />
                                     <span className="form-check-label">Verified only</span>
                                 </label>
+                                <FilterHint text={FILTER_HELP.verified} />
                             </div>
-                            <div className="col-auto">
+                            <div className="col-md-4 col-sm-6">
                                 <label className="form-check mb-0">
                                     <input
                                         type="checkbox"
@@ -293,8 +475,9 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                     />
                                     <span className="form-check-label">Insured only</span>
                                 </label>
+                                <FilterHint text={FILTER_HELP.insured} />
                             </div>
-                            <div className="col-auto">
+                            <div className="col-md-4 col-sm-6">
                                 <label className="form-check mb-0">
                                     <input
                                         type="checkbox"
@@ -304,8 +487,9 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                     />
                                     <span className="form-check-label">Company verified</span>
                                 </label>
+                                <FilterHint text={FILTER_HELP.company} />
                             </div>
-                            <div className="col-auto">
+                            <div className="col-md-4 col-sm-6">
                                 <label className="form-check mb-0">
                                     <input
                                         type="checkbox"
@@ -315,8 +499,9 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                     />
                                     <span className="form-check-label">Trade licence</span>
                                 </label>
+                                <FilterHint text={FILTER_HELP.licence} />
                             </div>
-                            <div className="col-auto">
+                            <div className="col-md-4 col-sm-6">
                                 <label className="form-check mb-0">
                                     <input
                                         type="checkbox"
@@ -324,16 +509,39 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                         checked={!!localFilters.shortlisted}
                                         onChange={(e) => setLocalFilters({ ...localFilters, shortlisted: e.target.checked ? 1 : 0 })}
                                     />
-                                    <span className="form-check-label">Shortlisted</span>
+                                    <span className="form-check-label">Saved to favorites</span>
                                 </label>
+                                <FilterHint text={FILTER_HELP.shortlisted} />
                             </div>
                         </div>
                     </div>
                 </form>
 
                 {!bids.length && (
-                    <div className="alert alert-info">No quotes received yet for this request.</div>
+                    <div className="card custom--card mb-4">
+                        <div className="card-body text-center py-5">
+                            <i className="las la-inbox fs-1 text-muted mb-3 d-block" aria-hidden="true" />
+                            <h5 className="mb-2">No quotes yet</h5>
+                            <p className="text-muted mb-4">
+                                Providers are reviewing your job. Most requests receive the first quote within 24–48 hours.
+                            </p>
+                            <div className="d-flex flex-wrap justify-content-center gap-2">
+                                <Link href={job.viewUrl} className="btn btn-outline--base btn-sm">View job</Link>
+                                {job.publicUrl && (
+                                    <button
+                                        type="button"
+                                        className="btn btn--base btn-sm"
+                                        onClick={() => navigator.clipboard?.writeText(job.publicUrl)}
+                                    >
+                                        Copy share link
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 )}
+
+                {bids.length === 1 && <SingleQuoteWaitingBanner job={job} />}
 
                 {bids.length > 0 && (
                     <PriceComparisonChart bids={bids} job={job} stats={stats} />
@@ -371,13 +579,13 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                     )}
                                     <div className="d-flex flex-wrap gap-2 mb-2">
                                         {bid.isLowestPrice && <span className="badge bg-success">Best price</span>}
-                                        {bid.isShortlisted && <span className="badge bg-warning text-dark">Shortlisted</span>}
+                                        {bid.isShortlisted && <span className="badge bg-warning text-dark">Saved</span>}
                                         {bid.revisionRequested && <span className="badge bg-info">Revision requested</span>}
                                     </div>
                                     <h4 className="text--base mb-1">{bid.amount}</h4>
-                                    {hireRequirements?.escrowEnabled && bid.shortfallRaw > 0 && (
+                                    {hireRequirements?.escrowEnabled && bid.canAccept && bid.shortfallRaw > 0 && (
                                         <p className="small text-warning mb-2">
-                                            Deposit at least <strong>{bid.shortfall}</strong> to accept
+                                            Add at least <strong>{bid.shortfall}</strong> to accept
                                         </p>
                                     )}
                                     <div className="compare-metric-bar mb-3">
@@ -420,7 +628,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                             </Link>
                                         )}
                                         <button type="button" className="btn btn-sm btn-outline--base" onClick={() => toggleShortlist(bid.id)}>
-                                            {bid.isShortlisted ? 'Unshortlist' : 'Shortlist'}
+                                            {bid.isShortlisted ? 'Remove favorite' : 'Save to favorites'}
                                         </button>
                                         {bid.canRequestRevision && (
                                             <button type="button" className="btn btn-sm btn-outline--secondary" onClick={() => openRevision(bid.id)}>
@@ -432,12 +640,11 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                                 <button
                                                     type="button"
                                                     className="btn btn-sm btn--base"
-                                                    disabled={hireRequirements?.escrowEnabled && bid.shortfallRaw > 0}
-                                                    onClick={() => acceptQuote(bid)}
+                                                    onClick={() => openAcceptConfirm(bid)}
                                                 >
-                                                    {hireRequirements?.escrowEnabled && bid.shortfallRaw > 0 ? 'Deposit to Accept' : 'Accept'}
+                                                    {hireRequirements?.escrowEnabled && bid.shortfallRaw > 0 ? 'Add money to accept' : 'Accept quote'}
                                                 </button>
-                                                <button type="button" className="btn btn-sm btn-outline--danger" onClick={() => rejectQuote(bid.id)}>
+                                                <button type="button" className="btn btn-sm btn-outline--danger" onClick={() => openRejectConfirm(bid.id)}>
                                                     Reject
                                                 </button>
                                             </>
@@ -453,6 +660,11 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                     <div className="card custom--card">
                         <div className="card-body table-responsive">
                             <h6 className="mb-3">{bids.length > 1 ? 'Side-by-Side Comparison' : 'Quote Breakdown'}</h6>
+                            {bids.length === 1 && (
+                                <p className="text-muted small">
+                                    This table shows the full details for your first quote. More columns will appear when additional providers respond.
+                                </p>
+                            )}
                             <table className="table table-bordered compare-quotes-table mb-0">
                                 <thead>
                                     <tr>
@@ -523,38 +735,78 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                 )}
             </div>
 
+            <ConfirmModal
+                show={confirmState?.type === 'accept'}
+                title={confirmState?.title}
+                message={confirmState?.message}
+                confirmLabel="Accept quote"
+                onConfirm={confirmAccept}
+                onCancel={() => setConfirmState(null)}
+                processing={acceptProcessing}
+            />
+
+            <ConfirmModal
+                show={confirmState?.type === 'reject'}
+                title={confirmState?.title}
+                message={confirmState?.message}
+                confirmLabel="Reject quote"
+                confirmClass="btn-outline--danger"
+                onConfirm={confirmReject}
+                onCancel={() => setConfirmState(null)}
+                processing={rejectProcessing}
+            />
+
+            <ConfirmModal
+                show={confirmState?.type === 'deposit'}
+                title={confirmState?.title}
+                message={confirmState?.message}
+                confirmLabel="Add money"
+                onConfirm={() => {
+                    router.visit(depositUrl);
+                    setConfirmState(null);
+                }}
+                onCancel={() => setConfirmState(null)}
+            />
+
+            <ConfirmModal
+                show={confirmState?.type === 'error'}
+                title={confirmState?.title}
+                message={confirmState?.message}
+                confirmLabel="OK"
+                onConfirm={() => setConfirmState(null)}
+                onCancel={() => setConfirmState(null)}
+            />
+
             {revisionBidId && (
-                <div className="modal custom--modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <form onSubmit={submitRevision}>
-                                <div className="modal-header">
-                                    <h5 className="modal-title">Request quote revision</h5>
-                                    <button type="button" className="btn-close" onClick={() => setRevisionBidId(null)} aria-label="Close"></button>
-                                </div>
-                                <div className="modal-body">
-                                    <p className="text-muted small">
-                                        Tell the provider what to change. Contact details are not shared through chat until you accept a quote.
-                                    </p>
-                                    <textarea
-                                        className="form-control form--control"
-                                        rows={5}
-                                        value={revisionData.note}
-                                        onChange={(e) => setRevisionData('note', e.target.value)}
-                                        placeholder="Please revise labour cost and include scaffolding in inclusions..."
-                                    />
-                                    {revisionErrors.note && <div className="text-danger small mt-2">{revisionErrors.note}</div>}
-                                </div>
-                                <div className="modal-footer">
-                                    <button type="button" className="btn btn--dark btn-sm" onClick={() => setRevisionBidId(null)}>Cancel</button>
-                                    <button type="submit" className="btn btn--base btn-sm" disabled={revisionProcessing}>
-                                        Send revision request
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                <ModalOverlay show onClose={() => setRevisionBidId(null)}>
+                    <div className="modal-content">
+                        <form onSubmit={submitRevision}>
+                            <div className="modal-header">
+                                <h5 className="modal-title">Request quote revision</h5>
+                                <button type="button" className="btn-close" onClick={() => setRevisionBidId(null)} aria-label="Close" />
+                            </div>
+                            <div className="modal-body">
+                                <p className="text-muted small">
+                                    Tell the provider what to change. Contact details are not shared through chat until you accept a quote.
+                                </p>
+                                <textarea
+                                    className="form-control form--control"
+                                    rows={5}
+                                    value={revisionData.note}
+                                    onChange={(e) => setRevisionData('note', e.target.value)}
+                                    placeholder="Please revise labour cost and include scaffolding in inclusions..."
+                                />
+                                {revisionErrors.note && <div className="text-danger small mt-2">{revisionErrors.note}</div>}
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn--dark btn-sm" onClick={() => setRevisionBidId(null)}>Cancel</button>
+                                <button type="submit" className="btn btn--base btn-sm" disabled={revisionProcessing}>
+                                    Send revision request
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                </div>
+                </ModalOverlay>
             )}
         </BuyerMasterLayout>
     );
