@@ -82,7 +82,7 @@ export function Banner({ data }) {
                             <BrandSlider clients={data.clients} />
                         </div>
                     </div>
-                    <div className="col-lg-6 d-xsm-block d-none">
+                    <div className="col-12 col-lg-6 banner-thumb-column">
                         <div className="banner-thumb-wrapper">
                             <div className="banner-thumb">
                                 <img src={data.image} alt="" />

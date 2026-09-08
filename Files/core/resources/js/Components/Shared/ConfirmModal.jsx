@@ -23,11 +23,11 @@ export default function ConfirmModal({
                     {message && <p className="mb-0">{message}</p>}
                     {children}
                 </div>
-                <div className="modal-footer">
-                    <button type="button" className="btn btn--dark btn-sm" onClick={onCancel} disabled={processing}>
+                <div className="modal-footer flex-column flex-sm-row gap-2">
+                    <button type="button" className="btn btn--dark btn-sm w-100 w-sm-auto order-2 order-sm-1" onClick={onCancel} disabled={processing}>
                         {cancelLabel}
                     </button>
-                    <button type="button" className={`btn btn-sm ${confirmClass}`} onClick={onConfirm} disabled={processing}>
+                    <button type="button" className={`btn btn-sm w-100 w-sm-auto order-1 order-sm-2 ${confirmClass}`} onClick={onConfirm} disabled={processing}>
                         {processing ? 'Please wait...' : confirmLabel}
                     </button>
                 </div>
