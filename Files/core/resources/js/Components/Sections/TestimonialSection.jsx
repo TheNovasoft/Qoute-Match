@@ -2,8 +2,7 @@ import Slider from 'react-slick';
 import QuoteIcon from '@/Components/Shared/QuoteIcon';
 
 const testimonialSliderSettings = {
-    mobileFirst: true,
-    slidesToShow: 1,
+    slidesToShow: 2,
     slidesToScroll: 1,
     autoplay: false,
     autoplaySpeed: 2000,
@@ -11,11 +10,13 @@ const testimonialSliderSettings = {
     dots: true,
     pauseOnHover: true,
     arrows: false,
+    infinite: true,
     responsive: [
         {
-            breakpoint: 992,
+            breakpoint: 768,
             settings: {
-                slidesToShow: 2,
+                slidesToShow: 1,
+                slidesToScroll: 1,
             },
         },
     ],

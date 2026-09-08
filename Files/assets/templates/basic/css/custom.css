@@ -4029,19 +4029,39 @@ h6.mb-2 {
 }
 
 /* Homepage testimonials — one card per slide on mobile */
-@media (max-width: 991px) {
+@media (max-width: 767px) {
+  .testimonial-slider:not(.slick-initialized) {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .testimonial-slider:not(.slick-initialized) > .testimonails-card {
+    width: 100%;
+  }
+
   .testimonial-slider.slick-initialized {
     margin: 0;
   }
 
   .testimonial-slider .slick-slide {
     width: 100% !important;
+    min-width: 100% !important;
     max-width: 100%;
     padding: 0 6px;
   }
 
+  .testimonial-slider .slick-list {
+    overflow: hidden;
+  }
+
   .testimonails-card {
     padding: 0;
+  }
+
+  .testimonial-item__desc {
+    word-break: normal;
+    overflow-wrap: anywhere;
   }
 }
 
