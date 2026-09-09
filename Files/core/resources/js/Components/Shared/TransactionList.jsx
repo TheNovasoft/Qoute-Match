@@ -2,7 +2,7 @@ import { router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import Pagination from '@/Components/Shared/Pagination';
 
-export default function TransactionList({ transactions, indexUrl }) {
+export default function TransactionList({ transactions, indexUrl, exportUrl }) {
     const rows = transactions?.data ?? [];
     const remarks = transactions?.remarks ?? [];
     const [showFilter, setShowFilter] = useState(false);
@@ -19,10 +19,18 @@ export default function TransactionList({ transactions, indexUrl }) {
 
     return (
         <div className="table-wrapper">
-            <div className="table-wrapper-header">
-                <button type="button" className="btn btn--base btn--sm mb-3" onClick={() => setShowFilter((v) => !v)}>
+            <div className="table-wrapper-header d-flex flex-wrap align-items-center gap-2 mb-3">
+                <button type="button" className="btn btn--base btn--sm" onClick={() => setShowFilter((v) => !v)}>
                     <i className="las la-filter" /> Filter
                 </button>
+                {exportUrl && (
+                    <a
+                        href={`${exportUrl}?${new URLSearchParams(Object.fromEntries(Object.entries(data).filter(([, value]) => value)))}`}
+                        className="btn btn-outline--base btn--sm"
+                    >
+                        <i className="las la-file-csv" /> Export CSV
+                    </a>
+                )}
                 {showFilter && (
                     <form className="responsive-filter-card my-4" onSubmit={submitFilter}>
                         <div className="d-flex flex-wrap gap-3">

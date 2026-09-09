@@ -23,10 +23,13 @@ class PaymentController extends Controller
             $gate->where('status', Status::ENABLE);
         })->with('method')->orderby('name')->get();
         $pageTitle = 'Deposit Methods';
+        $buyer = auth()->guard('buyer')->user();
+
         return Inertia::render('Buyer/Payment/Deposit', [
             'pageTitle' => $pageTitle,
             'gateways' => PaymentResource::depositGateways($gatewayCurrency),
             'storeUrl' => route('buyer.deposit.insert'),
+            'savedMethods' => \App\Lib\SavedPaymentMethodService::forBuyer((int) $buyer->id),
         ]);
     }
 
@@ -192,6 +195,8 @@ class PaymentController extends Controller
                 'trx' => $deposit->trx,
                 'post_balance' => showAmount($buyer->balance)
             ]);
+
+            \App\Lib\SavedPaymentMethodService::rememberFromDeposit($deposit);
         }
     }
 

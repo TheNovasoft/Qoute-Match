@@ -60,8 +60,8 @@ export function WithdrawHistoryPage({ pageTitle, role, withdrawals, indexUrl }) 
     return <Layout role={role} pageTitle={pageTitle}><WithdrawHistory withdrawals={withdrawals} indexUrl={indexUrl} /></Layout>;
 }
 
-export function TransactionsPage({ pageTitle, role, transactions, indexUrl }) {
-    return <Layout role={role} pageTitle={pageTitle}><TransactionList transactions={transactions} indexUrl={indexUrl} /></Layout>;
+export function TransactionsPage({ pageTitle, role, transactions, indexUrl, exportUrl }) {
+    return <Layout role={role} pageTitle={pageTitle}><TransactionList transactions={transactions} indexUrl={indexUrl} exportUrl={exportUrl} /></Layout>;
 }
 
 export function InvoicesPage({ pageTitle, role, invoices, indexUrl }) {

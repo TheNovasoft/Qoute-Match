@@ -561,6 +561,14 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                             </h6>
                                             <small className="text-muted d-block mb-1">
                                                 {(bid.provider.rating ?? 0)} ★ ({bid.provider.reviewsCount ?? 0} reviews)
+                                                {bid.provider.presenceLabel && (
+                                                    <>
+                                                        {' · '}
+                                                        <span className={`provider-presence provider-presence--${bid.provider.presence || 'offline'}`}>
+                                                            {bid.provider.presenceLabel}
+                                                        </span>
+                                                    </>
+                                                )}
                                             </small>
                                             <div className="compare-metric-bar__track compare-metric-bar__track--sm">
                                                 <div
@@ -581,6 +589,10 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                         {bid.isLowestPrice && <span className="badge bg-success">Best price</span>}
                                         {bid.isShortlisted && <span className="badge bg-warning text-dark">Saved</span>}
                                         {bid.revisionRequested && <span className="badge bg-info">Revision requested</span>}
+                                        {bid.isExpired && <span className="badge bg-secondary">Expired</span>}
+                                        {!bid.isExpired && bid.expiryLabel && (
+                                            <span className="badge bg-light text-dark">{bid.expiryLabel}</span>
+                                        )}
                                     </div>
                                     <h4 className="text--base mb-1">{bid.amount}</h4>
                                     {hireRequirements?.escrowEnabled && bid.canAccept && bid.shortfallRaw > 0 && (

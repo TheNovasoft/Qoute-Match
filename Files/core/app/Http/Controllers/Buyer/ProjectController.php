@@ -190,18 +190,20 @@ class ProjectController extends Controller
         }
 
         $freelancer = $project->user;
-        $bidAmount =  $bid->bid_amount;
+        $bidAmount = (float) $bid->bid_amount;
+        $remainingAmount = \App\Lib\EscrowPayoutService::remainingBidAmount($project, $bidAmount);
 
+        $payoutAmount = $remainingAmount > 0 ? $remainingAmount : ($remainingAmount === 0.0 ? 0 : $bidAmount);
 
         //if author already used escrow!
-        if (!$bid->project->escrow_amount && $buyer->balance <  $bidAmount) {
+        if ($payoutAmount > 0 && !$bid->project->escrow_amount && $buyer->balance < $payoutAmount) {
             $notify[] = ['error', FriendlyNotify::insufficientBalance(0, 'project')];
             return back()->withNotify($notify);
         }
 
         //if author not used escrow!
-        if (!$bid->project->escrow_amount) {
-            $buyer->balance -= $bidAmount;
+        if ($payoutAmount > 0 && !$bid->project->escrow_amount) {
+            $buyer->balance -= $payoutAmount;
             $buyer->save();
         }
 
@@ -236,11 +238,15 @@ class ProjectController extends Controller
             }
         }
 
-        if ($percentCharge) {
-            $calculatedChargeAmount = ($bidAmount * $percentCharge) / 100;
-            $chargeAmount =   $calculatedChargeAmount + $fixedCharge;
+        if ($payoutAmount > 0) {
+            if ($percentCharge) {
+                $calculatedChargeAmount = ($payoutAmount * $percentCharge) / 100;
+                $chargeAmount =   $calculatedChargeAmount + $fixedCharge;
+            } else {
+                $chargeAmount = $fixedCharge;
+            }
         } else {
-            $chargeAmount = $fixedCharge;
+            $chargeAmount = 0;
         }
 
         $review = new Review();
@@ -254,48 +260,54 @@ class ProjectController extends Controller
             StructuredReviewService::recalculateUserAverage($freelancer);
         }
 
-        $finalIncome  =  $bidAmount - $chargeAmount;
-        $freelancer->balance += $bidAmount;
-        $freelancer->save();
-
         $trx = GetTrx();
-        $transaction               = new Transaction();
-        $transaction->user_id      = $freelancer->id;
-        $transaction->amount       = $bidAmount;
-        $transaction->post_balance = $freelancer->balance;
-        $transaction->trx_type     = '+';
-        $transaction->details      = 'Project completed for job ' . $job->title;
-        $transaction->trx          = $trx;
-        $transaction->remark       = 'completed_project';
-        $transaction->save();
 
+        if ($payoutAmount > 0) {
+            $finalIncome  =  $payoutAmount - $chargeAmount;
+            $freelancer->balance += $payoutAmount;
+            $freelancer->save();
 
-        $freelancer->balance -= $chargeAmount;
-        $freelancer->earning += $finalIncome;
-        $freelancer->save();
+            $transaction               = new Transaction();
+            $transaction->user_id      = $freelancer->id;
+            $transaction->amount       = $payoutAmount;
+            $transaction->post_balance = $freelancer->balance;
+            $transaction->trx_type     = '+';
+            $transaction->details      = 'Project completed for job ' . $job->title;
+            $transaction->trx          = $trx;
+            $transaction->remark       = 'completed_project';
+            $transaction->save();
 
-        $freelancer->updateBadge();
+            $freelancer->balance -= $chargeAmount;
+            $freelancer->earning += $finalIncome;
+            $freelancer->save();
 
-        $transaction               = new Transaction();
-        $transaction->user_id      = $freelancer->id;
-        $transaction->amount       = $chargeAmount;
-        $transaction->post_balance = $freelancer->balance;
-        $transaction->trx_type     = '-';
-        $transaction->details      = 'Project completed commission for ' . $job->title;
-        $transaction->trx          = $trx;
-        $transaction->remark       = 'commission';
-        $transaction->save();
+            $freelancer->updateBadge();
 
-        $trxData = Transaction::where('project_id', $project->id)->first();
-        $transaction = $trxData ? $trxData : new Transaction();
-        $transaction->buyer_id = $buyer->id;
-        $transaction->amount = $bidAmount;
-        $transaction->post_balance = $buyer->balance;
-        $transaction->trx_type = '-';
-        $transaction->remark = 'completed_project';
-        $transaction->details = 'Project completed for job ' . $job->title;
-        $transaction->trx = $trxData ? $trxData->trx : null;
-        $transaction->save();
+            if ($chargeAmount > 0) {
+                $transaction               = new Transaction();
+                $transaction->user_id      = $freelancer->id;
+                $transaction->amount       = $chargeAmount;
+                $transaction->post_balance = $freelancer->balance;
+                $transaction->trx_type     = '-';
+                $transaction->details      = 'Project completed commission for ' . $job->title;
+                $transaction->trx          = $trx;
+                $transaction->remark       = 'commission';
+                $transaction->save();
+            }
+
+            $trxData = Transaction::where('project_id', $project->id)->first();
+            $transaction = $trxData ? $trxData : new Transaction();
+            $transaction->buyer_id = $buyer->id;
+            $transaction->amount = $payoutAmount;
+            $transaction->post_balance = $buyer->balance;
+            $transaction->trx_type = '-';
+            $transaction->remark = 'completed_project';
+            $transaction->details = 'Project completed for job ' . $job->title;
+            $transaction->trx = $trxData ? $trxData->trx : null;
+            $transaction->save();
+        } else {
+            $finalIncome = 0;
+        }
 
         $escrowHeld = (float) ($project->escrow_amount ?? 0);
         \App\Lib\InvoiceService::forProjectCompleted(

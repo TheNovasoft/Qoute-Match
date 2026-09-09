@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('quotes:notify-expired-deadlines')->dailyAt('00:30');
 Schedule::command('subscriptions:process-expiry')->dailyAt('01:00');
+Schedule::command('digest:send-daily')->dailyAt('08:00');

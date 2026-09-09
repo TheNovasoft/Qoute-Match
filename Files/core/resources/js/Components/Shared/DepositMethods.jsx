@@ -3,8 +3,11 @@ import { useMemo, useState } from 'react';
 import RequestFormFields from '@/Components/Jobs/RequestFormFields';
 import FriendlyErrorAlert from '@/Components/Shared/FriendlyErrorAlert';
 
-export default function DepositMethods({ gateways, storeUrl, currencySymbol, currencyText, depositUrl }) {
-    const [selectedIndex, setSelectedIndex] = useState(0);
+export default function DepositMethods({ gateways, storeUrl, currencySymbol, currencyText, depositUrl, savedMethods = [] }) {
+    const defaultIndex = savedMethods.find((method) => method.isDefault)
+        ? gateways.findIndex((gateway) => savedMethods.some((method) => method.isDefault && method.methodCode === gateway.methodCode && method.currency === gateway.currency))
+        : 0;
+    const [selectedIndex, setSelectedIndex] = useState(defaultIndex >= 0 ? defaultIndex : 0);
     const [amount, setAmount] = useState('');
     const [processing, setProcessing] = useState(false);
     const [error, setError] = useState('');
@@ -83,6 +86,32 @@ export default function DepositMethods({ gateways, storeUrl, currencySymbol, cur
                     routes={{ buyerDeposit: depositUrl, userDeposit: depositUrl }}
                     onDismiss={() => setError('')}
                 />
+            )}
+            {savedMethods.length > 0 && (
+                <div className="card custom--card mb-4">
+                    <div className="card-body">
+                        <h6 className="mb-3">Saved payment methods</h6>
+                        <div className="d-flex flex-wrap gap-2">
+                            {savedMethods.map((method) => {
+                                const gatewayIndex = gateways.findIndex(
+                                    (gateway) => gateway.methodCode === method.methodCode && gateway.currency === method.currency,
+                                );
+                                return (
+                                    <button
+                                        key={method.id}
+                                        type="button"
+                                        className={`btn btn-sm ${gatewayIndex === selectedIndex ? 'btn--base' : 'btn-outline--base'}`}
+                                        onClick={() => gatewayIndex >= 0 && setSelectedIndex(gatewayIndex)}
+                                        disabled={gatewayIndex < 0}
+                                    >
+                                        {method.label}
+                                        {method.isDefault ? ' (default)' : ''}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
             )}
             <div className="gateway-card">
                 <div className="row justify-content-center gy-sm-4 gy-3">

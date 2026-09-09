@@ -455,6 +455,7 @@ export default function JobPostWizard({
         budget: draft.budget || '',
         custom_budget: '1',
         deadline: draft.deadline || '',
+        quote_validity_days: draft.quote_validity_days ? String(draft.quote_validity_days) : '30',
         container_type: draft.container_type || '',
         firstname: draft.contact_firstname || '',
         lastname: draft.contact_lastname || '',
@@ -599,6 +600,7 @@ export default function JobPostWizard({
             custom_budget: '1',
             budget: '0',
             deadline: data.deadline || '',
+            quote_validity_days: data.quote_validity_days || '30',
             status: data.status || '1',
         }));
         form.post(budgetStoreUrl, {

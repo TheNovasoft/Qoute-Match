@@ -60,8 +60,11 @@ function LanguageTags({ languages, onChange, error }) {
     );
 }
 
-export default function Basic({ pageTitle, user }) {
+export default function Basic({ pageTitle, user, availabilityOptions = [], availabilityUrl }) {
     const { routes } = usePage().props;
+    const availabilityForm = useForm({
+        availability_status: String(user?.availabilityStatus ?? 1),
+    });
 
     const { data, setData, post, processing, errors } = useForm({
         firstname: user?.firstname || '',
@@ -73,6 +76,13 @@ export default function Basic({ pageTitle, user }) {
         city: user?.city || '',
         image: null,
     });
+
+    const saveAvailability = (event) => {
+        event.preventDefault();
+        availabilityForm.post(availabilityUrl ?? routes?.userProfileAvailability ?? '/provider/profile-availability', {
+            preserveScroll: true,
+        });
+    };
 
     const submit = (event) => {
         event.preventDefault();
@@ -92,6 +102,32 @@ export default function Basic({ pageTitle, user }) {
                                 <div className="profile-bio__item">
                                     <ProfileSteps currentRouteKey="userProfileSetting" userStep={user?.step ?? 0} />
                                     <ProfileErrors errors={errors} />
+
+                                    {availabilityOptions.length > 0 && (
+                                        <form className="card custom--card mb-4" onSubmit={saveAvailability}>
+                                            <div className="card-body">
+                                                <h6 className="mb-3">Availability status</h6>
+                                                <div className="d-flex flex-column gap-2">
+                                                    {availabilityOptions.map((option) => (
+                                                        <label key={option.value} className="form-check">
+                                                            <input
+                                                                type="radio"
+                                                                className="form-check-input"
+                                                                name="availability_status"
+                                                                value={String(option.value)}
+                                                                checked={availabilityForm.data.availability_status === String(option.value)}
+                                                                onChange={(e) => availabilityForm.setData('availability_status', e.target.value)}
+                                                            />
+                                                            <span className="form-check-label">{option.label}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                                <button type="submit" className="btn btn--base btn-sm mt-3" disabled={availabilityForm.processing}>
+                                                    Save availability
+                                                </button>
+                                            </div>
+                                        </form>
+                                    )}
 
                                     <form onSubmit={submit}>
                                         <div className="row gy-4 justify-content-center">

@@ -160,6 +160,8 @@ class InertiaResource
             ] : null,
             'verificationBadges' => VerificationBadgeService::badgesForUser($freelancer),
             'verificationSummary' => VerificationBadgeService::profileVerificationSummary($freelancer),
+            'presence' => ProviderPresenceService::statusKey($freelancer),
+            'presenceLabel' => ProviderPresenceService::statusLabel($freelancer),
             'profileUrl' => route('talent.explore', $freelancer->username),
             'inviteUrl' => route('buyer.talent.invite', $freelancer->id),
         ], $extra);

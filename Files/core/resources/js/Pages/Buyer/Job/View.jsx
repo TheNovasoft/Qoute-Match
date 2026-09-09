@@ -49,6 +49,8 @@ export default function View({ pageTitle, job, requestFields, backUrl }) {
                         <InfoItem icon="las la-object-ungroup" label="Speciality" value={job.subcategory} />
                         <InfoItem icon="las la-wallet" label="Budget" value={job.budget} />
                         <InfoItem icon="las la-calendar" label="Deadline" value={job.deadline} />
+                        <InfoItem icon="las la-eye" label="Views" value={String(job.viewCount ?? 0)} />
+                        <InfoItem icon="las la-hourglass-half" label="Quote validity" value={`${job.quoteValidityDays ?? 30} days`} />
                         <InfoItem icon="las la-bullhorn" label="Status" value={job.statusLabel} />
                         <InfoItem icon="las la-check-circle" label="Approval" value={job.approvalLabel} />
                     </div>

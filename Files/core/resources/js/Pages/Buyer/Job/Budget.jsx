@@ -10,6 +10,7 @@ export default function Budget({ pageTitle, job, requestFields, currencyText, gu
         budget: job?.budget ?? '',
         custom_budget: job?.custom_budget ?? '0',
         deadline: job?.deadline ?? '',
+        quote_validity_days: job?.quote_validity_days ?? '30',
         questions: job?.questions?.length ? job.questions : [''],
         status: guestMode ? '1' : (job?.status ?? '0'),
         firstname: contact?.firstname ?? '',
@@ -112,6 +113,23 @@ export default function Budget({ pageTitle, job, requestFields, currencyText, gu
                                     required
                                 />
                                 {errors.deadline && <small className="text-danger">{errors.deadline}</small>}
+                            </div>
+
+                            <div className="form-group mt-3">
+                                <label className="form--label">Quote validity (days)</label>
+                                <input
+                                    type="number"
+                                    className="form-control form--control"
+                                    value={data.quote_validity_days}
+                                    onChange={(e) => setData('quote_validity_days', e.target.value)}
+                                    min={1}
+                                    max={365}
+                                    placeholder="30"
+                                />
+                                <small className="text-muted d-block mt-1">
+                                    Each provider quote stays valid for this many days after submission.
+                                </small>
+                                {errors.quote_validity_days && <small className="text-danger">{errors.quote_validity_days}</small>}
                             </div>
 
                             <div className="form-group mt-4">

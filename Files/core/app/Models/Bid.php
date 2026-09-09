@@ -13,6 +13,7 @@ class Bid extends Model
     protected $casts = [
         'quote_data' => 'array',
         'revision_requested_at' => 'datetime',
+        'expires_at' => 'datetime',
     ];
 
     public function jobs()
