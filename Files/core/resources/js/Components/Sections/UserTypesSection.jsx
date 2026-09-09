@@ -8,7 +8,7 @@ function UserTypeCard({ item }) {
             : null;
 
     return (
-        <div className="col-lg-4 col-md-6">
+        <div className="col-12 col-md-6 col-lg-4">
             <div className="user-type-card h-100">
                 {item.image ? (
                     <div className="user-type-card__thumb">

@@ -9,7 +9,7 @@ export default function AccountSection({ data }) {
         <div className="account-section my-120">
             <div className="container">
                 <div className="row gy-4">
-                    <div className="col-xl-6">
+                    <div className="col-12 col-xl-6">
                         <div className="account-item">
                             <div className="account-item__content highlight">
                                 <h3 className="account-item__title s-highlight" data-s-break="-1" data-s-length="1">
@@ -27,7 +27,7 @@ export default function AccountSection({ data }) {
                             </div>
                         </div>
                     </div>
-                    <div className="col-xl-6">
+                    <div className="col-12 col-xl-6">
                         <div className="account-item">
                             <div className="account-item__content highlight">
                                 <h3 className="account-item__title s-highlight" data-s-break="-1" data-s-length="1">
