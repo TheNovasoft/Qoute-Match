@@ -16,9 +16,4 @@ export const JOB_POST_FLOW_UI_STRINGS = [
     'File attached',
     '0 skill(s) selected',
     'skill(s) selected',
-    'LCL packing',
-    'Same products',
-    'Multiple different products',
-    'Add box',
-    'Box',
 ];

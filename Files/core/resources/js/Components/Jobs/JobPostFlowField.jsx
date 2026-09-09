@@ -1,4 +1,3 @@
-import CargoDetailsSection from '@/Components/Jobs/CargoDetailsSection';
 import CbmCalculator from '@/Components/Jobs/CbmCalculator';
 
 import CountryCityFields from '@/Components/Jobs/CountryCityFields';
@@ -445,21 +444,103 @@ export default function JobPostFlowField({
 
             <div className="row g-3">
 
-                <CargoDetailsSection
+                {step.includeContainerType && (
 
-                    step={step}
+                    <div className="col-12">
 
-                    data={data}
+                        <label className="job-flow-title-desc__label mb-2">{tx('Container type')}</label>
 
-                    errors={errors}
+                        <div className="job-wizard-cards">
 
-                    onChange={onChange}
+                            {[
 
-                    onSelectSingle={onSelectSingle}
+                                { value: 'Full Container', label: 'Full Container (FCL)' },
 
-                    variant="flow"
+                                { value: 'LCL', label: 'LCL (Less than Container Load)' },
 
-                />
+                            ].map((opt) => (
+
+                                <WizardOptionCard
+
+                                    key={opt.value}
+
+                                    label={tx(opt.label)}
+
+                                    selected={String(data.container_type) === opt.value}
+
+                                    onClick={() => onSelectSingle('container_type', opt.value)}
+
+                                />
+
+                            ))}
+
+                        </div>
+
+                    </div>
+
+                )}
+
+                <div className="col-md-6">
+
+                    <input
+
+                        type="text"
+
+                        className={inputClass(errors[step.hsField])}
+
+                        placeholder={tx('HS code')}
+
+                        value={data[step.hsField] || ''}
+
+                        onChange={(e) => onChange(step.hsField, e.target.value)}
+
+                    />
+
+                    <FieldError message={errors[step.hsField]} tx={tx} />
+
+                </div>
+
+                <div className="col-md-6">
+
+                    <input
+
+                        type="number"
+
+                        min="0"
+
+                        step="any"
+
+                        className={inputClass(errors[step.weightField])}
+
+                        placeholder={tx('Weight (kg)')}
+
+                        value={data[step.weightField] || ''}
+
+                        onChange={(e) => onChange(step.weightField, e.target.value)}
+
+                    />
+
+                    <FieldError message={errors[step.weightField]} tx={tx} />
+
+                </div>
+
+                <div className="col-12">
+
+                    <CbmCalculator
+
+                        value={data[step.cbmField] || ''}
+
+                        onChange={(v) => onChange(step.cbmField, v)}
+
+                        weightKg={data[step.weightField] || ''}
+
+                        hideWeightInput
+
+                    />
+
+                    <FieldError message={errors[step.cbmField]} tx={tx} />
+
+                </div>
 
             </div>
 

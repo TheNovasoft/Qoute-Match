@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useJobPostFormTranslation } from '@/Components/Jobs/JobPostFormTranslationProvider';
 import {
     buildCbmApiPayload,
@@ -57,16 +57,9 @@ export default function CbmCalculator({
     const [isCalculating, setIsCalculating] = useState(false);
     const [calcError, setCalcError] = useState('');
     const skipFirstSync = useRef(true);
-    const syncTimerRef = useRef(null);
-    const scrollLockRef = useRef(null);
-    const valueRef = useRef(value);
-    const onChangeRef = useRef(onChange);
     const requestId = useRef(0);
     const useExternalWeight = hideWeightInput || typeof onWeightChange === 'function';
     const effectiveWeight = useExternalWeight ? weightKg : weight;
-
-    valueRef.current = value;
-    onChangeRef.current = onChange;
 
     useEffect(() => {
         if (weightKg !== null && weightKg !== undefined && weightKg !== '') {
@@ -154,23 +147,12 @@ export default function CbmCalculator({
 
     const results = apiResults || fallbackResults;
 
-    useLayoutEffect(() => {
-        if (scrollLockRef.current === null) {
+    useEffect(() => {
+        if (skipFirstSync.current) {
+            skipFirstSync.current = false;
             return;
         }
 
-        const lockedY = scrollLockRef.current;
-        scrollLockRef.current = null;
-        window.scrollTo({ top: lockedY, behavior: 'auto' });
-    }, [results]);
-
-    const flushStoredValue = useCallback(() => {
-        if (syncTimerRef.current) {
-            window.clearTimeout(syncTimerRef.current);
-            syncTimerRef.current = null;
-        }
-
-        const hasPartialInput = Boolean(String(length || '').trim() || String(width || '').trim() || String(height || '').trim());
         const next = results
             ? formatStoredCbmValue({
                 length,
@@ -182,35 +164,23 @@ export default function CbmCalculator({
                 qty,
                 results,
             })
-            : (hasPartialInput ? valueRef.current : '');
+            : '';
 
-        if (next !== valueRef.current) {
-            scrollLockRef.current = window.scrollY;
-            onChangeRef.current(next);
+        if (next !== value) {
+            onChange(next);
         }
-    }, [results, length, width, height, uom, effectiveWeight, weightUnit, qty]);
-
-    useEffect(() => {
-        if (skipFirstSync.current) {
-            skipFirstSync.current = false;
-            return undefined;
-        }
-
-        syncTimerRef.current = window.setTimeout(flushStoredValue, 280);
-
-        return () => {
-            if (syncTimerRef.current) {
-                window.clearTimeout(syncTimerRef.current);
-                syncTimerRef.current = null;
-            }
-        };
-    }, [flushStoredValue]);
-
-    useEffect(() => () => flushStoredValue(), [flushStoredValue]);
-
-    const handleDimensionBlur = () => {
-        flushStoredValue();
-    };
+    }, [
+        results,
+        length,
+        width,
+        height,
+        uom,
+        effectiveWeight,
+        weightUnit,
+        qty,
+        value,
+        onChange,
+    ]);
 
     const handleWeightChange = (nextValue) => {
         setWeight(nextValue);
@@ -295,7 +265,6 @@ export default function CbmCalculator({
                         className="form-select form--control form-control-lg"
                         value={uom}
                         onChange={(e) => setUom(e.target.value)}
-                        onBlur={handleDimensionBlur}
                     >
                         {UOM_OPTIONS.map((option) => (
                             <option key={option.value} value={option.value}>{tx(option.label)}</option>
@@ -311,7 +280,6 @@ export default function CbmCalculator({
                         className="form-control form--control form-control-lg"
                         value={length}
                         onChange={(e) => setLength(e.target.value)}
-                        onBlur={handleDimensionBlur}
                         placeholder="100"
                     />
                 </div>
@@ -324,7 +292,6 @@ export default function CbmCalculator({
                         className="form-control form--control form-control-lg"
                         value={width}
                         onChange={(e) => setWidth(e.target.value)}
-                        onBlur={handleDimensionBlur}
                         placeholder="80"
                     />
                 </div>
@@ -337,7 +304,6 @@ export default function CbmCalculator({
                         className="form-control form--control form-control-lg"
                         value={height}
                         onChange={(e) => setHeight(e.target.value)}
-                        onBlur={handleDimensionBlur}
                         placeholder="60"
                     />
                 </div>
@@ -378,37 +344,35 @@ export default function CbmCalculator({
                         className="form-control form--control form-control-lg"
                         value={qty}
                         onChange={(e) => setQty(e.target.value)}
-                        onBlur={handleDimensionBlur}
                         placeholder="1"
                     />
                 </div>
             </div>
 
-            <div className="cbm-calculator__results mt-4 pt-3 border-top">
-                <div className="d-flex align-items-center justify-content-between gap-2 mb-3 cbm-calculator__results-head">
+            <div className="mt-4 pt-3 border-top">
+                <div className="d-flex align-items-center justify-content-between gap-2 mb-3">
                     <h6 className="mb-0">{tx('Results')}</h6>
-                    <span className={`text-muted small cbm-calculator__status${isCalculating ? ' is-visible' : ''}`}>
-                        {tx('Calculating…')}
-                    </span>
+                    {isCalculating && <span className="text-muted small">{tx('Calculating…')}</span>}
                 </div>
                 {calcError && (
                     <p className="text-warning small mb-3">{tx(calcError)}</p>
                 )}
-                <div className="row gy-3 cbm-calculator__results-grid">
-                    <ResultField tx={tx} label="Volume (Cubic Meter)" labelExtra={uomLabel} value={results?.volumeM3} suffix=" m³" />
-                    <ResultField tx={tx} label="Volume (Cubic Feet)" value={results?.volumeFt3} suffix=" ft³" />
-                    <ResultField tx={tx} label="Weight (Kg)" value={results?.totalWeightKg} suffix=" kg" />
-                    <ResultField tx={tx} label="Weight (lb)" value={results?.totalWeightLb} suffix=" lb" />
-                    <ResultField tx={tx} label="Volumetric Weight Sea (Kg)" value={results?.volumetricWeightSeaKg} suffix=" kg" />
-                    <ResultField tx={tx} label="Volumetric Weight Sea (lb)" value={results?.volumetricWeightSeaLb} suffix=" lb" />
-                    <ResultField tx={tx} label="Volumetric Weight Air (Kg)" value={results?.volumetricWeightAirKg} suffix=" kg" />
-                    <ResultField tx={tx} label="Volumetric Weight Air (lb)" value={results?.volumetricWeightAirLb} suffix=" lb" />
-                    <ResultField tx={tx} label="20 Feet Container" value={results?.container20} suffix={` ${tx('units')}`} />
-                    <ResultField tx={tx} label="40 Feet Container" value={results?.container40} suffix={` ${tx('units')}`} />
-                    <ResultField tx={tx} label="40 Feet HC Container" value={results?.container40hc} suffix={` ${tx('units')}`} />
-                </div>
-                {!results && (
-                    <p className="text-muted small mt-2 mb-0">{tx('Enter length, width, and height to calculate CBM, volumetric weight, and container capacity.')}</p>
+                {results ? (
+                    <div className="row gy-3">
+                        <ResultField tx={tx} label="Volume (Cubic Meter)" labelExtra={uomLabel} value={results.volumeM3} suffix=" m³" />
+                        <ResultField tx={tx} label="Volume (Cubic Feet)" value={results.volumeFt3} suffix=" ft³" />
+                        <ResultField tx={tx} label="Weight (Kg)" value={results.totalWeightKg} suffix=" kg" />
+                        <ResultField tx={tx} label="Weight (lb)" value={results.totalWeightLb} suffix=" lb" />
+                        <ResultField tx={tx} label="Volumetric Weight Sea (Kg)" value={results.volumetricWeightSeaKg} suffix=" kg" />
+                        <ResultField tx={tx} label="Volumetric Weight Sea (lb)" value={results.volumetricWeightSeaLb} suffix=" lb" />
+                        <ResultField tx={tx} label="Volumetric Weight Air (Kg)" value={results.volumetricWeightAirKg} suffix=" kg" />
+                        <ResultField tx={tx} label="Volumetric Weight Air (lb)" value={results.volumetricWeightAirLb} suffix=" lb" />
+                        <ResultField tx={tx} label="20 Feet Container" value={results.container20} suffix={` ${tx('units')}`} />
+                        <ResultField tx={tx} label="40 Feet Container" value={results.container40} suffix={` ${tx('units')}`} />
+                        <ResultField tx={tx} label="40 Feet HC Container" value={results.container40hc} suffix={` ${tx('units')}`} />
+                    </div>
+                ) : (
+                    <p className="text-muted mb-0">{tx('Enter length, width, and height to calculate CBM, volumetric weight, and container capacity.')}</p>
                 )}
             </div>
 

@@ -23,19 +23,6 @@ function setError(errors, field, message) {
     }
 }
 
-export function isCargoCbmRequired(step, data) {
-    if (!step.cbmMeta?.isRequired) {
-        return false;
-    }
-
-    const containerType = trim(data.container_type);
-    if (step.includeContainerType || containerType) {
-        return containerType === 'LCL';
-    }
-
-    return true;
-}
-
 export function validateStep(step, data) {
     const errors = {};
 
@@ -167,7 +154,7 @@ export function validateStep(step, data) {
             setError(errors, step.weightField, VALIDATION_MSG.WEIGHT_INVALID);
         }
 
-        if (isCargoCbmRequired(step, data) && !trim(data[step.cbmField])) {
+        if (step.cbmMeta?.isRequired && !trim(data[step.cbmField])) {
             setError(errors, step.cbmField, VALIDATION_MSG.CBM_REQUIRED);
         }
 

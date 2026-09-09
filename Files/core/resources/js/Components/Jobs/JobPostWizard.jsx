@@ -2,9 +2,7 @@ import { Link, useForm, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CbmCalculator from '@/Components/Jobs/CbmCalculator';
 import CountryCityFields from '@/Components/Jobs/CountryCityFields';
-import CargoDetailsSection from '@/Components/Jobs/CargoDetailsSection';
 import WizardOptionCard from '@/Components/Jobs/WizardOptionCard';
-import { isCargoCbmRequired } from '@/utils/jobPostFlowValidation';
 
 function slugFromTitle(title) {
     return title
@@ -367,7 +365,7 @@ function screenIsValid(screen, data) {
         const hsOk = !screen.hsMeta?.isRequired || Boolean(String(data[screen.hsField] ?? '').trim());
         const weightVal = data[screen.weightField];
         const weightOk = !screen.weightMeta?.isRequired || (weightVal !== '' && weightVal !== null && weightVal !== undefined);
-        const cbmOk = !isCargoCbmRequired(screen, data) || Boolean(String(data[screen.cbmField] ?? '').trim());
+        const cbmOk = !screen.cbmMeta?.isRequired || Boolean(String(data[screen.cbmField] ?? '').trim());
         return hsOk && weightOk && cbmOk;
     }
     if (screen.optional) {
@@ -557,12 +555,6 @@ export default function JobPostWizard({
         form.setData('subcategory_id', subs[0].value);
     }, [form.data.category_id, form.data.subcategory_id, screens, screenIndex]);
 
-    useEffect(() => {
-        if (screen?.id === 'container-type' && !form.data.container_type) {
-            form.setData('container_type', 'Full Container');
-        }
-    }, [screen?.id, form.data.container_type]);
-
     const goNext = () => {
         if (screenIndex < screens.length - 1) {
             setScreenIndex(screenIndex + 1);
@@ -742,14 +734,52 @@ export default function JobPostWizard({
         if (screen.type === 'cargo-details') {
             return (
                 <div className="row gy-4">
-                    <CargoDetailsSection
-                        step={screen}
-                        data={form.data}
-                        errors={form.errors}
-                        onChange={(field, value) => form.setData(field, value)}
-                        onSelectSingle={(field, value) => form.setData(field, value)}
-                        variant="wizard"
-                    />
+                    <div className="col-md-6">
+                        <label className="form-label">{screen.hsMeta.name}</label>
+                        <input
+                            type="text"
+                            className="form-control form--control form-control-lg"
+                            placeholder="e.g. 8471.30"
+                            value={form.data[screen.hsField] || ''}
+                            onChange={(e) => form.setData(screen.hsField, e.target.value)}
+                        />
+                        {screen.hsMeta.instruction && (
+                            <small className="text-muted d-block mt-1">{screen.hsMeta.instruction}</small>
+                        )}
+                        {form.errors[screen.hsField] && (
+                            <small className="text-danger d-block mt-1">{form.errors[screen.hsField]}</small>
+                        )}
+                    </div>
+                    <div className="col-md-6">
+                        <label className="form-label">{screen.weightMeta.name}</label>
+                        <input
+                            type="number"
+                            className="form-control form--control form-control-lg"
+                            placeholder="e.g. 500"
+                            value={form.data[screen.weightField] || ''}
+                            onChange={(e) => form.setData(screen.weightField, e.target.value)}
+                            min="0"
+                            step="any"
+                        />
+                        {screen.weightMeta.instruction && (
+                            <small className="text-muted d-block mt-1">{screen.weightMeta.instruction}</small>
+                        )}
+                        {form.errors[screen.weightField] && (
+                            <small className="text-danger d-block mt-1">{form.errors[screen.weightField]}</small>
+                        )}
+                    </div>
+                    <div className="col-12">
+                        <label className="form-label">{screen.cbmMeta.name}</label>
+                        <CbmCalculator
+                            value={form.data[screen.cbmField] || ''}
+                            onChange={(nextValue) => form.setData(screen.cbmField, nextValue)}
+                            weightKg={form.data[screen.weightField] || ''}
+                            hideWeightInput
+                        />
+                        {form.errors[screen.cbmField] && (
+                            <small className="text-danger d-block mt-1">{form.errors[screen.cbmField]}</small>
+                        )}
+                    </div>
                 </div>
             );
         }
