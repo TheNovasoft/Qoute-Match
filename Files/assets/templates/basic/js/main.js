@@ -112,8 +112,7 @@
 
     // ========================= Slick Slider Js Start ==============
     $(".testimonial-slider").not(".slick-initialized").slick({
-      mobileFirst: true,
-      slidesToShow: 1,
+      slidesToShow: 2,
       slidesToScroll: 1,
       autoplay: false,
       autoplaySpeed: 2000,
@@ -121,15 +120,17 @@
       dots: true,
       pauseOnHover: true,
       arrows: false,
+      infinite: true,
       prevArrow:
         '<button type="button" class="slick-prev"><i class="fas fa-long-arrow-alt-left"></i></button>',
       nextArrow:
         '<button type="button" class="slick-next"><i class="fas fa-long-arrow-alt-right"></i></button>',
       responsive: [
         {
-          breakpoint: 992,
+          breakpoint: 768,
           settings: {
-            slidesToShow: 2,
+            slidesToShow: 1,
+            slidesToScroll: 1,
           },
         },
       ],

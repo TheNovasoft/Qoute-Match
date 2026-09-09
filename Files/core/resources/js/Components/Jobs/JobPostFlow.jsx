@@ -1,6 +1,7 @@
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import JobPostFlowField from '@/Components/Jobs/JobPostFlowField';
+import FriendlyErrorAlert from '@/Components/Shared/FriendlyErrorAlert';
 import JobPostFormTranslateButton from '@/Components/Jobs/JobPostFormTranslateButton';
 import { JobPostFormTranslationProvider, useJobPostFormTranslation } from '@/Components/Jobs/JobPostFormTranslationProvider';
 import { collectJobPostFormStrings } from '@/utils/jobPostFormStrings';
@@ -617,11 +618,17 @@ function JobPostFlowInner({
                 })}
             </div>
 
+            {form.errors.error && (
+                <FriendlyErrorAlert message={form.errors.error} routes={routes} className="mt-3" />
+            )}
+
             {!isBuyer && form.errors.email && (
-                <p className="text-danger text-center mt-3">
-                    {form.errors.email}{' '}
-                    <Link href={routes?.buyerLogin ?? '/customer/login'}>Log in</Link>
-                </p>
+                <div className="mt-3">
+                    <FriendlyErrorAlert
+                        message={`This email is already registered. Sign in to continue posting as ${form.data.email}.`}
+                        routes={routes}
+                    />
+                </div>
             )}
         </div>
     );

@@ -6,6 +6,7 @@ use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Lib\AccountResource;
 use App\Lib\FormProcessor;
+use App\Lib\FriendlyNotify;
 use App\Models\AdminNotification;
 use App\Models\Transaction;
 use App\Models\Withdrawal;
@@ -45,7 +46,7 @@ class WithdrawController extends Controller
         }
 
         if ($request->amount > $buyer->balance) {
-            $notify[] = ['error', 'Insufficient balance for withdrawal'];
+            $notify[] = ['error', FriendlyNotify::insufficientBalance(0, 'withdraw')];
             return back()->withNotify($notify)->withInput($request->all());
         }
 

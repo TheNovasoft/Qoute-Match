@@ -1,3 +1,5 @@
+import { formatToastMessage } from '@/utils/friendlyMessages';
+
 export function asset(path) {
     if (!path) return '';
     if (path.startsWith('http')) return path;
@@ -50,22 +52,30 @@ export function applyHighlights() {
     });
 }
 
-export function notify(status, message) {
-    const fire = () => {
+export function notify(status, message, routes = {}) {
+    const deliver = (formattedMessage, title) => {
+        if (typeof window.triggerToaster === 'function') {
+            window.triggerToaster(status, formattedMessage, title);
+            return true;
+        }
         if (typeof window.notify === 'function') {
-            window.notify(status, message);
+            window.notify(status, formattedMessage);
             return true;
         }
         return false;
     };
 
-    if (fire()) {
-        return;
+    if (Array.isArray(message) || (typeof message === 'object' && message !== null)) {
+        if (deliver(message)) return;
+    } else {
+        const formatted = formatToastMessage(status, message, routes);
+        if (deliver(formatted.message, formatted.title)) return;
     }
 
     let attempts = 0;
     const interval = setInterval(() => {
-        if (fire() || ++attempts > 30) {
+        const formatted = formatToastMessage(status, message, routes);
+        if (deliver(formatted.message, formatted.title) || ++attempts > 30) {
             clearInterval(interval);
         }
     }, 100);

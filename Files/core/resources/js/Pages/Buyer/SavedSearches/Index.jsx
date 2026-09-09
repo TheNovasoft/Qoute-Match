@@ -1,11 +1,19 @@
 import BuyerMasterLayout from '@/Components/Layout/BuyerMasterLayout';
+import ConfirmModal from '@/Components/Shared/ConfirmModal';
 import Pagination, { EmptyState } from '@/Components/Shared/Pagination';
 import { Link, router } from '@inertiajs/react';
+import { useState } from 'react';
 
 export default function Index({ pageTitle, searches }) {
+    const [pendingDeleteUrl, setPendingDeleteUrl] = useState(null);
+
     const remove = (url) => {
-        if (!window.confirm('Remove this saved search?')) return;
-        router.post(url);
+        setPendingDeleteUrl(url);
+    };
+
+    const confirmRemove = () => {
+        if (!pendingDeleteUrl) return;
+        router.post(pendingDeleteUrl, {}, { onFinish: () => setPendingDeleteUrl(null) });
     };
 
     return (
@@ -60,6 +68,16 @@ export default function Index({ pageTitle, searches }) {
                     <Pagination links={searches.links} />
                 </div>
             )}
+
+            <ConfirmModal
+                show={!!pendingDeleteUrl}
+                title="Remove saved search?"
+                message="This saved filter will be deleted. You can always save the search again later."
+                confirmLabel="Remove"
+                confirmClass="btn-outline--danger"
+                onConfirm={confirmRemove}
+                onCancel={() => setPendingDeleteUrl(null)}
+            />
         </BuyerMasterLayout>
     );
 }

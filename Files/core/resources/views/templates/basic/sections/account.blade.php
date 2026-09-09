@@ -5,7 +5,7 @@
 <div class="account-section my-120">
     <div class="container">
         <div class="row gy-4">
-            <div class="col-xl-6">
+            <div class="col-12 col-xl-6">
                 <div class="account-item">
                     <div class="account-item__content highlight">
                         <h3 class="account-item__title s-highlight" data-s-break="-1" data-s-length="1"> {{ __(@$account->freelancer_title) }}</h3>
@@ -19,7 +19,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-6">
+            <div class="col-12 col-xl-6">
                 <div class="account-item">
                     <div class="account-item__content highlight">
                         <h3 class="account-item__title s-highlight" data-s-break="-1" data-s-length="1"> {{ __(@$account->buyer_title) }}</h3>

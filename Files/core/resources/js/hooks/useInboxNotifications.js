@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { formatInboxNotification } from '@/utils/friendlyMessages';
 import { notify } from '@/utils/helpers';
 
 export default function useInboxNotifications(pollUrl, initialCount = 0) {
@@ -29,9 +30,9 @@ export default function useInboxNotifications(pollUrl, initialCount = 0) {
                 const count = Number(payload.count || 0);
 
                 if (lastCountRef.current !== null && count > lastCountRef.current) {
-                    const subject = payload.subject || 'New notification';
-                    const preview = payload.preview || 'You have a new update';
-                    notify('info', `${subject}: ${preview}`);
+                    const subject = payload.subject || 'New update';
+                    const preview = payload.preview || 'You have a new notification';
+                    notify('info', formatInboxNotification(subject, preview));
                 }
 
                 lastCountRef.current = count;

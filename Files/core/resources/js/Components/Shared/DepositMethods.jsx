@@ -1,8 +1,9 @@
 import { router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import RequestFormFields from '@/Components/Jobs/RequestFormFields';
+import FriendlyErrorAlert from '@/Components/Shared/FriendlyErrorAlert';
 
-export default function DepositMethods({ gateways, storeUrl, currencySymbol, currencyText }) {
+export default function DepositMethods({ gateways, storeUrl, currencySymbol, currencyText, depositUrl }) {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [amount, setAmount] = useState('');
     const [processing, setProcessing] = useState(false);
@@ -36,7 +37,7 @@ export default function DepositMethods({ gateways, storeUrl, currencySymbol, cur
             return;
         }
         if (!storeUrl) {
-            setError('Deposit endpoint is missing. Refresh the page and try again.');
+            setError('We could not start your deposit. Reload this page and try again.');
             return;
         }
         if (!amountInRange) {
@@ -58,7 +59,8 @@ export default function DepositMethods({ gateways, storeUrl, currencySymbol, cur
             {
                 preserveScroll: true,
                 onError: (errors) => {
-                    setError(errors.amount || errors.gateway || errors.currency || 'Unable to start deposit.');
+                    const firstError = errors.amount || errors.gateway || errors.currency || errors.error || Object.values(errors)[0];
+                    setError(firstError || 'We could not start your deposit. Check the amount and payment method, then try again.');
                 },
                 onFinish: () => setProcessing(false),
             },
@@ -76,9 +78,11 @@ export default function DepositMethods({ gateways, storeUrl, currencySymbol, cur
     return (
         <form onSubmit={submit} className="deposit-form">
             {error && (
-                <div className="alert alert-danger mb-3" role="alert">
-                    {error}
-                </div>
+                <FriendlyErrorAlert
+                    message={error}
+                    routes={{ buyerDeposit: depositUrl, userDeposit: depositUrl }}
+                    onDismiss={() => setError('')}
+                />
             )}
             <div className="gateway-card">
                 <div className="row justify-content-center gy-sm-4 gy-3">

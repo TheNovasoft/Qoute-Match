@@ -516,14 +516,14 @@ export default function JobDetails({
             </div>
 
             {showBidModal && (
-                <div className="modal custom--modal show d-block" id="bidModal" tabIndex="-1">
-                    <div className="modal-dialog modal-dialog-centered modal-lg">
+                <div className="modal custom--modal show d-block quote-bid-modal" id="bidModal" tabIndex="-1">
+                    <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable modal-fullscreen-sm-down">
                         <div className="modal-content">
                             <form onSubmit={handleQuoteWizardSubmit}>
                                 <div className="modal-body p-4">
-                                    <div className="d-flex justify-content-between align-items-center">
+                                    <div className="d-flex justify-content-between align-items-start gap-2">
                                         <h5 className="mb-2">{isEditMode ? 'Update your quote' : job.title}</h5>
-                                        <button type="button" className="btn-close" onClick={() => {
+                                        <button type="button" className="btn-close flex-shrink-0" onClick={() => {
                                             setShowBidModal(false);
                                             setIsEditMode(false);
                                         }}></button>
@@ -623,16 +623,16 @@ export default function JobDetails({
                                         </div>
                                     )}
 
-                                    <div className="d-flex justify-content-between align-items-center mt-4">
+                                    <div className="quote-wizard-actions d-flex flex-column flex-sm-row justify-content-between align-items-stretch align-items-sm-center gap-2 mt-4">
                                         <button
                                             type="button"
-                                            className="btn btn-outline--secondary"
+                                            className="btn btn-outline--secondary order-2 order-sm-1"
                                             disabled={quoteStep === 0 || processing}
                                             onClick={() => setQuoteStep((step) => Math.max(0, step - 1))}
                                         >
                                             Back
                                         </button>
-                                        <button type="submit" className="btn btn--base" disabled={processing || !canAdvanceQuoteStep()}>
+                                        <button type="submit" className="btn btn--base order-1 order-sm-2" disabled={processing || !canAdvanceQuoteStep()}>
                                             {quoteStep === quoteWizardSteps.length - 1
                                                 ? (isEditMode ? 'Update Quote' : 'Send Quote')
                                                 : 'Next'}

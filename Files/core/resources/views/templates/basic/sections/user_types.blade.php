@@ -25,7 +25,7 @@
         <div class="row gy-4">
             @foreach ($types as $type)
                 @php $item = $type->data_values; @endphp
-                <div class="col-lg-4 col-md-6">
+                <div class="col-12 col-md-6 col-lg-4">
                     <div class="user-type-card h-100">
                         @if (@$item->image)
                             <div class="user-type-card__thumb">

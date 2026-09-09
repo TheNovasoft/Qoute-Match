@@ -17,14 +17,18 @@ function DropdownMenu({ id, icon, label, openId, setOpenId, active, children }) 
     const isOpen = openId === id || active;
 
     return (
-        <li className={`sidebar-menu-list__item has-dropdown${active ? ' active' : ''}`}>
+        <li className={`sidebar-menu-list__item has-dropdown${active ? ' active' : ''}${isOpen ? ' is-open' : ''}`}>
             <button
                 type="button"
-                className={`sidebar-menu-list__link w-100 border-0 bg-transparent text-start${active ? ' active' : ''}`}
+                className={`sidebar-menu-list__link sidebar-menu-list__link--dropdown w-100 border-0 bg-transparent text-start d-flex align-items-center${active ? ' active' : ''}`}
+                aria-expanded={isOpen}
                 onClick={() => setOpenId(isOpen && openId === id && !active ? null : id)}
             >
                 <span className="icon"><i className={icon}></i></span>
-                <span className="text">{label}</span>
+                <span className="text flex-grow-1">{label}</span>
+                <span className="sidebar-menu-list__chevron" aria-hidden="true">
+                    <i className="las la-angle-down"></i>
+                </span>
             </button>
             <div className={`sidebar-submenu ${isOpen ? 'open-submenu' : ''}`}>{children}</div>
         </li>

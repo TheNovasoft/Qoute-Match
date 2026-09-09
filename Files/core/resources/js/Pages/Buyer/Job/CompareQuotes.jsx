@@ -408,7 +408,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                             </button>
                         </div>
                         <div className="row g-3 align-items-end">
-                            <div className="col-lg-3 col-md-6">
+                            <div className="col-12 col-md-6 col-lg-3">
                                 <label className="form--label">Sort</label>
                                 <select
                                     className="form-select form--control"
@@ -424,7 +424,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                 </select>
                                 <FilterHint text={FILTER_HELP.sort} />
                             </div>
-                            <div className="col-lg-2 col-md-6">
+                            <div className="col-12 col-md-6 col-lg-2">
                                 <label className="form--label">Min price</label>
                                 <input
                                     type="number"
@@ -436,7 +436,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                 />
                                 <FilterHint text={FILTER_HELP.min_price} />
                             </div>
-                            <div className="col-lg-2 col-md-6">
+                            <div className="col-12 col-md-6 col-lg-2">
                                 <label className="form--label">Max price</label>
                                 <input
                                     type="number"
@@ -448,12 +448,12 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                 />
                                 <FilterHint text={FILTER_HELP.max_price} />
                             </div>
-                            <div className="col-lg-2 col-md-6">
+                            <div className="col-12 col-md-6 col-lg-2">
                                 <button type="submit" className="btn btn--base w-100">Apply filters</button>
                             </div>
                         </div>
-                        <div className="row g-3 mt-2">
-                            <div className="col-md-4 col-sm-6">
+                        <div className="row g-3 mt-2 compare-quotes-filters__checks">
+                            <div className="col-12 col-md-6 col-lg-4">
                                 <label className="form-check mb-0">
                                     <input
                                         type="checkbox"
@@ -465,7 +465,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                 </label>
                                 <FilterHint text={FILTER_HELP.verified} />
                             </div>
-                            <div className="col-md-4 col-sm-6">
+                            <div className="col-12 col-md-6 col-lg-4">
                                 <label className="form-check mb-0">
                                     <input
                                         type="checkbox"
@@ -477,7 +477,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                 </label>
                                 <FilterHint text={FILTER_HELP.insured} />
                             </div>
-                            <div className="col-md-4 col-sm-6">
+                            <div className="col-12 col-md-6 col-lg-4">
                                 <label className="form-check mb-0">
                                     <input
                                         type="checkbox"
@@ -489,7 +489,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                 </label>
                                 <FilterHint text={FILTER_HELP.company} />
                             </div>
-                            <div className="col-md-4 col-sm-6">
+                            <div className="col-12 col-md-6 col-lg-4">
                                 <label className="form-check mb-0">
                                     <input
                                         type="checkbox"
@@ -501,7 +501,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                 </label>
                                 <FilterHint text={FILTER_HELP.licence} />
                             </div>
-                            <div className="col-md-4 col-sm-6">
+                            <div className="col-12 col-md-6 col-lg-4">
                                 <label className="form-check mb-0">
                                     <input
                                         type="checkbox"
