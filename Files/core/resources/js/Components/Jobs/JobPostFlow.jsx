@@ -349,7 +349,13 @@ function JobPostFlowInner({
         if (field === 'description' && manual) {
             setDescManual(true);
         }
-        form.setData(field, value);
+        form.setData((current) => {
+            if (current[field] === value) {
+                return current;
+            }
+
+            return { ...current, [field]: value };
+        });
     };
 
     const handleCategorySelect = (field, value) => {

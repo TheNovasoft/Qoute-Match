@@ -4272,6 +4272,121 @@ h6.mb-2 {
   color: hsl(var(--body-color) / 0.75);
 }
 
+.lcl-pack-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.lcl-pack-toggle .job-wizard-card {
+  align-items: center;
+  min-height: 56px;
+  padding: 14px 16px;
+}
+
+.lcl-pack-toggle .job-wizard-card__indicator {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.lcl-pack-toggle .job-wizard-card__label {
+  font-size: 0.9375rem;
+  line-height: 1.35;
+}
+
+.cargo-add-box-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0.45rem 1.15rem;
+  border: none;
+  border-radius: 999px;
+  background: hsl(var(--base));
+  color: hsl(var(--white)) !important;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cargo-add-box-btn:hover {
+  background: hsl(var(--base-d-100, var(--base)));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px hsl(var(--base) / 0.28);
+}
+
+.cargo-box-item {
+  scroll-margin-top: 88px;
+  overflow-anchor: none;
+}
+
+.cbm-calculator {
+  overflow-anchor: none;
+}
+
+.cbm-calculator__results {
+  overflow-anchor: none;
+}
+
+.cbm-calculator__results-grid .form-control {
+  min-height: calc(1.5em + 1rem + 2px);
+}
+
+.cbm-calculator__results-head {
+  min-height: 1.5rem;
+}
+
+.cbm-calculator__status {
+  visibility: hidden;
+}
+
+.cbm-calculator__status.is-visible {
+  visibility: visible;
+}
+
+.cargo-box-item--enter {
+  animation: cargoBoxEnter 0.35s ease-out;
+}
+
+.cargo-box-item__title {
+  font-weight: 700;
+  color: hsl(var(--heading-color));
+}
+
+@keyframes cargoBoxEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 575px) {
+  .lcl-pack-toggle {
+    gap: 8px;
+  }
+
+  .lcl-pack-toggle .job-wizard-card {
+    padding: 12px 10px;
+    gap: 8px;
+  }
+
+  .lcl-pack-toggle .job-wizard-card__indicator {
+    font-size: 1.1rem;
+  }
+
+  .lcl-pack-toggle .job-wizard-card__label {
+    font-size: 0.8125rem;
+  }
+}
+
 .job-wizard__actions {
   display: flex;
   justify-content: space-between;
