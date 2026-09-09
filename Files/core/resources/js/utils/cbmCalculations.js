@@ -135,6 +135,44 @@ export function calculateCbmResults({
     };
 }
 
+export const CBM_MULTI_BOX_SEPARATOR = ' || ';
+
+export function parseStoredCbmBoxes(value) {
+    if (!value || typeof value !== 'string') {
+        return [''];
+    }
+
+    const trimmed = value.trim();
+    if (!trimmed) {
+        return [''];
+    }
+
+    if (/Box\s+\d+:/i.test(trimmed)) {
+        return trimmed
+            .split(CBM_MULTI_BOX_SEPARATOR)
+            .map((segment) => {
+                const match = segment.trim().match(/^Box\s+\d+:\s*(.+)$/i);
+                return match ? match[1].trim() : segment.trim();
+            })
+            .filter(Boolean);
+    }
+
+    return [trimmed];
+}
+
+export function formatStoredCbmBoxes(boxValues, { multiple = false } = {}) {
+    const filled = (boxValues || []).map((value) => String(value || '').trim()).filter(Boolean);
+    if (!filled.length) {
+        return '';
+    }
+
+    if (!multiple || filled.length === 1) {
+        return filled[0];
+    }
+
+    return filled.map((value, index) => `Box ${index + 1}: ${value}`).join(CBM_MULTI_BOX_SEPARATOR);
+}
+
 export function parseStoredCbmValue(value) {
     const defaults = {
         length: '',
