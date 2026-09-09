@@ -1121,6 +1121,27 @@ body .account-section .row {
     }
 }
 
+@media (max-width: 1199px) {
+    body .account-section .row > [class*="col-xl-6"] {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    body .account-item__content {
+        max-width: 100% !important;
+    }
+
+    body .account-item__thumb,
+    body div [class*="col"]:last-child .account-item__thumb {
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+        margin-top: 16px !important;
+        justify-content: center !important;
+    }
+}
+
 body .account-item,
 body .account-section .account-item,
 body div [class*="col"] .account-item,

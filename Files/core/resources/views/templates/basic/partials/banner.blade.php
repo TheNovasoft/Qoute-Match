@@ -44,7 +44,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 d-xsm-block d-none">
+            <div class="col-12 col-lg-6 banner-thumb-column">
                 <div class="banner-thumb-wrapper">
                     <div class="banner-thumb">
                         <img src="{{ frontendImage('banner', @$banner->image, '1140x970') }}" alt="">

@@ -1,8 +1,11 @@
 import { router, useForm } from '@inertiajs/react';
+import { useState } from 'react';
 import StatusBadge from '@/Components/Shared/StatusBadge';
+import ConfirmModal from '@/Components/Shared/ConfirmModal';
 
 export default function SupportTicketView({ ticket, messages = [] }) {
     const form = useForm({ message: '', attachments: [] });
+    const [confirmClose, setConfirmClose] = useState(false);
 
     const submitReply = (event) => {
         event.preventDefault();
@@ -14,8 +17,11 @@ export default function SupportTicketView({ ticket, messages = [] }) {
     };
 
     const closeTicket = () => {
-        if (!window.confirm('Are you sure to close this ticket?')) return;
-        router.post(ticket.closeUrl);
+        setConfirmClose(true);
+    };
+
+    const confirmCloseTicket = () => {
+        router.post(ticket.closeUrl, {}, { onFinish: () => setConfirmClose(false) });
     };
 
     return (
@@ -130,6 +136,16 @@ export default function SupportTicketView({ ticket, messages = [] }) {
                     </div>
                 )}
             </div>
+
+            <ConfirmModal
+                show={confirmClose}
+                title="Close this support ticket?"
+                message="You will not be able to reply after closing. Open a new ticket if you need more help later."
+                confirmLabel="Close ticket"
+                confirmClass="btn-outline--danger"
+                onConfirm={confirmCloseTicket}
+                onCancel={() => setConfirmClose(false)}
+            />
         </div>
     );
 }

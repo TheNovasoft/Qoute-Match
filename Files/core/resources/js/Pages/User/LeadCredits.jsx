@@ -1,4 +1,4 @@
-import { router, usePage } from '@inertiajs/react';
+import { router, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import MasterLayout from '@/Components/Layout/MasterLayout';
 import Pagination from '@/Components/Shared/Pagination';
@@ -44,6 +44,7 @@ export default function LeadCredits({
     logs,
 }) {
     const { routes } = usePage().props;
+    const depositUrl = routes?.userDeposit ?? '/provider/deposit';
     const [payment, setPayment] = useState({ gateway: '', currency: '' });
     const [processing, setProcessing] = useState(false);
 
@@ -234,9 +235,12 @@ export default function LeadCredits({
                                                     </p>
                                                     <p className="h5 text--base">{pkg.price}</p>
                                                     {!canBuy && paymentSelected && usingWallet && (
-                                                        <p className="small text-warning mb-2">
-                                                            Insufficient wallet balance for this package.
-                                                        </p>
+                                                        <div className="small text-warning mb-2">
+                                                            <p className="mb-2">Not enough wallet balance for this package.</p>
+                                                            <Link href={depositUrl} className="btn btn-sm btn-outline--base">
+                                                                Add money
+                                                            </Link>
+                                                        </div>
                                                     )}
                                                     {!canBuy && paymentSelected && !usingWallet && (
                                                         <p className="small text-warning mb-2">
@@ -291,9 +295,12 @@ export default function LeadCredits({
                                                     </ul>
                                                     <p className="h5 text--base">{plan.price}</p>
                                                     {!canBuy && paymentSelected && usingWallet && (
-                                                        <p className="small text-warning mb-2">
-                                                            Insufficient wallet balance for this plan.
-                                                        </p>
+                                                        <div className="small text-warning mb-2">
+                                                            <p className="mb-2">Not enough wallet balance for this plan.</p>
+                                                            <Link href={depositUrl} className="btn btn-sm btn-outline--base">
+                                                                Add money
+                                                            </Link>
+                                                        </div>
                                                     )}
                                                     <button
                                                         type="button"

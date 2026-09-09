@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { formatToastMessage } from '@/utils/friendlyMessages';
 
 export default function NotifyScripts() {
     useEffect(() => {
@@ -31,10 +32,11 @@ export default function NotifyScripts() {
                 info: 'fas fa-exclamation-circle',
             };
 
-            window.triggerToaster = (status, message) => {
+            window.triggerToaster = (status, message, titleOverride) => {
+                const formatted = formatToastMessage(status, message);
                 window.iziToast[status]({
-                    title: status.charAt(0).toUpperCase() + status.slice(1),
-                    message,
+                    title: titleOverride || formatted.title || status.charAt(0).toUpperCase() + status.slice(1),
+                    message: titleOverride ? message : formatted.message,
                     position: 'topRight',
                     backgroundColor: '#fff',
                     icon: icons[status],

@@ -31,7 +31,7 @@ export default function Freelancers({ pageTitle, seo, sections, freelancers, ski
                         <div className="filter-wrapper">
                             <div className="filter-wrapper__content">
                                 <span className="filter-wrapper__content-title">Filter</span>
-                                <form className="filter-form" onSubmit={submit}>
+                                <form className="filter-form filter-form--stacked" onSubmit={submit}>
                                     <select className="form-select form--control" name="rating" defaultValue={filters.rating || '0'}>
                                         <option value="0">All Star</option>
                                         {[1, 2, 3, 4, 5].map((n) => (

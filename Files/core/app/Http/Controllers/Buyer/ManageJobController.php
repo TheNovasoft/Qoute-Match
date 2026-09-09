@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Buyer;
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Lib\FormTranslateLocale;
+use App\Lib\FriendlyNotify;
 use App\Lib\GuestJobPostService;
 use App\Lib\QuoteMessagingService;
 use App\Lib\RequestFormService;
@@ -118,7 +119,7 @@ class ManageJobController extends Controller
         $job = $id ? Job::where('buyer_id', $buyer->id)->with('skills')->findOrFail($id) : null;
 
         if ($job && !$this->buyerCanEditJob($job)) {
-            $notify[] = ['error', 'This request can no longer be edited because a provider has already been hired.'];
+            $notify[] = ['error', FriendlyNotify::alreadyHired()];
             return back()->withNotify($notify);
         }
 
@@ -229,7 +230,7 @@ class ManageJobController extends Controller
         if ($id) {
             $existingJob = Job::where('buyer_id', $buyer->id)->findOrFail($id);
             if (!$this->buyerCanEditJob($existingJob)) {
-                $notify[] = ['error', 'This request can no longer be edited because a provider has already been hired.'];
+                $notify[] = ['error', FriendlyNotify::alreadyHired()];
                 return back()->withNotify($notify);
             }
         }
@@ -318,7 +319,7 @@ class ManageJobController extends Controller
         if ($id) {
             $existingJob = Job::where('buyer_id', $buyer->id)->findOrFail($id);
             if (!$this->buyerCanEditJob($existingJob)) {
-                $notify[] = ['error', 'This request can no longer be edited because a provider has already been hired.'];
+                $notify[] = ['error', FriendlyNotify::alreadyHired()];
                 return back()->withNotify($notify);
             }
         }
@@ -432,7 +433,7 @@ class ManageJobController extends Controller
         $job = Job::where('buyer_id', $buyer->id)->findOrFail($id);
 
         if (!$this->buyerCanEditJob($job)) {
-            $notify[] = ['error', 'This request can no longer be edited because a provider has already been hired.'];
+            $notify[] = ['error', FriendlyNotify::alreadyHired()];
             return back()->withNotify($notify);
         }
 
@@ -479,7 +480,7 @@ class ManageJobController extends Controller
         $job = Job::where('buyer_id', $buyer->id)->findOrFail($id);
 
         if (!$this->buyerCanEditJob($job)) {
-            $notify[] = ['error', 'This request can no longer be edited because a provider has already been hired.'];
+            $notify[] = ['error', FriendlyNotify::alreadyHired()];
             return back()->withNotify($notify);
         }
 
@@ -676,7 +677,7 @@ class ManageJobController extends Controller
             ->where('buyer_id', $buyer->id)
             ->findOrFail($id);
 
-        $sort = $request->get('sort', 'price_asc');
+        $sort = $request->get('sort', 'recommended');
         $filterVerified = $request->boolean('verified');
         $filterInsured = $request->boolean('insured');
         $filterCompany = $request->boolean('company');
@@ -691,9 +692,15 @@ class ManageJobController extends Controller
             ->where('status', '!=', Status::BID_WITHDRAW);
 
         $statsBids = (clone $statsQuery)->get();
-        $statsLowest = $statsBids->min(fn (Bid $bid) => (float) $bid->bid_amount);
+        $activeBids = $statsBids->where('status', Status::BID_PENDING)->values();
+        $rejectedCount = $statsBids->where('status', Status::BID_REJECTED)->count();
+        $statsLowest = $activeBids->min(fn (Bid $bid) => (float) $bid->bid_amount);
 
-        $bidsQuery = (clone $statsQuery)->with([
+        $bidsQuery = Bid::query()
+            ->where('job_id', $job->id)
+            ->where('buyer_id', $buyer->id)
+            ->where('status', Status::BID_PENDING)
+            ->with([
             'user.providerVerifications',
             'user.projects',
             'user.approvedReviews',
@@ -818,12 +825,14 @@ class ManageJobController extends Controller
             'job' => [
                 'id' => $job->id,
                 'title' => $job->title,
+                'slug' => $job->slug,
                 'category' => $job->category?->name,
                 'subcategory' => $job->subcategory?->name,
                 'budget' => showAmount($job->budget),
                 'budgetRaw' => (float) $job->budget,
                 'requestSummary' => RequestFormService::displayValues($job->request_data ?? []),
                 'viewUrl' => route('buyer.job.post.view', $job->id),
+                'publicUrl' => $job->slug ? route('explore.bid.job', $job->slug) : null,
             ],
             'bids' => $bids,
             'filters' => [
@@ -837,8 +846,9 @@ class ManageJobController extends Controller
                 'max_price' => $request->max_price,
             ],
             'stats' => [
-                'total' => $statsBids->count(),
-                'shortlisted' => $statsBids->where('is_shortlist', Status::YES)->count(),
+                'total' => $activeBids->count(),
+                'rejected' => $rejectedCount,
+                'shortlisted' => $activeBids->where('is_shortlist', Status::YES)->count(),
                 'lowestPrice' => $statsLowest !== null ? showAmount($statsLowest) : null,
                 'highestPrice' => $highestAmount !== null ? showAmount($highestAmount) : null,
                 'averagePrice' => $averageAmount ? showAmount($averageAmount) : null,
@@ -924,20 +934,20 @@ class ManageJobController extends Controller
         $bidAmount = (float) $bid->bid_amount;
 
         if (!$freelancer) {
-            $notify[] = ['error', 'Provider account not found for this quote.'];
+            $notify[] = ['error', FriendlyNotify::providerNotFound()];
             return back()->withNotify($notify);
         }
 
         $existProject = Project::where('job_id', $bid->job_id)->where('status', '!=', Status::PROJECT_REJECTED)->first();
 
         if ($existProject) {
-            $notify[] = ['error', 'Invalid action! Already hired talent.'];
+            $notify[] = ['error', FriendlyNotify::alreadyHired()];
             return back()->withNotify($notify);
         }
 
         if (gs('escrow_payment') && (float) $buyer->balance < $bidAmount) {
             $shortfall = max(0, $bidAmount - (float) $buyer->balance);
-            $notify[] = ['error', 'Insufficient balance. Deposit at least ' . showAmount($shortfall) . ' to accept this quote.'];
+            $notify[] = ['error', FriendlyNotify::insufficientBalance($shortfall, 'quote')];
             return to_route('buyer.deposit.index')->withNotify($notify);
         }
 

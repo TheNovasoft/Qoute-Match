@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Buyer;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Lib\FriendlyNotify;
 use App\Models\AdminNotification;
 use App\Models\Bid;
 use App\Models\Charge;
@@ -194,7 +195,7 @@ class ProjectController extends Controller
 
         //if author already used escrow!
         if (!$bid->project->escrow_amount && $buyer->balance <  $bidAmount) {
-            $notify[] = ['error', 'Insufficient balance for this completed project!'];
+            $notify[] = ['error', FriendlyNotify::insufficientBalance(0, 'project')];
             return back()->withNotify($notify);
         }
 

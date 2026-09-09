@@ -61,17 +61,23 @@ export function AuthorizationPage({ pageTitle, authz }) {
     );
 }
 
-export function DepositPage({ pageTitle, gateways, storeUrl }) {
-    const { site } = usePage().props;
+export function DepositPage({ pageTitle, gateways, storeUrl, role = 'buyer' }) {
+    const { site, routes } = usePage().props;
+    const Layout = role === 'buyer' ? BuyerMasterLayout : MasterLayout;
+    const depositUrl = role === 'buyer'
+        ? (routes?.buyerDeposit ?? '/customer/deposit')
+        : (routes?.userDeposit ?? '/provider/deposit');
+
     return (
-        <BuyerMasterLayout pageTitle={pageTitle}>
+        <Layout pageTitle={pageTitle}>
             <DepositMethods
                 gateways={gateways}
                 storeUrl={storeUrl}
                 currencySymbol={site.currencySymbol}
                 currencyText={site.currencyText}
+                depositUrl={depositUrl}
             />
-        </BuyerMasterLayout>
+        </Layout>
     );
 }
 

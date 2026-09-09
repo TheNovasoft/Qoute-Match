@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Buyer;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Lib\FriendlyNotify;
 use App\Lib\TaskResource;
 use App\Models\AdminNotification;
 use App\Models\Bid;
@@ -76,7 +77,7 @@ class ManageTaskController extends Controller
             : new TrialTask();
 
         if (!$taskId && $buyer->balance < $request->amount) {
-            $notify[] = ['error', 'Insufficient balance'];
+            $notify[] = ['error', FriendlyNotify::insufficientBalance(0, 'project')];
             return back()->withNotify($notify);
         }
 
@@ -171,7 +172,7 @@ class ManageTaskController extends Controller
         $amount =  $task->amount;
 
         if ($task->escrow_amount == 0 && $buyer->balance <  $amount) {
-            $notify[] = ['error', 'Insufficient balance for this completed project!'];
+            $notify[] = ['error', FriendlyNotify::insufficientBalance(0, 'project')];
             return back()->withNotify($notify);
         }
 
