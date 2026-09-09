@@ -121,10 +121,26 @@ class ProfileController extends Controller
                 'language' => array_values(array_filter($languages)),
                 'image' => getImage(getFilePath('userProfile') . '/' . $user->image, getFileSize('userProfile')),
                 'step' => (int) $user->step,
+                'availabilityStatus' => (int) ($user->availability_status ?? \App\Lib\ProviderPresenceService::STATUS_ONLINE),
             ],
+            'availabilityOptions' => \App\Lib\ProviderPresenceService::options(),
+            'availabilityUrl' => route('user.profile.availability'),
         ]);
     }
 
+    public function updateAvailability(Request $request)
+    {
+        $request->validate([
+            'availability_status' => 'required|integer|in:1,2,3',
+        ]);
+
+        $user = auth()->user();
+        $user->availability_status = (int) $request->availability_status;
+        $user->save();
+
+        $notify[] = ['success', 'Availability status updated.'];
+        return back()->withNotify($notify);
+    }
 
     public function submitProfile(Request $request)
     {

@@ -175,7 +175,15 @@ class UserController extends Controller
             'pageTitle' => $pageTitle,
             'transactions' => AccountResource::transactions($transactions, $remarks->all()),
             'indexUrl' => route('user.transactions'),
+            'exportUrl' => route('user.transactions.export'),
         ]);
+    }
+
+    public function exportTransactions(\Illuminate\Http\Request $request)
+    {
+        $query = \App\Lib\TransactionExportService::userQuery(auth()->id(), $request->only(['search', 'trx_type', 'remark']));
+
+        return \App\Lib\TransactionExportService::streamCsv($query, 'provider-transactions.csv');
     }
 
     public function kycForm()

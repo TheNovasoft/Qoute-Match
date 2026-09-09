@@ -68,6 +68,7 @@ export default function MasterLayout({ children, pageTitle, backUrl }) {
     const verificationHref = routes.userVerification ?? '/freelancer/verification';
     const conversationHref = routes.userConversation ?? '/freelancer/conversation';
     const settingsHref = routes.userProfileSetting ?? '/freelancer/profile-setting';
+    const servicesHref = routes.userServices ?? '/provider/services';
     const logoutHref = routes.userLogout ?? '/freelancer/logout';
 
     return (
@@ -135,6 +136,12 @@ export default function MasterLayout({ children, pageTitle, backUrl }) {
                                     icon="las la-briefcase"
                                     label="My Projects"
                                     active={isNavActive(url, projectsHref)}
+                                />
+                                <SidebarLink
+                                    href={servicesHref}
+                                    icon="las la-box"
+                                    label="Service Packages"
+                                    active={isNavActive(url, servicesHref)}
                                 />
                                 {!isSimple && (
                                     <>

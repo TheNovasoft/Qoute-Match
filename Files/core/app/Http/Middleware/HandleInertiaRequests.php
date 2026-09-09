@@ -138,6 +138,8 @@ class HandleInertiaRequests extends Middleware
                 'userStoreProfilePortfolio' => route('user.store.profile.portfolio'),
                 'userStatusProfilePortfolio' => url('/provider/status-profile-portfolio'),
                 'userProfileComplete' => route('user.profile.complete'),
+                'userProfileAvailability' => route('user.profile.availability'),
+                'userServices' => route('user.services.index'),
                 'userBidIndex' => route('user.bid.index'),
                 'userProjectIndex' => route('user.project.index'),
                 'userDisputes' => route('user.disputes.index'),

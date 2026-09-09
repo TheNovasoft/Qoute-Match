@@ -27,13 +27,18 @@ class MilestoneService
             throw new \InvalidArgumentException('Milestone is not ready for approval.');
         }
 
+        $milestone->loadMissing('project.user', 'project.job');
+        $project = $milestone->project;
+
+        if (! $project) {
+            throw new \InvalidArgumentException('Project not found for this milestone.');
+        }
+
         $milestone->status = ProjectMilestone::STATUS_APPROVED;
         $milestone->approved_at = now();
         $milestone->save();
 
-        // Partial payout foundation — full escrow split can be extended later.
-        $milestone->status = ProjectMilestone::STATUS_PAID;
-        $milestone->save();
+        EscrowPayoutService::releaseMilestone($project, $milestone);
     }
 
     public static function submit(ProjectMilestone $milestone, ?string $notes = null): void

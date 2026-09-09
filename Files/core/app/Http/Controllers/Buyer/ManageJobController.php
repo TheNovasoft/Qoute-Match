@@ -302,7 +302,8 @@ class ManageJobController extends Controller
             'skill_level'    => 'required|in:1,2,3,4',
             'budget'         => 'nullable|numeric|gte:0',
             'custom_budget'  => 'required|in:0,1',
-            'deadline'       => 'nullable|date',
+            'deadline'            => 'nullable|date',
+            'quote_validity_days' => 'nullable|integer|min:1|max:365',
         ]);
 
         $category = Category::active()->with(['requestForm', 'subcategories' => fn ($q) => $q->active()])->findOrFail($request->category_id);
@@ -386,6 +387,9 @@ class ManageJobController extends Controller
         $job->budget = $request->custom_budget == '1' ? 0 : ($request->budget ?? 0);
         $job->custom_budget = $request->custom_budget;
         $job->deadline = $request->deadline ?: null;
+        $job->quote_validity_days = $request->filled('quote_validity_days')
+            ? (int) $request->quote_validity_days
+            : null;
         $job->questions = [];
         $job->status = Status::JOB_PUBLISH;
         $job->is_approved = Status::JOB_APPROVED;
@@ -470,8 +474,9 @@ class ManageJobController extends Controller
         $request->validate([
             'budget'        => 'nullable|numeric|gte:0',
             'custom_budget' => 'required|in:0,1',
-            'deadline'      => 'nullable|date',
-            'questions'     => 'nullable|array|max:5',
+            'deadline'            => 'nullable|date',
+            'quote_validity_days' => 'nullable|integer|min:1|max:365',
+            'questions'           => 'nullable|array|max:5',
             'questions.*'   => 'nullable|string',
             'status'        => 'nullable|in:0,1',
         ]);
@@ -500,6 +505,9 @@ class ManageJobController extends Controller
         $job->budget = $request->custom_budget == '1' ? 0 : ($request->budget ?? 0);
         $job->custom_budget = $request->custom_budget;
         $job->deadline = $request->deadline ?: null;
+        $job->quote_validity_days = $request->filled('quote_validity_days')
+            ? (int) $request->quote_validity_days
+            : $job->quote_validity_days;
         $job->questions = $request->questions;
         $job->status = $status;
 
@@ -537,6 +545,7 @@ class ManageJobController extends Controller
         $toRoute = route('buyer.job.post.index');
         $buyer = auth()->guard('buyer')->user()->loadCount('buyerReviews');
         $job = Job::where('buyer_id', $buyer->id)->with(['skills', 'category', 'subcategory'])->findOrFail($id);
+        $job->increment('view_count');
         $requestFields = RequestFormService::displayValues($job->request_data);
 
         return Inertia::render('Buyer/Job/View', [
@@ -563,6 +572,8 @@ class ManageJobController extends Controller
                 'isApproved' => (int) $job->is_approved === Status::JOB_APPROVED,
                 'skills' => $job->skills->pluck('name')->values()->all(),
                 'questions' => $job->questions ?? [],
+                'viewCount' => (int) ($job->view_count ?? 0),
+                'quoteValidityDays' => (int) ($job->quote_validity_days ?? \App\Lib\QuoteExpiryService::DEFAULT_VALIDITY_DAYS),
             ],
         ]);
     }
@@ -791,7 +802,10 @@ class ManageJobController extends Controller
                 'revisionRequested' => (bool) $bid->revision_requested_at,
                 'revisionNote' => $bid->revision_note,
                 'revisionRequestedAt' => $bid->revision_requested_at ? showDateTime($bid->revision_requested_at) : null,
-                'canAccept' => $bid->status == Status::BID_PENDING,
+                'expiresAt' => $bid->expires_at ? showDateTime($bid->expires_at, 'd M, Y') : null,
+                'isExpired' => \App\Lib\QuoteExpiryService::isExpired($bid),
+                'expiryLabel' => \App\Lib\QuoteExpiryService::label($bid),
+                'canAccept' => $bid->status == Status::BID_PENDING && ! \App\Lib\QuoteExpiryService::isExpired($bid),
                 'canReject' => $bid->status == Status::BID_PENDING,
                 'canMessage' => QuoteMessagingService::bidAllowsMessaging($bid),
                 'messageUrl' => route('buyer.conversation.bid', $bid->id),
@@ -815,6 +829,8 @@ class ManageJobController extends Controller
                     'licenceVerified' => \App\Lib\VerificationBadgeService::hasApprovedLicence($user),
                     'verificationBadges' => \App\Lib\VerificationBadgeService::badgesForUser($user),
                     'profileUrl' => route('talent.explore', $user->username),
+                    'presence' => \App\Lib\ProviderPresenceService::statusKey($user),
+                    'presenceLabel' => \App\Lib\ProviderPresenceService::statusLabel($user),
                 ],
                 'createdAt' => showDateTime($bid->created_at),
             ];
@@ -942,6 +958,11 @@ class ManageJobController extends Controller
 
         if ($existProject) {
             $notify[] = ['error', FriendlyNotify::alreadyHired()];
+            return back()->withNotify($notify);
+        }
+
+        if (\App\Lib\QuoteExpiryService::isExpired($bid)) {
+            $notify[] = ['error', 'This quote has expired. Ask the provider to submit a fresh quote.'];
             return back()->withNotify($notify);
         }
 

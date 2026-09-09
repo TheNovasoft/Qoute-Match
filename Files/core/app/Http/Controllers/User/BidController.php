@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Lib\DashboardResource;
 use App\Lib\JobMatchingService;
 use App\Lib\QuoteDeadlineService;
+use App\Lib\QuoteExpiryService;
 use App\Lib\QuoteAmountService;
 use App\Lib\RequestFormService;
 use App\Rules\FileTypeValidate;
@@ -178,6 +179,7 @@ class BidController extends Controller
         $bid->quote_data     = $quoteData;
         $bid->revision_requested_at = null;
         $bid->revision_note = null;
+        QuoteExpiryService::applyToBid($bid, $job);
         $bid->save();
 
         \App\Lib\LeadCreditService::chargeForQuote($freelancer, $bid);
@@ -235,6 +237,7 @@ class BidController extends Controller
         $bid->quote_data = $quoteData;
         $bid->revision_requested_at = null;
         $bid->revision_note = null;
+        QuoteExpiryService::applyToBid($bid, $job);
         $bid->save();
 
         notify($bid->buyer, 'BID_PLACED', [

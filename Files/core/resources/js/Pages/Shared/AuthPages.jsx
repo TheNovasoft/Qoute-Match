@@ -61,7 +61,7 @@ export function AuthorizationPage({ pageTitle, authz }) {
     );
 }
 
-export function DepositPage({ pageTitle, gateways, storeUrl, role = 'buyer' }) {
+export function DepositPage({ pageTitle, gateways, storeUrl, role = 'buyer', savedMethods = [] }) {
     const { site, routes } = usePage().props;
     const Layout = role === 'buyer' ? BuyerMasterLayout : MasterLayout;
     const depositUrl = role === 'buyer'
@@ -76,6 +76,7 @@ export function DepositPage({ pageTitle, gateways, storeUrl, role = 'buyer' }) {
                 currencySymbol={site.currencySymbol}
                 currencyText={site.currencyText}
                 depositUrl={depositUrl}
+                savedMethods={savedMethods}
             />
         </Layout>
     );

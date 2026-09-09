@@ -5535,3 +5535,20 @@ h6.mb-2 {
     width: 100%;
   }
 }
+
+.provider-presence {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.provider-presence--online {
+  color: #16a34a;
+}
+
+.provider-presence--away {
+  color: #d97706;
+}
+
+.provider-presence--offline {
+  color: #6b7280;
+}

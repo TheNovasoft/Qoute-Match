@@ -21,6 +21,7 @@ export default function TalentProfile({
     reviews,
     dimensionAverages,
     portfolios,
+    services = [],
     templateIcons,
 }) {
     const { auth, routes, csrfToken } = usePage().props;
@@ -86,6 +87,11 @@ export default function TalentProfile({
                                     <div className="main-content-wrapper">
                                         <div className="profile-content">
                                             <h5 className="profile-content__name">{freelancer.fullname}</h5>
+                                            {freelancer.presenceLabel && (
+                                                <span className={`provider-presence provider-presence--${freelancer.presence || 'offline'} mb-2 d-inline-block`}>
+                                                    {freelancer.presenceLabel}
+                                                </span>
+                                            )}
                                             <VerificationBadges badges={freelancer.verificationBadges} className="mb-2" />
                                             <span className="profile-content__title">{freelancer.tagline}</span>
                                             <ul className="rating-list">
@@ -141,6 +147,27 @@ export default function TalentProfile({
                                     <div className="body-content">
                                         <h6 className="body-content__title">Why should you work with me ?</h6>
                                         <div className="body-content__desc" dangerouslySetInnerHTML={{ __html: freelancer.about || '' }} />
+                                        {services.length > 0 && (
+                                            <div className="proficiency-wrapper mb-4">
+                                                <div className="proficiency-wrapper__item w-100">
+                                                    <p className="proficiency-wrapper__title">Service Packages</p>
+                                                    <div className="row gy-3">
+                                                        {services.map((service) => (
+                                                            <div className="col-md-6" key={service.id}>
+                                                                <div className="card custom--card h-100">
+                                                                    <div className="card-body">
+                                                                        <h6 className="mb-1">{service.title}</h6>
+                                                                        <p className="text--base fw-semibold mb-2">{service.price}</p>
+                                                                        <p className="small text-muted mb-2">Delivery: {service.deliveryDays} days</p>
+                                                                        {service.description && <p className="small mb-0">{service.description}</p>}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                         <div className="proficiency-wrapper">
                                             <div className="proficiency-wrapper__item">
                                                 <p className="proficiency-wrapper__title">My Specializations</p>

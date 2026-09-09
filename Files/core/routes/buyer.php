@@ -70,6 +70,7 @@ Route::middleware('buyer')->name('buyer.')->group(function () {
                 //Report
                 Route::any('deposit/history', 'depositHistory')->name('deposit.history');
                 Route::get('transactions', 'transactions')->name('transactions');
+                Route::get('transactions/export', 'exportTransactions')->name('transactions.export');
 
                 Route::post('add-device-token', 'addDeviceToken')->name('add.device.token');
                 Route::post('talent-invite/{fId}', 'talentInviteByBuyer')->name('talent.invite');

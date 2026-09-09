@@ -367,7 +367,14 @@ class JobExploreController extends Controller
 
         $freelancer = User::publicProfile()
             ->where('username', $slug)
-            ->with(['skills', 'badge', 'providerVerifications', 'portfolios', 'projects' => fn ($q) => $q->select('id', 'user_id', 'status')])
+            ->with([
+                'skills',
+                'badge',
+                'providerVerifications',
+                'portfolios',
+                'providerServices' => fn ($q) => $q->active()->orderBy('sort_order'),
+                'projects' => fn ($q) => $q->select('id', 'user_id', 'status'),
+            ])
             ->firstOrFail();
 
         $skillIds = $freelancer->skills->pluck('id')->toArray();
@@ -423,6 +430,13 @@ class JobExploreController extends Controller
                 'label' => $item['label'],
                 'average' => $item['average'],
             ])->all()),
+            'services' => $freelancer->providerServices->map(fn ($service) => [
+                'id' => (int) $service->id,
+                'title' => __($service->title),
+                'description' => __($service->description),
+                'price' => showAmount($service->price),
+                'deliveryDays' => (int) $service->delivery_days,
+            ])->values()->all(),
             'portfolios' => $freelancer->portfolios->where('status', Status::ENABLE)->map(fn ($portfolio) => [
                 'id' => $portfolio->id,
                 'title' => __($portfolio->title),

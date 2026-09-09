@@ -35,6 +35,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'kyc_data'          => 'object',
         'ver_code_send_at'  => 'datetime',
+        'last_seen_at'      => 'datetime',
         'language'          => 'object',
         'skill_ids'         => 'array',
         'subcategory_ids'   => 'array',
@@ -87,6 +88,11 @@ class User extends Authenticatable
     public function portfolios()
     {
         return $this->hasMany(Portfolio::class);
+    }
+
+    public function providerServices()
+    {
+        return $this->hasMany(ProviderService::class)->orderBy('sort_order');
     }
 
     public function skills()

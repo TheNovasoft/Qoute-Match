@@ -225,7 +225,16 @@ class BuyerController extends Controller
             'pageTitle' => $pageTitle,
             'transactions' => AccountResource::transactions($transactions, $remarks->all()),
             'indexUrl' => route('buyer.transactions'),
+            'exportUrl' => route('buyer.transactions.export'),
         ]);
+    }
+
+    public function exportTransactions(\Illuminate\Http\Request $request)
+    {
+        $buyerId = auth()->guard('buyer')->id();
+        $query = \App\Lib\TransactionExportService::buyerQuery($buyerId, $request->only(['search', 'trx_type', 'remark']));
+
+        return \App\Lib\TransactionExportService::streamCsv($query, 'customer-transactions.csv');
     }
 
     public function kycForm()

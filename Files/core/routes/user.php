@@ -68,8 +68,17 @@ Route::middleware('auth')->name('user.')->group(function () {
                 //Report
                 Route::any('deposit/history', 'depositHistory')->name('deposit.history');
                 Route::get('transactions', 'transactions')->name('transactions');
+                Route::get('transactions/export', 'exportTransactions')->name('transactions.export');
 
                 Route::post('add-device-token', 'addDeviceToken')->name('add.device.token');
+            });
+
+            Route::controller('ServicePackageController')->prefix('services')->name('services.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::post('{id}', 'update')->name('update');
+                Route::post('{id}/status', 'status')->name('status');
+                Route::post('{id}/delete', 'destroy')->name('delete');
             });
 
             Route::controller('InvoiceController')->prefix('invoices')->name('invoices.')->group(function () {
@@ -88,6 +97,7 @@ Route::middleware('auth')->name('user.')->group(function () {
 
                 Route::get('profile-setting', 'profile')->name('profile.setting');
                 Route::post('profile-setting', 'submitProfile')->name('store.profile.setting');
+                Route::post('profile-availability', 'updateAvailability')->name('profile.availability');
 
                 Route::get('profile-education', 'education')->name('profile.education');
                 Route::post('profile-education-store', 'submitEducations')->name('store.profile.education');
