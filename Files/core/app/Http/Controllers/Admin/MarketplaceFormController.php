@@ -91,7 +91,9 @@ class MarketplaceFormController extends Controller
         $request->validate($generatorValidation['rules'], $generatorValidation['messages']);
 
         if (! $request->filled('form_generator.form_label')) {
-            $notify[] = ['error', 'Add at least one field before saving.'];
+            $form->form_data = (object) [];
+            $form->save();
+            $notify[] = ['success', 'All form fields removed. Save again when you add new fields.'];
             return back()->withNotify($notify);
         }
 

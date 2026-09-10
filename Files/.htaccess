@@ -5,6 +5,12 @@
 
     RewriteEngine On
 
+    # Block direct web access to Laravel application code (vendor, .env, etc.)
+    RewriteRule ^core(/.*)?$ - [F,L]
+    # Block web installer after first successful setup (see core/storage/framework/installed.lock)
+    RewriteCond %{DOCUMENT_ROOT}/core/storage/framework/installed.lock -f
+    RewriteRule ^install(/.*)?$ - [F,L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

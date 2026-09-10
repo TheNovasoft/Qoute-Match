@@ -9,7 +9,7 @@
             <a href="{{ route('admin.marketplace.forms.index') }}" class="btn btn-sm btn-outline--primary">
                 <i class="las la-arrow-left"></i> @lang('Back to forms')
             </a>
-            <span class="text-muted small">@lang('Apple-style form editor — save after every change')</span>
+            <span class="text-muted small">@lang('Drag to reorder fields, then click Save Fields once to apply.')</span>
         </div>
     </div>
 

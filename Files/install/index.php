@@ -1,4 +1,9 @@
 <?php
+$installedLock = __DIR__ . '/../core/storage/framework/installed.lock';
+if (is_file($installedLock)) {
+    http_response_code(404);
+    exit('Not found');
+}
 $itemName = 'olance';
 error_reporting(E_ALL);
 $action = isset($_GET['action']) ? $_GET['action'] : '';

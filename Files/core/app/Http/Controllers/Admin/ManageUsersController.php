@@ -422,7 +422,7 @@ class ManageUsersController extends Controller
     {
         $request->validate([
             'message' => 'required',
-            'via'     => 'required|in:email,sms,push',
+            'via'     => 'required|in:email,sms,push,in_app,whatsapp',
             'subject' => 'required_if:via,email,push',
             'image'   => ['nullable', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])],
         ]);
@@ -457,7 +457,7 @@ class ManageUsersController extends Controller
     public function sendNotificationAll(Request $request)
     {
         $request->validate([
-            'via'                          => 'required|in:email,sms,push',
+            'via'                          => 'required|in:email,sms,push,in_app,whatsapp',
             'message'                      => 'required',
             'subject'                      => 'required_if:via,email,push',
             'start'                        => 'required|integer|gte:1',

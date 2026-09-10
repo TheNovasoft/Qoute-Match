@@ -42,9 +42,9 @@ class AppServiceProvider extends ServiceProvider
     {
         MailConfigurator::syncFromEnv();
 
-        if (!cache()->get('SystemInstalled')) {
-            $envFilePath = base_path('.env');
-            if (!file_exists($envFilePath)) {
+        $envFilePath = base_path('.env');
+        if (! cache()->get('SystemInstalled')) {
+            if (! file_exists($envFilePath)) {
                 header('Location: install');
                 exit;
             }
@@ -52,8 +52,14 @@ class AppServiceProvider extends ServiceProvider
             if (empty($envContents)) {
                 header('Location: install');
                 exit;
-            } else {
-                cache()->put('SystemInstalled', true);
+            }
+            cache()->put('SystemInstalled', true);
+        }
+
+        if (file_exists($envFilePath) && filesize($envFilePath) > 0) {
+            $lockFile = storage_path('framework/installed.lock');
+            if (! file_exists($lockFile)) {
+                @file_put_contents($lockFile, now()->toIso8601String());
             }
         }
 

@@ -3,7 +3,12 @@
     @php
         $sessionData = session('SEND_NOTIFICATION') ?? [];
         $viaName     = $sessionData['via'] ?? 'email';
-        $viaText     = @$sessionData['via'] == 'push' ? 'Push notification ' : ucfirst($viaName);
+        $viaText     = match ($viaName) {
+            'push' => 'Push notification',
+            'in_app' => 'In-app notification',
+            'whatsapp' => 'WhatsApp notification',
+            default => ucfirst($viaName),
+        };
     @endphp
 
     @empty(!$sessionData)
@@ -181,7 +186,7 @@
                                             <label>@lang('Cooling Period') </label>
                                             <div class="input-group">
                                                 <input class="form-control" name="cooling_time"
-                                                    value="{{ old('cooling_time', @$sessionData['batch']) }}" type="number"
+                                                    value="{{ old('cooling_time', @$sessionData['cooling_time']) }}" type="number"
                                                     placeholder="@lang('Waiting time')" required>
                                                 <span class="input-group-text">
                                                     @lang('Seconds')
@@ -295,7 +300,7 @@
 
             function getUserCount(methodName) {
                 var methodNameUpper = methodName.toUpperCase();
-                if (methodNameUpper == 'SELECTEDUSERS' || methodNameUpper == 'ALLUSERS' || methodNameUpper == 'TOPDEPOSITEDUSERS' ||
+                if (methodNameUpper == 'SELECTEDUSERS' || methodNameUpper == 'TOPDEPOSITEDUSERS' ||
                     methodNameUpper == 'NOTLOGINUSERS') {
                     $('.userCount').text(0);
                     $('.userCountText').addClass('d-none');

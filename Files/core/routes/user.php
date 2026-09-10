@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 Route::namespace('User\Auth')->name('user.')->middleware('guest')->group(function () {
     Route::controller('LoginController')->group(function () {
         Route::get('/login', 'showLoginForm')->name('login');
-        Route::post('/login', 'login');
+        Route::post('/login', 'login')->middleware('throttle:10,1');
         Route::get('logout', 'logout')->middleware('auth')->withoutMiddleware('guest')->name('logout');
     });
 

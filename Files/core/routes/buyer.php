@@ -7,7 +7,7 @@ Route::namespace('Buyer\Auth')->name('buyer.')->group(function () {
     Route::middleware('buyer.guest')->group(function () {
         Route::controller('LoginController')->group(function () {
             Route::get('/login', 'showLoginForm')->name('login');
-            Route::post('/login', 'login')->name('login');
+            Route::post('/login', 'login')->middleware('throttle:10,1')->name('login');
             Route::get('logout', 'logout')->middleware('buyer')->withoutMiddleware('buyer.guest')->name('logout');
         });
 
