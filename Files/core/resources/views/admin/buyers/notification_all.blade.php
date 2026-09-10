@@ -3,7 +3,12 @@
     @php
         $sessionData = session('SEND_NOTIFICATION') ?? [];
         $viaName     = $sessionData['via'] ?? 'email';
-        $viaText     = @$sessionData['via'] == 'push' ? 'Push notification ' : ucfirst($viaName);
+        $viaText     = match ($viaName) {
+            'push' => 'Push notification',
+            'in_app' => 'In-app notification',
+            'whatsapp' => 'WhatsApp notification',
+            default => ucfirst($viaName),
+        };
     @endphp
 
     @empty(!$sessionData)
@@ -181,7 +186,7 @@
                                             <label>@lang('Cooling Period') </label>
                                             <div class="input-group">
                                                 <input class="form-control" name="cooling_time"
-                                                    value="{{ old('cooling_time', @$sessionData['batch']) }}" type="number"
+                                                    value="{{ old('cooling_time', @$sessionData['cooling_time']) }}" type="number"
                                                     placeholder="@lang('Waiting time')" required>
                                                 <span class="input-group-text">
                                                     @lang('Seconds')
@@ -233,7 +238,7 @@
                     $('.input-append').html(`
                     <div class="form-group">
                         <label class="required">@lang('Number Of Top Deposited Buyer')</label>
-                        <input class="form-control" type="number" name="number_of_top_deposited_user" >
+                        <input class="form-control" type="number" name="number_of_top_deposited_buyer" >
                     </div>
                     `);
                     return;
@@ -295,7 +300,7 @@
 
             function getBuyerCount(methodName) {
                 var methodNameUpper = methodName.toUpperCase();
-                if (methodNameUpper == 'SELECTEDBUYERS' || methodNameUpper == 'ALLBUYERS' || methodNameUpper == 'TOPDEPOSITEDBUYERS' ||
+                if (methodNameUpper == 'SELECTEDBUYERS' || methodNameUpper == 'TOPDEPOSITEDBUYERS' ||
                     methodNameUpper == 'NOTLOGINBUYERS') {
                     $('.userCount').text(0);
                     $('.userCountText').addClass('d-none');

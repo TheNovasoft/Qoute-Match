@@ -142,6 +142,7 @@ class ManageJobController extends Controller
                 'budget' => $job->budget ? getAmount($job->budget) : '',
                 'custom_budget' => $job->custom_budget !== null ? (string) (int) $job->custom_budget : '0',
                 'deadline' => $job->deadline ? showDateTime($job->deadline, 'Y-m-d') : '',
+                'quote_validity_days' => $job->quote_validity_days ?? \App\Lib\QuoteExpiryService::DEFAULT_VALIDITY_DAYS,
                 'questions' => $job->questions ?? [],
                 'request_data' => $job->request_data,
             ] : null,

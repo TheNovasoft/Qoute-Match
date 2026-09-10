@@ -27,6 +27,9 @@
                         <option value="checkbox">@lang('Checkbox')</option>
                         <option value="radio">@lang('Radio')</option>
                         <option value="file">@lang('File')</option>
+                        <option value="cbm">@lang('CBM (volume)')</option>
+                        <option value="country">@lang('Country')</option>
+                        <option value="city">@lang('City')</option>
                     </select>
                 </div>
                 <div class="form-group">

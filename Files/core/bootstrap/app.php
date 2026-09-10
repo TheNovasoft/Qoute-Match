@@ -80,7 +80,13 @@ return Application::configure(basePath: dirname(__DIR__))
             return route('user.login');
         });
 
+        $middleware->web(prepend: [
+            \App\Http\Middleware\EnsureAppKeySet::class,
+            \App\Http\Middleware\ForceHttps::class,
+        ]);
+
         $middleware->web(append: [
+            \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\LanguageMiddleware::class,
             \App\Http\Middleware\ActiveTemplateMiddleware::class,
             \App\Http\Middleware\HandleInertiaRequests::class,

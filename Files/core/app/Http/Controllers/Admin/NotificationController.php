@@ -10,6 +10,7 @@ use App\Models\NotificationTemplate;
 use App\Notify\Sms;
 use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class NotificationController extends Controller
 {
@@ -79,7 +80,12 @@ class NotificationController extends Controller
             ],
         ];
 
-        return \App\Lib\InertiaBridge::admin('admin.notification.channels', compact('pageTitle', 'channels'));
+        return Inertia::render('Admin/Notification/Channels', [
+            'pageTitle' => $pageTitle,
+            'channels' => $channels,
+            'updateUrl' => route('admin.setting.notification.channels.update'),
+            'cleanupUrl' => route('admin.setting.notification.channels.cleanup'),
+        ]);
     }
 
     public function channelsUpdate(Request $request)

@@ -162,11 +162,14 @@ This project had **two separate lists**:
 
 ---
 
-## Section 10 — Admin Improvements (Partial)
+## Section 10 — Admin Improvements (Done — PR pending)
 
-- [ ] Remaining Blade settings pages → React (optional)
-- [ ] Form builder editor UX simplify
-- [x] Bulk notification to user segments — already implemented in admin
+| Item | Status |
+|------|--------|
+| Bulk notification segments | Done — in-app/WhatsApp via validation, cooling time fix, segment counts for All Users/Buyers |
+| Form builder editor UX | Done — responsive field rows, CBM/country/city types in modal, clearer save copy, allow clearing all fields |
+| Notification channels hub | Done — React page at `/admin/notification/channels` |
+| Remaining Blade settings → React | Optional follow-up (general, gateways, KYC, etc.) |
 
 ---
 

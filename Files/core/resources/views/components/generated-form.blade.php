@@ -80,8 +80,10 @@
     <style>
         .form-field {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
             border: 1px solid #cdcdcd;
             padding: 10px 15px;
             border-radius: 5px;
@@ -96,12 +98,13 @@
         }
 
         .form-field .form-field__item {
-            min-width: 170px;
+            min-width: 120px;
+            flex: 1 1 140px;
             text-align: left;
         }
 
         .addedField.simple_with_drop.ui-sortable {
-            min-width: 900px;
+            min-width: 0;
         }
 
         .form-field .form-field__item:last-child {
