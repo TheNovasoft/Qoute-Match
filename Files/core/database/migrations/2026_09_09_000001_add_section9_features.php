@@ -52,6 +52,15 @@ return new class extends Migration
 
                 $table->index(['user_id', 'status']);
             });
+        } else {
+            Schema::table('provider_services', function (Blueprint $table) {
+                if (! Schema::hasColumn('provider_services', 'sort_order')) {
+                    $table->unsignedSmallInteger('sort_order')->default(0)->after('status');
+                }
+                if (! Schema::hasColumn('provider_services', 'delivery_days')) {
+                    $table->unsignedSmallInteger('delivery_days')->default(7)->after('price');
+                }
+            });
         }
 
         if (! Schema::hasTable('buyer_saved_payment_methods')) {
