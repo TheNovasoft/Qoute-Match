@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePage } from '@inertiajs/react';
 import { applyHighlights } from '@/utils/helpers';
 import { formatToastMessage } from '@/utils/friendlyMessages';
@@ -9,7 +9,8 @@ import NotifyScripts from '@/Components/Shared/NotifyScripts';
 import CookieBanner from '@/Components/Shared/CookieBanner';
 
 export default function AppLayout({ children, pageTitle, seo, showPreloader = true }) {
-    const { site, template, seoDefaults, flash, errors, routes } = usePage().props;
+    const { site, template, seoDefaults, canonicalUrl, flash, errors, routes } = usePage().props;
+    const templateScriptsLoaded = useRef(false);
 
     useEffect(() => {
         applyHighlights();
@@ -50,28 +51,40 @@ export default function AppLayout({ children, pageTitle, seo, showPreloader = tr
         ];
 
         const loadScript = (src) =>
-            new Promise((resolve, reject) => {
+            new Promise((resolve) => {
                 if (document.querySelector(`script[src="${src}"]`)) {
                     resolve();
                     return;
                 }
                 const script = document.createElement('script');
                 script.src = src;
-                script.onload = resolve;
-                script.onerror = reject;
+                script.onload = () => resolve();
+                script.onerror = () => resolve();
                 document.body.appendChild(script);
             });
 
-        scripts
-            .reduce((chain, src) => chain.then(() => loadScript(src)), Promise.resolve())
-            .then(() => {
+        const bootTemplate = () => {
             patchBootstrapModalBridge();
             applyHighlights();
             initTemplateSliders();
             initTemplateInteractions();
             window.setTimeout(() => initTemplateSliders(), 100);
-        });
-    }, [template.assetPath, pageTitle]);
+        };
+
+        if (templateScriptsLoaded.current) {
+            bootTemplate();
+            return undefined;
+        }
+
+        scripts
+            .reduce((chain, src) => chain.then(() => loadScript(src)), Promise.resolve())
+            .then(() => {
+                templateScriptsLoaded.current = true;
+                bootTemplate();
+            });
+
+        return undefined;
+    }, [template.assetPath]);
 
     useEffect(() => {
         initTemplateInteractions();
@@ -83,7 +96,7 @@ export default function AppLayout({ children, pageTitle, seo, showPreloader = tr
         ? (seo?.keywords || seoDefaults?.keywords).join(', ')
         : seo?.keywords || seoDefaults?.keywords;
     const image = seo?.image || seoDefaults?.image;
-    const canonical = seo?.canonical;
+    const canonical = seo?.canonical || canonicalUrl;
 
     return (
         <>

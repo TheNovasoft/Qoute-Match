@@ -95,8 +95,14 @@ class ForgotPasswordController extends Controller
         ]);
         $code =  str_replace(' ', '', $request->code);
 
-        if (PasswordReset::where('token', $code)->where('email', $request->email)->count() != 1) {
+        $reset = PasswordReset::where('token', $code)->where('email', $request->email)->first();
+        if (! $reset) {
             $notify[] = ['error', 'Verification code doesn\'t match'];
+            return to_route('user.password.request')->withNotify($notify);
+        }
+        if (\App\Lib\PasswordResetGuard::isExpired($reset)) {
+            $reset->delete();
+            $notify[] = ['error', 'This reset code has expired. Please request a new one.'];
             return to_route('user.password.request')->withNotify($notify);
         }
         $notify[] = ['success', 'You can change your password'];

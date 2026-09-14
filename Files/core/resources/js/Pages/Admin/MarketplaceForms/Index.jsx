@@ -1,4 +1,5 @@
-import { useForm } from '@inertiajs/react';
+import { useEffect } from 'react';
+import { router, useForm, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layout/AdminLayout';
 import AdminStatusTabs from '@/Components/Admin/AdminStatusTabs';
 import CategoryTabs from '@/Components/Admin/CategoryTabs';
@@ -12,12 +13,23 @@ const TYPE_TABS = [
 
 export default function Index({ pageTitle, forms }) {
     const rows = forms?.data ?? [];
-    const createForm = useForm({ type: 'request', slug: '' });
+    const csrfToken = usePage().props?.csrfToken ?? '';
 
-    const submitCreate = (e) => {
-        e.preventDefault();
-        createForm.post(forms.createUrl);
-    };
+    useEffect(() => {
+        const reloadForms = () => {
+            router.reload({ only: ['forms'], preserveScroll: true });
+        };
+
+        const onPageShow = (event) => {
+            if (event.persisted) {
+                reloadForms();
+            }
+        };
+
+        window.addEventListener('pageshow', onPageShow);
+
+        return () => window.removeEventListener('pageshow', onPageShow);
+    }, []);
 
     return (
         <AdminLayout pageTitle={pageTitle}>
@@ -31,12 +43,17 @@ export default function Index({ pageTitle, forms }) {
                     />
                 </div>
                 <div className="col-lg-7">
-                    <form className="row g-2 align-items-center justify-content-lg-end" onSubmit={submitCreate}>
+                    <form
+                        method="post"
+                        action={forms.createUrl}
+                        className="row g-2 align-items-center justify-content-lg-end"
+                    >
+                        <input type="hidden" name="_token" value={csrfToken} />
                         <div className="col-6 col-sm-3 col-md-auto">
                             <select
+                                name="type"
                                 className="form-control form--control"
-                                value={createForm.data.type}
-                                onChange={(e) => createForm.setData('type', e.target.value)}
+                                defaultValue={forms.type === 'quote' ? 'quote' : 'request'}
                             >
                                 <option value="request">Request</option>
                                 <option value="quote">Quote</option>
@@ -44,20 +61,17 @@ export default function Index({ pageTitle, forms }) {
                         </div>
                         <div className="col-6 col-sm-5 col-md">
                             <input
+                                name="slug"
                                 className="form-control form--control"
-                                placeholder="slug_key (e.g. kitchen)"
-                                value={createForm.data.slug}
-                                onChange={(e) => createForm.setData('slug', e.target.value)}
+                                placeholder="slug_key (e.g. kitchen_test)"
+                                pattern="[a-z0-9_]+"
+                                title="Lowercase letters, numbers, and underscore only"
                                 required
                             />
                         </div>
                         <div className="col-12 col-sm-4 col-md-auto">
-                            <button
-                                type="submit"
-                                className="btn btn--primary w-100 text-nowrap px-4"
-                                disabled={createForm.processing}
-                            >
-                                {createForm.processing ? 'Creating…' : 'Create'}
+                            <button type="submit" className="btn btn--primary w-100 text-nowrap px-4">
+                                Create
                             </button>
                         </div>
                     </form>
@@ -113,7 +127,11 @@ function FormRow({ row }) {
                         className="btn btn-sm btn-outline--danger"
                         disabled={deleteForm.processing}
                         onClick={() => {
-                            if (window.confirm('Delete form?')) deleteForm.post(row.deleteUrl);
+                            if (!window.confirm('Delete form?')) return;
+                            deleteForm.post(row.deleteUrl, {
+                                preserveScroll: true,
+                                onSuccess: () => router.reload({ only: ['forms'] }),
+                            });
                         }}
                     >
                         Delete

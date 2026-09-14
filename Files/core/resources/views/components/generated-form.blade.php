@@ -2,8 +2,8 @@
 
 <div class="form-field__wrapper">
     <div class="addedField simple_with_drop">
-        @if ($form)
-            @foreach ($form->form_data as $formData)
+        @if ($form && $form->fieldCount() > 0)
+            @foreach ((array) $form->form_data as $formData)
                 <div class="form-field-wrapper" id="{{ $loop->index }}">
                     <input type="hidden" name="form_generator[is_required][]" value="{{ $formData->is_required }}">
                     <input type="hidden" name="form_generator[extensions][]" value="{{ $formData->extensions }}">
@@ -129,7 +129,7 @@
         "use strict"
         var formGenerator = new FormGenerator();
         @if ($form)
-            formGenerator.totalField = {{ $form ? count((array) $form->form_data) : 0 }}
+            formGenerator.totalField = {{ $form ? $form->fieldCount() : 0 }}
         @endif
         $(".simple_with_drop").sortable({
             stop: function(event, ui) {

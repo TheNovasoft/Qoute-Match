@@ -29,20 +29,14 @@ class ProfileController extends Controller
     public function submitPassword(Request $request)
     {
 
-        $passwordValidation = Password::min(6);
-        if (gs('secure_password')) {
-            $passwordValidation = $passwordValidation->mixedCase()->numbers()->symbols()->uncompromised();
-        }
-
         $request->validate([
             'current_password' => 'required',
-            'password' => ['required', 'confirmed', $passwordValidation]
+            'password' => ['required', 'confirmed', \App\Lib\PasswordRules::portal()],
         ]);
 
         $user = auth()->user();
         if (Hash::check($request->current_password, $user->password)) {
-            $password = Hash::make($request->password);
-            $user->password = $password;
+            $user->password = $request->password;
             $user->save();
             $notify[] = ['success', 'Password changed successfully'];
             return back()->withNotify($notify);
@@ -86,6 +80,7 @@ class ProfileController extends Controller
             $user->step = 1;
         }
         $user->save();
+        \App\Lib\WorkProfileGate::sync($user->fresh());
         $notify[] = ['success', 'Skills updated successfully. Proceed to the next step.'];
         return to_route('user.profile.setting')->withNotify($notify);
     }
@@ -178,6 +173,7 @@ class ProfileController extends Controller
         }
 
         $user->save();
+        \App\Lib\WorkProfileGate::sync($user->fresh());
         $notify[] = ['success', 'Basic setting updated successfully.  Proceed to the next step.'];
         return to_route('user.profile.education')->withNotify($notify);
     }
@@ -269,13 +265,42 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->step < 3) {
+        if ((int) $user->step < 1) {
+            return to_route('user.profile.skill')->withNotify([
+                ['error', 'Complete your skills and about section before continuing.'],
+            ]);
+        }
+
+        if ((int) $user->step < 3) {
             $user->step = 3;
             $user->save();
         }
 
         return to_route('user.profile.portfolio')->withNotify([
             ['info', 'Education skipped — you can add it later from profile settings.'],
+        ]);
+    }
+
+    public function skipPortfolio()
+    {
+        $user = auth()->user()->fresh();
+
+        if ((int) $user->step < 1) {
+            return to_route('user.profile.skill')->withNotify([
+                ['error', 'Complete your skills and about section before continuing.'],
+            ]);
+        }
+
+        \App\Lib\WorkProfileGate::sync($user);
+
+        if ((int) $user->fresh()->work_profile_complete !== Status::YES) {
+            return back()->withNotify([
+                ['error', 'Add your about section, skills, and basic profile details before finishing setup.'],
+            ]);
+        }
+
+        return to_route('user.home')->withNotify([
+            ['success', 'Profile complete — you can start quoting. Add portfolio items anytime from your profile.'],
         ]);
     }
 
@@ -356,11 +381,9 @@ class ProfileController extends Controller
             $user->step = 4;
         }
 
-        if ($user->portfolios()->count() >= 1) {
-            $user->work_profile_complete = Status::YES;
-        }
-
         $user->save();
+        \App\Lib\WorkProfileGate::sync($user->fresh());
+        $user = $user->fresh();
 
         $notify[] = ['success', $user->work_profile_complete
             ? 'Portfolio saved. Your profile is live — you can start bidding!'

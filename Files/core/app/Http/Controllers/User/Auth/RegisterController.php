@@ -37,12 +37,6 @@ class RegisterController extends Controller
 
     protected function validator(array $data)
     {
-        $passwordValidation = Password::min(6);
-
-        if (gs('secure_password')) {
-            $passwordValidation = $passwordValidation->mixedCase()->numbers()->symbols()->uncompromised();
-        }
-
         $agree = gs('agree') ? 'required' : 'nullable';
 
         return Validator::make($data, [
@@ -52,7 +46,7 @@ class RegisterController extends Controller
             'company_number' => 'nullable|string|max:100',
             'mobile' => 'required|string|max:30',
             'email' => 'required|string|email|unique:users',
-            'password' => ['required', 'confirmed', $passwordValidation],
+            'password' => ['required', 'confirmed', \App\Lib\PasswordRules::portal()],
             'subcategory_ids' => 'required|array|min:1',
             'subcategory_ids.*' => 'exists:subcategories,id',
             'service_areas' => 'required|string|max:1000',
@@ -61,6 +55,7 @@ class RegisterController extends Controller
         ], [
             'firstname.required' => 'The first name field is required',
             'lastname.required' => 'The last name field is required',
+            'email.unique' => 'An account with this email already exists. Please log in or use password reset.',
         ]);
     }
 
@@ -96,7 +91,7 @@ class RegisterController extends Controller
         $user->mobile = $data['mobile'];
         $user->subcategory_ids = $data['subcategory_ids'];
         $user->service_areas = $data['service_areas'];
-        $user->password = Hash::make($data['password']);
+        $user->password = $data['password'];
         $user->provider_approved = false;
         $user->status = Status::USER_ACTIVE;
         $user->kv = gs('kv') ? Status::NO : Status::YES;

@@ -105,7 +105,7 @@ class ProjectController extends Controller
             $notify[] = ['error', 'You are not authorized to upload files for this project, right now.'];
             return back()->withNotify($notify);
         }
-        $allowedExtension = ['zip', 'rar', 'pdf', 'doc', 'docx', 'xls', 'xlsx', '7zip'];
+        $allowedExtension = ['zip', 'rar', 'pdf', 'doc', 'docx', 'xls', 'xlsx', '7zip', 'jpg', 'jpeg', 'png', 'webp', 'heic'];
         $request->validate([
             'comments'     => 'nullable|string',
             'project_file' => [

@@ -48,12 +48,6 @@ class RegisterController extends Controller
 
     protected function validator(array $data)
     {
-        $passwordValidation = Password::min(6);
-
-        if (gs('secure_password')) {
-            $passwordValidation = $passwordValidation->mixedCase()->numbers()->symbols()->uncompromised();
-        }
-
         $agree = gs('agree') ? 'required' : 'nullable';
 
         return Validator::make($data, [
@@ -63,12 +57,13 @@ class RegisterController extends Controller
             'company_name' => 'required_if:customer_type,business|nullable|string|max:255',
             'phone' => 'nullable|string|max:30',
             'email' => 'required|string|email|unique:buyers',
-            'password' => ['required', 'confirmed', $passwordValidation],
+            'password' => ['required', 'confirmed', \App\Lib\PasswordRules::portal()],
             'captcha' => 'sometimes|required',
             'agree' => $agree === 'required' ? 'accepted' : 'nullable',
         ], [
             'firstname.required' => 'The first name field is required',
             'lastname.required' => 'The last name field is required',
+            'email.unique' => 'An account with this email already exists. Please log in or use password reset.',
         ]);
     }
 
@@ -103,7 +98,7 @@ class RegisterController extends Controller
         $buyer->company_name = $data['customer_type'] === 'business' ? ($data['company_name'] ?? null) : null;
         $buyer->phone = $data['phone'] ?? null;
         $buyer->username = suggestUsername($buyer->email);
-        $buyer->password = Hash::make($data['password']);
+        $buyer->password = $data['password'];
         $buyer->status = Status::USER_ACTIVE;
         $buyer->kv = gs('kv') ? Status::NO : Status::YES;
         $buyer->ev = gs('ev') ? Status::NO : Status::YES;

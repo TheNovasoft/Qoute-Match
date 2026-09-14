@@ -1,4 +1,4 @@
-import { createInertiaApp, Head, Link, router } from '@inertiajs/react';
+import { createInertiaApp, Head, Link, progress, router } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import InertiaErrorBoundary from '@/Components/Shared/InertiaErrorBoundary';
@@ -6,6 +6,7 @@ import { bindAdminSidebarSync } from '@/utils/adminSidebar';
 import './bootstrap';
 
 const appName = 'QuoteMatch';
+const pageModules = import.meta.glob('./Pages/**/*.jsx');
 
 const hidePreloader = () => {
     document.querySelectorAll('.preloader').forEach((el) => {
@@ -13,21 +14,47 @@ const hidePreloader = () => {
     });
 };
 
+const resetProgressBar = () => {
+    try {
+        if (typeof progress.isStarted === 'function' && progress.isStarted()) {
+            progress.finish();
+        } else if (typeof progress.reset === 'function') {
+            progress.reset();
+        }
+    } catch {
+        // ignore
+    }
+};
+
 router.on('navigate', hidePreloader);
-router.on('finish', hidePreloader);
+router.on('finish', () => {
+    hidePreloader();
+    resetProgressBar();
+});
+router.on('cancel', resetProgressBar);
 
 router.on('error', (errors) => {
     console.error('Inertia navigation error:', errors);
+    resetProgressBar();
 });
 
-// Sync Blade sidebar active state with Inertia top-nav / sidebar clicks
+router.on('exception', (event) => {
+    console.error('Inertia exception:', event.detail?.exception);
+    resetProgressBar();
+});
+
 bindAdminSidebarSync(router);
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: (name) =>
-        resolvePageComponent(`./Pages/${name}.jsx`, import.meta.glob('./Pages/**/*.jsx')),
+        resolvePageComponent(`./Pages/${name}.jsx`, pageModules).catch((error) => {
+            console.error(`Failed to load page component: ${name}`, error);
+            resetProgressBar();
+            throw error;
+        }),
     setup({ el, App, props }) {
+        hidePreloader();
         createRoot(el).render(
             <InertiaErrorBoundary>
                 <App {...props} />
@@ -36,6 +63,7 @@ createInertiaApp({
     },
     progress: {
         color: '#0071e3',
+        delay: 250,
     },
 });
 

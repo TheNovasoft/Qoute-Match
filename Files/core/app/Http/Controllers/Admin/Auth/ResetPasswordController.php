@@ -30,7 +30,7 @@ class ResetPasswordController extends Controller
         $request->validate([
             'email' => 'required|email',
             'token' => 'required',
-            'password' => 'required|confirmed|min:4',
+            'password' => ['required', 'confirmed', \App\Lib\PasswordRules::admin()],
         ]);
 
         $reset = AdminPasswordReset::where('token', $request->token)->orderBy('created_at', 'desc')->first();
@@ -40,7 +40,7 @@ class ResetPasswordController extends Controller
             return to_route('admin.login')->withNotify($notify);
         }
 
-        $admin->password = Hash::make($request->password);
+        $admin->password = $request->password;
         $admin->save();
         $reset->status = Status::DISABLE;
         $reset->save();

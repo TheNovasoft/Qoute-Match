@@ -26,3 +26,7 @@ if ($byEmail) {
     echo "\nFound by email admin@site.com — username is: {$byEmail->username}\n";
     echo "  Hash matches 'admin': " . (Hash::check('admin', $byEmail->password) ? 'YES' : 'NO') . "\n";
 }
+
+echo "\nRotate weak credentials:\n";
+echo "  php artisan security:rotate-weak-passwords        # dry run\n";
+echo "  php artisan security:rotate-weak-passwords --force  # apply\n";

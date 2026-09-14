@@ -40,23 +40,23 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
     const { auth, site, routes, trialTask, template } = props;
     const buyer = auth?.buyer;
 
-    const jobListHref = routes.buyerJobList ?? '/buyer/job/post/index';
-    const jobPostHref = routes.buyerJobPost ?? '/buyer/job/post/job-details';
-    const depositHref = routes.buyerDeposit ?? '/buyer/deposit';
-    const depositHistoryHref = routes.buyerDepositHistory ?? '/buyer/deposit/history';
-    const withdrawHref = routes.buyerWithdraw ?? '/buyer/withdraw';
-    const withdrawHistoryHref = routes.buyerWithdrawHistory ?? '/buyer/withdraw/history';
-    const ticketOpenHref = routes.buyerTicketOpen ?? '/buyer/ticket/open';
-    const ticketIndexHref = routes.buyerTicketIndex ?? '/buyer/ticket';
-    const profileHref = routes.buyerProfileSetting ?? '/buyer/profile-setting';
-    const passwordHref = routes.buyerChangePassword ?? '/buyer/change-password';
-    const twofactorHref = routes.buyerTwofactor ?? '/buyer/twofactor';
+    const jobListHref = routes.buyerJobList ?? '/customer/job/post/index';
+    const jobPostHref = routes.buyerJobPost ?? '/customer/job/post/job-details';
+    const depositHref = routes.buyerDeposit ?? '/customer/deposit';
+    const depositHistoryHref = routes.buyerDepositHistory ?? '/customer/deposit/history';
+    const withdrawHref = routes.buyerWithdraw ?? '/customer/withdraw';
+    const withdrawHistoryHref = routes.buyerWithdrawHistory ?? '/customer/withdraw/history';
+    const ticketOpenHref = routes.buyerTicketOpen ?? '/customer/ticket/new';
+    const ticketIndexHref = routes.buyerTicketIndex ?? '/customer/ticket';
+    const profileHref = routes.buyerProfileSetting ?? '/customer/profile-setting';
+    const passwordHref = routes.buyerChangePassword ?? '/customer/change-password';
+    const twofactorHref = routes.buyerTwofactor ?? '/customer/twofactor';
 
     const sectionOpen = useMemo(() => {
         if (isNavActive(url, jobListHref) || isNavActive(url, jobPostHref)) return 'jobs';
         if (isNavActive(url, depositHref) || isNavActive(url, depositHistoryHref)
             || isNavActive(url, withdrawHref) || isNavActive(url, withdrawHistoryHref)
-            || isNavActive(url, routes.buyerTransactions ?? '/buyer/transactions')
+            || isNavActive(url, routes.buyerTransactions ?? '/customer/transactions')
             || isNavActive(url, routes.buyerInvoices ?? '/customer/invoices')) return 'payments';
         if (isNavActive(url, ticketOpenHref) || isNavActive(url, ticketIndexHref)) return 'support';
         if (isNavActive(url, profileHref) || isNavActive(url, passwordHref) || isNavActive(url, twofactorHref)) return 'settings';
@@ -119,10 +119,10 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                         </button>
                     </li>
 
-                    <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerDashboard ?? '/buyer/dashboard', { exact: true }) ? ' active' : ''}`}>
+                    <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerDashboard ?? '/customer/dashboard', { exact: true }) ? ' active' : ''}`}>
                         <Link
-                            href={routes.buyerDashboard ?? '/buyer/dashboard'}
-                            className={`sidebar-menu-list__link${isNavActive(url, routes.buyerDashboard ?? '/buyer/dashboard', { exact: true }) ? ' active' : ''}`}
+                            href={routes.buyerDashboard ?? '/customer/dashboard'}
+                            className={`sidebar-menu-list__link${isNavActive(url, routes.buyerDashboard ?? '/customer/dashboard', { exact: true }) ? ' active' : ''}`}
                         >
                             <span className="icon"><i className="las la-home"></i></span>
                             <span className="text">Dashboard</span>
@@ -144,10 +144,10 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                     </DropdownMenu>
 
                     {(!isSimple || trialTask) && trialTask && (
-                        <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerTrialTasks ?? '/buyer/trial-task') ? ' active' : ''}`}>
+                        <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerTrialTasks ?? '/customer/trial-task/index') ? ' active' : ''}`}>
                             <Link
-                                href={routes.buyerTrialTasks ?? '/buyer/trial-task'}
-                                className={`sidebar-menu-list__link${isNavActive(url, routes.buyerTrialTasks ?? '/buyer/trial-task') ? ' active' : ''}`}
+                                href={routes.buyerTrialTasks ?? '/customer/trial-task/index'}
+                                className={`sidebar-menu-list__link${isNavActive(url, routes.buyerTrialTasks ?? '/customer/trial-task/index') ? ' active' : ''}`}
                             >
                                 <span className="icon"><i className="las la-tasks"></i></span>
                                 <span className="text">Trial Tasks</span>
@@ -155,10 +155,10 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                         </li>
                     )}
 
-                    <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerProjects ?? '/buyer/projects') ? ' active' : ''}`}>
+                    <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerProjects ?? '/customer/project/index') ? ' active' : ''}`}>
                         <Link
-                            href={routes.buyerProjects ?? '/buyer/projects'}
-                            className={`sidebar-menu-list__link${isNavActive(url, routes.buyerProjects ?? '/buyer/projects') ? ' active' : ''}`}
+                            href={routes.buyerProjects ?? '/customer/project/index'}
+                            className={`sidebar-menu-list__link${isNavActive(url, routes.buyerProjects ?? '/customer/project/index') ? ' active' : ''}`}
                         >
                             <span className="icon"><i className="las la-briefcase"></i></span>
                             <span className="text">My Projects</span>
@@ -177,10 +177,10 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                         </Link>
                     </li>
 
-                    <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerDisputes ?? '/buyer/disputes') ? ' active' : ''}`}>
+                    <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerDisputes ?? '/customer/disputes') ? ' active' : ''}`}>
                         <Link
-                            href={routes.buyerDisputes ?? '/buyer/disputes'}
-                            className={`sidebar-menu-list__link${isNavActive(url, routes.buyerDisputes ?? '/buyer/disputes') ? ' active' : ''}`}
+                            href={routes.buyerDisputes ?? '/customer/disputes'}
+                            className={`sidebar-menu-list__link${isNavActive(url, routes.buyerDisputes ?? '/customer/disputes') ? ' active' : ''}`}
                         >
                             <span className="icon"><i className="las la-exclamation-triangle"></i></span>
                             <span className="text">
@@ -192,10 +192,10 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                         </Link>
                     </li>
 
-                    <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerNotifications ?? '/buyer/notifications') ? ' active' : ''}`}>
+                    <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerNotifications ?? '/customer/notifications') ? ' active' : ''}`}>
                         <Link
-                            href={routes.buyerNotifications ?? '/buyer/notifications'}
-                            className={`sidebar-menu-list__link${isNavActive(url, routes.buyerNotifications ?? '/buyer/notifications') ? ' active' : ''}`}
+                            href={routes.buyerNotifications ?? '/customer/notifications'}
+                            className={`sidebar-menu-list__link${isNavActive(url, routes.buyerNotifications ?? '/customer/notifications') ? ' active' : ''}`}
                         >
                             <span className="icon"><i className="las la-bell"></i></span>
                             <span className="text">
@@ -225,7 +225,7 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                             <DropdownItem href={depositHistoryHref} label="Deposit History" active={isNavActive(url, depositHistoryHref)} />
                             <DropdownItem href={withdrawHref} label="Withdraw" active={isNavActive(url, withdrawHref, { exact: true })} />
                             <DropdownItem href={withdrawHistoryHref} label="Withdraw History" active={isNavActive(url, withdrawHistoryHref)} />
-                            <DropdownItem href={routes.buyerTransactions ?? '/buyer/transactions'} label="Transactions" active={isNavActive(url, routes.buyerTransactions ?? '/buyer/transactions')} />
+                            <DropdownItem href={routes.buyerTransactions ?? '/customer/transactions'} label="Transactions" active={isNavActive(url, routes.buyerTransactions ?? '/customer/transactions')} />
                             <DropdownItem href={routes.buyerInvoices ?? '/customer/invoices'} label="Invoices" active={isNavActive(url, routes.buyerInvoices ?? '/customer/invoices')} />
                         </ul>
                     </DropdownMenu>
@@ -246,10 +246,10 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                         </ul>
                     </DropdownMenu>
 
-                    <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerConversation ?? '/buyer/conversation') ? ' active' : ''}`}>
+                    <li className={`sidebar-menu-list__item${isNavActive(url, routes.buyerConversation ?? '/customer/conversation') ? ' active' : ''}`}>
                         <Link
-                            href={routes.buyerConversation ?? '/buyer/conversation'}
-                            className={`sidebar-menu-list__link${isNavActive(url, routes.buyerConversation ?? '/buyer/conversation') ? ' active' : ''}`}
+                            href={routes.buyerConversation ?? '/customer/conversation'}
+                            className={`sidebar-menu-list__link${isNavActive(url, routes.buyerConversation ?? '/customer/conversation') ? ' active' : ''}`}
                         >
                             <span className="icon"><i className="lab la-rocketchat"></i></span>
                             <span className="text">
@@ -287,7 +287,7 @@ export default function BuyerSidebar({ unreadCount = 0, notificationUnreadCount 
                     </DropdownMenu>
 
                     <li className="sidebar-menu-list__item">
-                        <Link href={routes.buyerLogout ?? '/buyer/logout'} method="get" as="button" className="sidebar-menu-list__link">
+                        <Link href={routes.buyerLogout ?? '/customer/logout'} method="get" as="button" className="sidebar-menu-list__link">
                             <span className="icon"><i className="las la-sign-out-alt"></i></span>
                             <span className="text">Logout</span>
                         </Link>

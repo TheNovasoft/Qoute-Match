@@ -67,7 +67,13 @@ class BuyerNotificationSender
 
         $this->sendNotifications($buyer, $request, $imageUrl, true);
 
-        return $this->redirectWithNotify("success", "Notification sent successfully");
+        if ((int) session()->pull('bulk_notify_failures', 0) > 0 && $request->via === 'email') {
+            $detail = session()->pull('mail_error');
+
+            return $this->redirectWithNotify('error', $detail ?: 'Email could not be sent. Check SMTP / Mailpit settings.');
+        }
+
+        return $this->redirectWithNotify('success', 'Notification sent successfully');
     }
     /**
      * Check if the notification template is enabled for the specified channel.
@@ -183,19 +189,27 @@ class BuyerNotificationSender
      */
     private function sendNotifications($buyers, $request, $imageUrl, $isSingleNotification = false)
     {
+        NotificationSendTracker::reset();
+
         if (!$isSingleNotification) {
             foreach ($buyers as $buyer) {
-                notify($buyer, 'DEFAULT', [
+                if (! notify($buyer, 'DEFAULT', [
                     'subject' => $request->subject,
                     'message' => $request->message,
-                ], [$request->via], pushImage: $imageUrl);
+                ], [$request->via], pushImage: $imageUrl)) {
+                    NotificationSendTracker::recordFailure(session('mail_error'));
+                }
             }
         } else {
-            notify($buyers, 'DEFAULT', [
+            if (! notify($buyers, 'DEFAULT', [
                 'subject' => $request->subject,
                 'message' => $request->message,
-            ], [$request->via], pushImage: $imageUrl);
+            ], [$request->via], pushImage: $imageUrl)) {
+                NotificationSendTracker::recordFailure(session('mail_error'));
+            }
         }
+
+        NotificationSendTracker::flushToSession();
     }
 
     /**
@@ -228,7 +242,32 @@ class BuyerNotificationSender
             $url     = route("admin.buyers.notification.all") . "?email_sent=yes";
         }
 
-        $notify[] = ['success', $message];
+        $notify = $this->buildBulkSendFlash($request, $message);
+
         return redirect($url)->withNotify($notify);
+    }
+
+    /**
+     * @return list<array{0: string, 1: string}>
+     */
+    private function buildBulkSendFlash($request, string $successMessage): array
+    {
+        $failures = (int) session()->pull('bulk_notify_failures', 0);
+        $notify = [];
+
+        if ($failures > 0 && $request->via === 'email') {
+            $detail = session()->pull('mail_error');
+            $notify[] = ['error', "Email could not be delivered for {$failures} buyer(s). Configure SMTP under Admin → Notification → Email Setting, or start Laragon Mailpit (inbox: http://127.0.0.1:8025)."];
+            if ($detail) {
+                $notify[] = ['error', $detail];
+            }
+            if ((gs('mail_config')->name ?? '') === 'log') {
+                $notify[] = ['info', 'Local mode: outgoing messages are saved to storage/logs/outgoing-mail.log until SMTP is configured.'];
+            }
+        } else {
+            $notify[] = ['success', $successMessage];
+        }
+
+        return $notify;
     }
 }

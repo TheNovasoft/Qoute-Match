@@ -17,8 +17,19 @@ syncCsrfHeader();
 router.on('navigate', syncCsrfHeader);
 
 router.on('invalid', (event) => {
-    if (event.detail.response?.status === 419) {
+    const status = event.detail.response?.status;
+    if (status === 419) {
         event.preventDefault();
         window.location.reload();
+        return;
+    }
+    if (status === 409) {
+        const location =
+            event.detail.response?.headers?.['x-inertia-location']
+            ?? event.detail.response?.headers?.['X-Inertia-Location'];
+        if (location) {
+            event.preventDefault();
+            window.location.href = location;
+        }
     }
 });

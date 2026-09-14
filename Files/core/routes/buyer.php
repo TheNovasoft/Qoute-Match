@@ -14,14 +14,14 @@ Route::namespace('Buyer\Auth')->name('buyer.')->group(function () {
 
         Route::controller('RegisterController')->middleware(['buyer.guest'])->group(function () {
             Route::get('register', 'showRegistrationForm')->name('register');
-            Route::post('register', 'register');
+            Route::post('register', 'register')->middleware('throttle:5,1');
             Route::post('check-buyer', 'checkBuyer')->name('checkBuyer')->withoutMiddleware('buyer.guest');
         });
         Route::controller('ForgotPasswordController')->prefix('password')->name('password.')->group(function () {
             Route::get('reset', 'showLinkRequestForm')->name('request');
-            Route::post('email', 'sendResetCodeEmail')->name('email');
+            Route::post('email', 'sendResetCodeEmail')->middleware('throttle:5,1')->name('email');
             Route::get('code-verify', 'codeVerify')->name('code.verify');
-            Route::post('verify-code', 'verifyCode')->name('verify.code');
+            Route::post('verify-code', 'verifyCode')->middleware('throttle:5,1')->name('verify.code');
         });
 
         Route::controller('ResetPasswordController')->group(function () {

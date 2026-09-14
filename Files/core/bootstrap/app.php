@@ -81,7 +81,6 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $middleware->web(prepend: [
-            \App\Http\Middleware\EnsureAppKeySet::class,
             \App\Http\Middleware\ForceHttps::class,
         ]);
 
@@ -118,6 +117,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'kyc' => KycMiddleware::class,
             'registration.complete' => RegistrationStep::class,
             'maintenance' => MaintenanceMode::class,
+            'admin.weak.password' => \App\Http\Middleware\BlockWeakAdminPassword::class,
         ]);
 
         $middleware->validateCsrfTokens(

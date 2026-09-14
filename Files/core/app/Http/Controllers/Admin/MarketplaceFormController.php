@@ -59,8 +59,11 @@ class MarketplaceFormController extends Controller
         $act = $request->type . '_' . $request->slug;
 
         if (Form::where('act', $act)->exists()) {
-            $notify[] = ['error', 'A form with this key already exists.'];
-            return back()->withNotify($notify);
+            $notify[] = ['error', 'A form with this key already exists. Choose another slug (e.g. kitchen_test).'];
+
+            return redirect()
+                ->route('admin.marketplace.forms.index', ['type' => $request->type])
+                ->withNotify($notify);
         }
 
         $form = new Form();
@@ -70,8 +73,9 @@ class MarketplaceFormController extends Controller
 
         $notify[] = ['success', 'Form created. Add fields below and save.'];
 
-        // Force a full browser visit — edit page is Blade, not Inertia.
-        return \Inertia\Inertia::location(route('admin.marketplace.forms.edit', $form->id));
+        return redirect()
+            ->route('admin.marketplace.forms.edit', $form->id)
+            ->withNotify($notify);
     }
 
     public function edit($id)
@@ -93,14 +97,17 @@ class MarketplaceFormController extends Controller
         if (! $request->filled('form_generator.form_label')) {
             $form->form_data = (object) [];
             $form->save();
-            $notify[] = ['success', 'All form fields removed. Save again when you add new fields.'];
-            return back()->withNotify($notify);
+            $notify[] = ['success', 'All form fields removed.'];
+
+            return redirect()->to($this->formsIndexUrl($form))->withNotify($notify);
         }
 
         $formProcessor->generate($form->act, true, 'id', $form->id);
+        $form->refresh();
 
-        $notify[] = ['success', 'Form fields saved successfully.'];
-        return back()->withNotify($notify);
+        $notify[] = ['success', 'Form fields saved successfully. Field count: ' . $form->fieldCount() . '.'];
+
+        return redirect()->to($this->formsIndexUrl($form))->withNotify($notify);
     }
 
     public function destroy($id)
@@ -120,10 +127,22 @@ class MarketplaceFormController extends Controller
             return back()->withNotify($notify);
         }
 
+        $type = $form->isQuoteForm() ? 'quote' : 'request';
         $form->delete();
 
         $notify[] = ['success', 'Form deleted successfully'];
-        return back()->withNotify($notify);
+
+        return redirect()->route('admin.marketplace.forms.index', ['type' => $type])->withNotify($notify);
+    }
+
+    private function formsIndexUrl(Form $form): string
+    {
+        $type = $form->isQuoteForm() ? 'quote' : 'request';
+
+        return route('admin.marketplace.forms.index', [
+            'type' => $type,
+            '_' => time(),
+        ]);
     }
 
     public static function validateFormAssignment(?int $formId, string $expectedType): ?string

@@ -141,7 +141,7 @@ class BuyerSocialLogin
 
         $newUser->email = $user->email;
 
-        $newUser->password = Hash::make($password);
+        $newUser->password = $password;
         $newUser->firstname = $firstName;
         $newUser->lastname = $lastName;
 

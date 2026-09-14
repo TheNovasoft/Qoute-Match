@@ -56,7 +56,7 @@ class ResetPasswordController extends Controller
             return to_route('buyer.password.request')->withNotify($notify);
         }
 
-        $user->password = Hash::make($request->password);
+        $user->password = $request->password;
         $user->save();
 
         PasswordReset::where('email', $reset->email)->delete();
@@ -78,14 +78,10 @@ class ResetPasswordController extends Controller
 
     protected function rules()
     {
-        $passwordValidation = Password::min(6);
-        if (gs('secure_password')) {
-            $passwordValidation = $passwordValidation->mixedCase()->numbers()->symbols()->uncompromised();
-        }
         return [
             'token' => 'required',
             'email' => 'required|email',
-            'password' => ['required','confirmed',$passwordValidation],
+            'password' => ['required', 'confirmed', \App\Lib\PasswordRules::portal()],
         ];
     }
 

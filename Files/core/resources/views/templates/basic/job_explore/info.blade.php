@@ -46,8 +46,9 @@
                 <div class="buyer-info__content">
                     <p class="buyer-info__name"> {{ @$job->buyer->fullname }}</p>
                     <div class="location">
-                        <div class="text"> {{ @$job->buyer->country_name }} |</div>
-                        <small>{{ @$job->buyer->address }}</small>
+                        <div class="text">
+                            {{ trim((@$job->buyer->city ? @$job->buyer->city . ', ' : '') . @$job->buyer->country_name) }}
+                        </div>
                     </div>
                     <ul class="review-rating-list">
                         @php echo avgRating($job->buyer->avg_rating) @endphp

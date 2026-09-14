@@ -7,11 +7,25 @@
 ```bash
 git pull origin main
 cd Files/core
-php artisan migrate --force
+php artisan migrate --force   # required on every release — never skip
+npm ci && npm run build       # when frontend (resources/js) changed
 php artisan optimize:clear
 php artisan config:clear
 php artisan view:clear
 ```
+
+Production `.env` (minimum):
+
+- `APP_ENV=production` and `APP_DEBUG=false`
+- Real SMTP (`MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, credentials) — not `127.0.0.1:1025`
+- Run weak-password rotation after deploy (saves new secrets to the terminal — copy to a password manager):
+
+```bash
+php artisan security:rotate-weak-passwords --force
+php scripts/check-admin.php
+```
+
+(`check-admin.php` should report **NO** for hash matches `admin`.)
 
 Hard refresh the browser (Ctrl+F5).
 

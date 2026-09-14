@@ -166,6 +166,11 @@ class JobExploreController extends Controller
             abort(404);
         }
 
+        $viewerBuyerId = auth()->guard('buyer')->id();
+        if (! $viewerBuyerId || (int) $viewerBuyerId !== (int) $job->buyer_id) {
+            $job->increment('view_count');
+        }
+
         $buyerJobs = Project::where('buyer_id', $job->buyer_id);
         $buyerSuccessJobs = (clone $buyerJobs)->where('status', Status::PROJECT_COMPLETED)->count();
         $buyerSuccessJobPercent = $buyerJobs->count() > 0 ? ($buyerSuccessJobs / $buyerJobs->count()) * 100 : 0;
@@ -246,7 +251,6 @@ class JobExploreController extends Controller
                 'fullname' => @$job->buyer->fullname,
                 'image' => getImage(getFilepath('buyerProfile') . '/' . @$job->buyer->image, avatar: true),
                 'country' => @$job->buyer->country_name,
-                'address' => @$job->buyer->address,
                 'city' => @$job->buyer->city,
                 'successPercent' => showAmount($buyerSuccessJobPercent, currencyFormat: false),
                 'successJobs' => $buyerSuccessJobs,

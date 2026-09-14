@@ -6,6 +6,15 @@ import ModalOverlay from '@/Components/Shared/ModalOverlay';
 import StructuredReviewScores from '@/Components/Shared/StructuredReviewScores';
 import VerificationBadges from '@/Components/Shared/VerificationBadges';
 
+function formatProviderRating(rating, reviewsCount) {
+    if (!reviewsCount) {
+        return 'No reviews yet';
+    }
+
+    const value = Number(rating ?? 0);
+    return `${value.toFixed(1)} / 5 (${reviewsCount} review${reviewsCount === 1 ? '' : 's'})`;
+}
+
 const FILTER_HELP = {
     sort: 'Recommended balances price, rating, and availability. Use Lowest price when cost matters most.',
     min_price: 'Hide quotes above this amount. Leave blank to show all prices.',
@@ -133,7 +142,7 @@ function PriceComparisonChart({ bids, job, stats }) {
                             />
                             <CompareMetricBar
                                 label="Provider rating"
-                                value={`${bid.provider.rating ?? 0} / 5 (${bid.provider.reviewsCount ?? 0} reviews)`}
+                                value={formatProviderRating(bid.provider.rating, bid.provider.reviewsCount)}
                                 percent={((bid.provider.rating ?? 0) / 5) * 100}
                                 tone="primary"
                             />
@@ -560,7 +569,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                                 <VerificationBadges badges={bid.provider.verificationBadges} className="ms-1" />
                                             </h6>
                                             <small className="text-muted d-block mb-1">
-                                                {(bid.provider.rating ?? 0)} ★ ({bid.provider.reviewsCount ?? 0} reviews)
+                                                {formatProviderRating(bid.provider.rating, bid.provider.reviewsCount)}
                                                 {bid.provider.presenceLabel && (
                                                     <>
                                                         {' · '}
@@ -718,9 +727,15 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                         ))}
                                     </tr>
                                     <tr>
+                                        <td>Quote valid until</td>
+                                        {bids.map((bid) => (
+                                            <td key={bid.id}>{bid.expiryLabel || bid.expiresAt || '—'}</td>
+                                        ))}
+                                    </tr>
+                                    <tr>
                                         <td>Rating</td>
                                         {bids.map((bid) => (
-                                            <td key={bid.id}>{bid.provider.rating} ({bid.provider.reviewsCount})</td>
+                                            <td key={bid.id}>{formatProviderRating(bid.provider.rating, bid.provider.reviewsCount)}</td>
                                         ))}
                                     </tr>
                                     {comparisonRows.map((label) => (

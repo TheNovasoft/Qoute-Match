@@ -14,19 +14,19 @@ Route::namespace('Auth')->group(function () {
         // Admin Password Reset
         Route::controller('ForgotPasswordController')->prefix('password')->name('password.')->group(function () {
             Route::get('reset', 'showLinkRequestForm')->name('reset');
-            Route::post('reset', 'sendResetCodeEmail');
+            Route::post('reset', 'sendResetCodeEmail')->middleware('throttle:5,1');
             Route::get('code-verify', 'codeVerify')->name('code.verify');
-            Route::post('verify-code', 'verifyCode')->name('verify.code');
+            Route::post('verify-code', 'verifyCode')->middleware('throttle:5,1')->name('verify.code');
         });
 
         Route::controller('ResetPasswordController')->group(function () {
             Route::get('password/reset/{token}', 'showResetForm')->name('password.reset.form');
-            Route::post('password/reset/change', 'reset')->name('password.change');
+            Route::post('password/reset/change', 'reset')->middleware('throttle:5,1')->name('password.change');
         });
     });
 });
 
-Route::middleware(['admin', 'demo'])->group(function () {
+Route::middleware(['admin', 'admin.weak.password', 'demo'])->group(function () {
     Route::controller('AdminController')->group(function () {
         Route::get('dashboard', 'dashboard')->name('dashboard');
         Route::get('chart/deposit-withdraw', 'depositAndWithdrawReport')->name('chart.deposit.withdraw');

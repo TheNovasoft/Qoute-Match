@@ -1,0 +1,1 @@
+import{j as t}from"./app-yclWeYni.js";import{A as i}from"./AdminLayout-B3AskIUv.js";import{I as m}from"./InvoiceDetail-B_wUsR_L.js";import"./PortalBackLink-CCjCEdf2.js";import"./adminBack-BtKMpVDR.js";function f({pageTitle:o,invoice:r}){return t.jsx(i,{pageTitle:o,children:t.jsx(m,{invoice:r})})}export{f as default};

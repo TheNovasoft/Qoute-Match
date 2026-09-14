@@ -74,7 +74,7 @@ class StructuredReviewService
     public static function applyToReview(Review $review, array $scores, string $text, ?int $status = null): Review
     {
         $review->scores = $scores;
-        $review->rating = (int) round(self::overallRating($scores));
+        $review->rating = self::overallRating($scores);
         $review->review = $text;
         $review->status = $status ?? self::initialStatus();
 

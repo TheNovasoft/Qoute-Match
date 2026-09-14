@@ -7,6 +7,7 @@ use App\Lib\FrontendNavigation;
 use App\Models\Frontend;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Cookie;
 use Inertia\Middleware;
 
@@ -39,12 +40,7 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
-        $languages = Language::get();
-        $defaultLang = $languages->firstWhere('is_default', Status::YES);
-        $currentLangCode = session('lang', config('app.locale'));
-        $currentLang = $languages->firstWhere('code', $currentLangCode) ?: $defaultLang;
-        $seo = Frontend::where('data_keys', 'seo.data')->first();
-        $cookie = Frontend::where('data_keys', 'cookie.data')->first();
+        $isAdminPanel = $request->is('admin') || $request->is('admin/*');
         $general = gs();
 
         $user = $request->user();
@@ -61,9 +57,7 @@ class HandleInertiaRequests extends Middleware
                     'name' => $admin->name ?? $admin->username,
                 ] : null,
             ],
-            'adminNav' => ($request->is('admin') || $request->is('admin/*'))
-                ? \App\Lib\AdminResource::adminNav()
-                : [],
+            'adminNav' => $isAdminPanel ? \App\Lib\AdminResource::adminNav() : [],
             'flash' => [
                 'notify' => fn () => session('notify', []),
                 'success' => fn () => $request->session()->get('success'),
@@ -90,32 +84,82 @@ class HandleInertiaRequests extends Middleware
                 'name' => activeTemplateName(),
                 'assetPath' => rtrim(asset(activeTemplate(true)), '/') . '/',
             ],
-            'navigation' => FrontendNavigation::data(),
-            'locale' => [
-                'current' => $currentLang?->code ?? config('app.locale'),
-                'languages' => $languages->map(fn ($lang) => [
-                    'code' => $lang->code,
-                    'name' => $lang->name,
-                    'image' => $lang->image,
-                    'imageUrl' => $lang->image
-                        ? getImage(getFilePath('language') . '/' . $lang->image, getFileSize('language'))
-                        : null,
-                    'is_default' => (bool) $lang->is_default,
-                ]),
-            ],
-            'seoDefaults' => $seo ? (array) $seo->data_values : null,
+            'navigation' => fn () => $isAdminPanel
+                ? ['pages' => collect(), 'aboutPage' => null, 'extraPages' => collect(), 'extraLinks' => []]
+                : Cache::remember('inertia_frontend_navigation_v1', 300, fn () => FrontendNavigation::data()),
+            'locale' => fn () => $this->sharedLocale(),
+            'seoDefaults' => fn () => $isAdminPanel
+                ? null
+                : Cache::remember('inertia_seo_defaults_v1', 600, function () {
+                    $seo = Frontend::where('data_keys', 'seo.data')->first();
+
+                    return $seo ? (array) $seo->data_values : null;
+                }),
+            'canonicalUrl' => fn () => url()->current(),
             'csrfToken' => csrf_token(),
             'cookieConsent' => fn () => Cookie::get('gdpr_cookie'),
-            'cookieSettings' => fn () => [
-                'enabled' => ($cookie?->data_values->status ?? Status::DISABLE) == Status::ENABLE,
-                'shortDesc' => $cookie?->data_values->short_desc ?? 'We use cookies to improve your experience on QuoteMatch.',
-            ],
+            'cookieSettings' => fn () => $this->sharedCookieSettings($isAdminPanel),
             'trialTask' => (bool) gs('trial_task'),
             'monetisation' => [
                 'enabled' => (bool) gs('monetisation_enabled'),
                 'mode' => gs('monetisation_mode') ?: 'credits',
             ],
-            'routes' => [
+        ]);
+    }
+
+    public function shareOnce(Request $request): array
+    {
+        $isAdminPanel = $request->is('admin') || $request->is('admin/*');
+
+        return [
+            'routes' => fn () => $this->inertiaRoutes(),
+            'footerData' => fn () => $isAdminPanel
+                ? []
+                : Cache::remember('inertia_footer_data_v1', 600, fn () => \App\Lib\SectionDataBuilder::footer()),
+        ];
+    }
+
+    private function sharedLocale(): array
+    {
+        $languages = Cache::remember('inertia_languages_v1', 600, fn () => Language::get());
+        $defaultLang = $languages->firstWhere('is_default', Status::YES);
+        $currentLangCode = session('lang', config('app.locale'));
+        $currentLang = $languages->firstWhere('code', $currentLangCode) ?: $defaultLang;
+
+        return [
+            'current' => $currentLang?->code ?? config('app.locale'),
+            'languages' => $languages->map(fn ($lang) => [
+                'code' => $lang->code,
+                'name' => $lang->name,
+                'image' => $lang->image,
+                'imageUrl' => $lang->image
+                    ? getImage(getFilePath('language') . '/' . $lang->image, getFileSize('language'))
+                    : null,
+                'is_default' => (bool) $lang->is_default,
+            ]),
+        ];
+    }
+
+    private function sharedCookieSettings(bool $isAdminPanel): array
+    {
+        if ($isAdminPanel) {
+            return ['enabled' => false, 'shortDesc' => ''];
+        }
+
+        $cookie = Cache::remember('inertia_cookie_settings_row_v1', 600, fn () => Frontend::where('data_keys', 'cookie.data')->first());
+
+        return [
+            'enabled' => ($cookie?->data_values->status ?? Status::DISABLE) == Status::ENABLE,
+            'shortDesc' => $cookie?->data_values->short_desc ?? 'We use cookies to improve your experience on QuoteMatch.',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function inertiaRoutes(): array
+    {
+        return [
                 'home' => route('home'),
                 'blogs' => route('blogs'),
                 'contact' => route('contact'),
@@ -133,6 +177,7 @@ class HandleInertiaRequests extends Middleware
                 'userStoreProfileEducation' => route('user.store.profile.education'),
                 'userSkipProfileEducation' => route('user.skip.profile.education'),
                 'userProfilePortfolio' => route('user.profile.portfolio'),
+                'userSkipProfilePortfolio' => route('user.skip.profile.portfolio'),
                 'userVerification' => route('user.verification.index'),
                 'userVerificationStore' => url('/provider/verification'),
                 'userStoreProfilePortfolio' => route('user.store.profile.portfolio'),
@@ -214,9 +259,7 @@ class HandleInertiaRequests extends Middleware
                 'cookieAccept' => route('cookie.accept'),
                 'cookiePolicy' => route('cookie.policy'),
                 'adminLogin' => route('admin.login'),
-            ],
-            'footerData' => fn () => \App\Lib\SectionDataBuilder::footer(),
-        ]);
+        ];
     }
 
     /**
@@ -230,16 +273,34 @@ class HandleInertiaRequests extends Middleware
         }
 
         $user->loadMissing('badge');
+        $countsKey = 'inertia_provider_counts_' . $user->id;
 
-        return array_merge($user->toArray(), [
-            'balance_formatted' => showAmount($user->balance),
-            'lead_credits' => (int) ($user->lead_credits ?? 0),
-            'monetisation' => \App\Lib\LeadCreditService::summaryFor($user),
+        $counts = Cache::remember($countsKey, 30, fn () => [
             'active_disputes' => \App\Models\Dispute::where('user_id', $user->id)->active()->count(),
-            'image' => getImage(getFilePath('userProfile') . '/' . $user->image, avatar: true),
             'unread_count' => \App\Lib\QuoteMessagingService::unreadCountForProvider($user),
             'notification_unread_count' => \App\Lib\NotificationInboxService::unreadCountForProvider($user),
         ]);
+
+        return [
+            'id' => (int) $user->id,
+            'username' => $user->username,
+            'fullname' => $user->fullname,
+            'firstname' => $user->firstname,
+            'lastname' => $user->lastname,
+            'email' => $user->email,
+            'balance' => $user->balance,
+            'balance_formatted' => showAmount($user->balance),
+            'lead_credits' => (int) ($user->lead_credits ?? 0),
+            'monetisation' => \App\Lib\LeadCreditService::summaryFor($user),
+            'ev' => $user->ev,
+            'sv' => $user->sv,
+            'tv' => $user->tv,
+            'profile_complete' => $user->profile_complete,
+            'provider_approved' => $user->provider_approved,
+            'badge' => $user->badge,
+            'image' => getImage(getFilePath('userProfile') . '/' . $user->image, avatar: true),
+            ...$counts,
+        ];
     }
 
     private function inertiaBuyer($buyer): ?array
@@ -248,12 +309,29 @@ class HandleInertiaRequests extends Middleware
             return null;
         }
 
-        return array_merge($buyer->toArray(), [
-            'balance_formatted' => showAmount($buyer->balance),
-            'image' => getImage(getFilePath('buyerProfile') . '/' . $buyer->image, avatar: true),
+        $countsKey = 'inertia_buyer_counts_' . $buyer->id;
+
+        $counts = Cache::remember($countsKey, 30, fn () => [
             'unread_count' => \App\Lib\QuoteMessagingService::unreadCountForBuyer($buyer),
             'notification_unread_count' => \App\Lib\NotificationInboxService::unreadCountForBuyer($buyer),
             'active_disputes' => \App\Models\Dispute::where('buyer_id', $buyer->id)->active()->count(),
         ]);
+
+        return [
+            'id' => (int) $buyer->id,
+            'username' => $buyer->username,
+            'fullname' => $buyer->fullname,
+            'firstname' => $buyer->firstname,
+            'lastname' => $buyer->lastname,
+            'email' => $buyer->email,
+            'balance' => $buyer->balance,
+            'balance_formatted' => showAmount($buyer->balance),
+            'ev' => $buyer->ev,
+            'sv' => $buyer->sv,
+            'tv' => $buyer->tv,
+            'profile_complete' => $buyer->profile_complete,
+            'image' => getImage(getFilePath('buyerProfile') . '/' . $buyer->image, avatar: true),
+            ...$counts,
+        ];
     }
 }

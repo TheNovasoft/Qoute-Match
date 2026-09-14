@@ -73,20 +73,14 @@ class ProfileController extends Controller
 
     public function submitPassword(Request $request)
     {
-        $passwordValidation = Password::min(6);
-        if (gs('secure_password')) {
-            $passwordValidation = $passwordValidation->mixedCase()->numbers()->symbols()->uncompromised();
-        }
-
         $request->validate([
             'current_password' => 'required',
-            'password' => ['required','confirmed',$passwordValidation]
+            'password' => ['required', 'confirmed', \App\Lib\PasswordRules::portal()],
         ]);
 
         $user = auth()->guard('buyer')->user();
         if (Hash::check($request->current_password, $user->password)) {
-            $password = Hash::make($request->password);
-            $user->password = $password;
+            $user->password = $request->password;
             $user->save();
             $notify[] = ['success', 'Password changed successfully'];
             return back()->withNotify($notify);

@@ -469,8 +469,9 @@ export default function JobDetails({
                                             <div className="buyer-info__content">
                                                 <p className="buyer-info__name">{buyer.fullname}</p>
                                                 <div className="location">
-                                                    <div className="text">{buyer.country} |</div>
-                                                    <small>{buyer.address}</small>
+                                                    <div className="text">
+                                                        {[buyer.city, buyer.country].filter(Boolean).join(', ')}
+                                                    </div>
                                                 </div>
                                                 <div className="text-wrapper">
                                                     <p className="text">{buyer.successPercent}% Job Success</p>

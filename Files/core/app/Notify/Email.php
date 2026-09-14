@@ -1,8 +1,11 @@
 <?php
 
 namespace App\Notify;
+
+use App\Lib\NotificationSendTracker;
 use App\Notify\NotifyProcess;
 use App\Notify\Notifiable;
+use Illuminate\Support\Facades\Log;
 use Mailjet\Client;
 use Mailjet\Resources;
 use PHPMailer\PHPMailer\Exception;
@@ -39,23 +42,38 @@ class Email extends NotifyProcess implements Notifiable{
 	public function send(){
 
 		if (!gs('en')) {
+			NotificationSendTracker::recordFailure('Email notifications are disabled in settings.');
+
 			return false;
 		}
 		//get message from parent
 		$message = $this->getMessage();
-		if ($message) {
-			//Send mail
-			$methodName = gs('mail_config')->name;
-			$method = $this->mailMethods($methodName);
-			try{
-				$this->$method();
-				$this->createLog('email');
-			}catch(\Exception $e){
-				$this->createErrorLog($e->getMessage());
-				session()->flash('mail_error',$e->getMessage());
-			}
+		if (! $message) {
+			NotificationSendTracker::recordFailure('Email template is missing or disabled.');
+
+			return false;
 		}
 
+		$config = gs('mail_config');
+		$methodName = $config->name ?? 'php';
+		$method = $this->mailMethods($methodName);
+		if ($method === null) {
+			NotificationSendTracker::recordFailure('Unknown mail configuration.');
+
+			return false;
+		}
+
+		try {
+			$this->$method();
+			$this->createLog('email');
+
+			return true;
+		} catch (\Exception $e) {
+			$this->createErrorLog($e->getMessage());
+			session()->flash('mail_error', $e->getMessage());
+
+			return false;
+		}
 	}
 
     /**
@@ -69,8 +87,28 @@ class Email extends NotifyProcess implements Notifiable{
 			'smtp'=>'sendSmtpMail',
 			'sendgrid'=>'sendSendGridMail',
 			'mailjet'=>'sendMailjetMail',
+			'log'=>'sendLogMail',
 		];
-		return $methods[$name];
+
+		return $methods[$name] ?? null;
+	}
+
+	protected function sendLogMail(): void
+	{
+		$path = storage_path('logs/outgoing-mail.log');
+		$entry = sprintf(
+			"[%s] TO: %s <%s>\nSUBJECT: %s\n%s\n---\n",
+			now()->toDateTimeString(),
+			$this->receiverName,
+			$this->email,
+			$this->subject,
+			strip_tags((string) $this->finalMessage)
+		);
+		file_put_contents($path, $entry, FILE_APPEND | LOCK_EX);
+		Log::info('Email captured locally (no SMTP)', [
+			'to' => $this->email,
+			'subject' => $this->subject,
+		]);
 	}
 
 	protected function sendPhpMail(){

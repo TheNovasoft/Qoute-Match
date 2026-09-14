@@ -6,6 +6,7 @@ use App\Constants\Status;
 use App\Models\Bid;
 use App\Models\Buyer;
 use App\Models\Job;
+use App\Models\NotificationTemplate;
 use App\Models\User;
 use Illuminate\Support\Collection;
 
@@ -13,6 +14,14 @@ class DailyDigestService
 {
     public static function send(): array
     {
+        if (! self::templateReady()) {
+            return [
+                'buyers' => 0,
+                'providers' => 0,
+                'skipped' => true,
+            ];
+        }
+
         $since = now()->subDay();
         $buyerCount = self::sendBuyerDigests($since);
         $providerCount = self::sendProviderDigests($since);
@@ -20,7 +29,19 @@ class DailyDigestService
         return [
             'buyers' => $buyerCount,
             'providers' => $providerCount,
+            'skipped' => false,
         ];
+    }
+
+    public static function templateReady(): bool
+    {
+        return NotificationTemplate::query()
+            ->where('act', 'DAILY_DIGEST')
+            ->where(function ($query) {
+                $query->where('email_status', Status::ENABLE)
+                    ->orWhere('in_app_status', Status::ENABLE);
+            })
+            ->exists();
     }
 
     protected static function sendBuyerDigests($since): int

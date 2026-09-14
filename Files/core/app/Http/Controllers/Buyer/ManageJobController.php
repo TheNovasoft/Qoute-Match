@@ -546,7 +546,6 @@ class ManageJobController extends Controller
         $toRoute = route('buyer.job.post.index');
         $buyer = auth()->guard('buyer')->user()->loadCount('buyerReviews');
         $job = Job::where('buyer_id', $buyer->id)->with(['skills', 'category', 'subcategory'])->findOrFail($id);
-        $job->increment('view_count');
         $requestFields = RequestFormService::displayValues($job->request_data);
 
         return Inertia::render('Buyer/Job/View', [
@@ -780,7 +779,9 @@ class ManageJobController extends Controller
             $avgRating = round((float) $user->approvedReviews()->avg('rating'), 1);
             $reviewsCount = (int) $user->approvedReviews()->count();
             $dimensionAverages = \App\Lib\StructuredReviewService::dimensionAverages($user);
-            $quoteSummary = RequestFormService::displayValues($bid->quote_data ?? []);
+            $quoteSummary = \App\Lib\CompareQuoteFields::forComparison(
+                RequestFormService::displayValues($bid->quote_data ?? [])
+            );
             $quoteBreakdown = \App\Lib\QuoteAmountService::breakdown($bid->quote_data ?? []);
             $buyerBalance = (float) $buyer->balance;
             $shortfallRaw = gs('escrow_payment') ? max(0, (float) $bid->bid_amount - $buyerBalance) : 0;

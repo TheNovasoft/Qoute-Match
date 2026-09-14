@@ -103,6 +103,8 @@ class Notify
 			$methods = $this->notifyMethods();
 		}
 
+		$ok = true;
+
         //send the notification via methods one by one
 		foreach($methods as $method){
 			$notify = new $method;
@@ -112,8 +114,13 @@ class Notify
 			$notify->createLog = $this->createLog;
 			$notify->userColumn = $this->userColumn;
 			$notify->pushImage = $this->pushImage;
-			$notify->send();
+			$result = $notify->send();
+			if ($result === false) {
+				$ok = false;
+			}
 		}
+
+		return $ok;
 	}
 
     /**

@@ -14,6 +14,11 @@
                     @endif
                 </div>
                 <div class="card-body">
+                    @if (gs('percent_service_charge') && $charges->isEmpty())
+                        <div class="alert alert-warning">
+                            @lang('Percentage commission is enabled but no earning tiers are configured. Only the fixed service charge will apply until you add tiers below.')
+                        </div>
+                    @endif
                     <ul class="list-group list-group-flush">
                         @foreach ($charges as $charge)
                             <li class="list-group-item d-flex flex-wrap justify-content-between">
