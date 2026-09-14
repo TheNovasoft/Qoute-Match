@@ -66,7 +66,7 @@
     <div class="row @empty(!$sessionData) d-none @endempty">
         <div class="col-xl-12">
             <div class="card">
-                <form class="notify-form" method="POST" enctype="multipart/form-data">
+                <form class="notify-form" method="POST" action="{{ route('admin.buyers.notification.all.send') }}" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="via" value="{{ $viaName }}">
                     <div class="card-body">
@@ -351,6 +351,14 @@
 
             $(".notify-form").on("submit", function(e) {
                 formSubmit = true;
+                if ($('.notification-via.active').data('method') === 'email') {
+                    $('.nicEdit').each(function() {
+                        var editor = nicEditors.findEditor(this.id);
+                        if (editor) {
+                            editor.saveContent();
+                        }
+                    });
+                }
             });
 
             @empty(!$sessionData)

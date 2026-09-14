@@ -1,0 +1,1 @@
+import{j as n,L as s}from"./app-BWUm9okf.js";import{a as r}from"./adminBack-CJmC81X2.js";function c({href:a,label:t="Back",className:i="btn btn-sm btn-outline--dark admin-back-btn"}){return a?n.jsxs(s,{href:a,onClick:o=>r(o,a),className:i,children:[n.jsx("i",{className:"la la-undo"})," ",t]}):null}export{c as P};

@@ -72,11 +72,21 @@ class ForgotPasswordController extends Controller
     public function verifyCode(Request $request)
     {
         $request->validate(['code' => 'required']);
-        $adminPasswordReset = AdminPasswordReset::where('email', session()->get('pass_res_mail'))->where('status',Status::ENABLE)->orderBy('id','desc')->first();
+        $adminPasswordReset = AdminPasswordReset::where('email', session()->get('pass_res_mail'))
+            ->where('status', Status::ENABLE)
+            ->orderBy('id', 'desc')
+            ->first();
 
-        if ($adminPasswordReset->token != $request->code) {
+        if (! $adminPasswordReset || $adminPasswordReset->token != $request->code) {
             $notify[] = ['error', 'Verification code does not match'];
             return to_route('admin.login')->withNotify($notify);
+        }
+
+        if (\App\Lib\AdminPasswordResetGuard::isExpired($adminPasswordReset)) {
+            $adminPasswordReset->status = Status::DISABLE;
+            $adminPasswordReset->save();
+            $notify[] = ['error', 'This reset code has expired. Please request a new one.'];
+            return to_route('admin.password.reset')->withNotify($notify);
         }
 
         $notify[] = ['success', 'You can change your password'];

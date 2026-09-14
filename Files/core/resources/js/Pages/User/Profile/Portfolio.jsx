@@ -309,7 +309,15 @@ export default function Portfolio({ pageTitle, user, portfolios, skills, workPro
                                         <Link href={routes?.userProfileEducation ?? '/provider/profile-education'} className="btn btn-outline--dark">
                                             Previous
                                         </Link>
-                                        {workProfileComplete ? (
+                                        {!workProfileComplete ? (
+                                            <button
+                                                type="button"
+                                                className="btn btn--base"
+                                                onClick={() => router.post(routes?.userSkipProfilePortfolio ?? '/provider/profile-portfolio-skip')}
+                                            >
+                                                Finish without portfolio
+                                            </button>
+                                        ) : (
                                             <>
                                                 <Link href={routes?.freelanceJobs ?? '/jobs'} className="btn btn--base">
                                                     Browse jobs
@@ -318,7 +326,7 @@ export default function Portfolio({ pageTitle, user, portfolios, skills, workPro
                                                     Hide profile
                                                 </button>
                                             </>
-                                        ) : null}
+                                        )}
                                     </div>
                                 </div>
                             </div>

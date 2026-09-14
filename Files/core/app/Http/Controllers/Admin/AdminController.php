@@ -78,6 +78,10 @@ class AdminController extends Controller
 
 
     public function depositAndWithdrawReport(Request $request) {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
 
         $diffInDays = Carbon::parse($request->start_date)->diffInDays(Carbon::parse($request->end_date));
 
@@ -137,6 +141,10 @@ class AdminController extends Controller
     }
 
     public function transactionReport(Request $request) {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
 
         $diffInDays = Carbon::parse($request->start_date)->diffInDays(Carbon::parse($request->end_date));
 
@@ -273,7 +281,7 @@ class AdminController extends Controller
     {
         $request->validate([
             'old_password' => 'required',
-            'password' => 'required|min:5|confirmed',
+            'password' => ['required', 'confirmed', \App\Lib\PasswordRules::admin()],
         ]);
 
         $user = auth('admin')->user();
@@ -281,7 +289,7 @@ class AdminController extends Controller
             $notify[] = ['error', 'Password doesn\'t match!!'];
             return back()->withNotify($notify);
         }
-        $user->password = Hash::make($request->password);
+        $user->password = $request->password;
         $user->save();
         $notify[] = ['success', 'Password changed successfully.'];
         return to_route('admin.password')->withNotify($notify);

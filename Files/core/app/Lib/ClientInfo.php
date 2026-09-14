@@ -2,6 +2,8 @@
 
 namespace App\Lib;
 
+use Illuminate\Support\Facades\Http;
+
 class ClientInfo{
 
     /**
@@ -12,30 +14,51 @@ class ClientInfo{
 	public static function ipInfo()
 	{
 	    $ip = getRealIP();
+        $empty = self::emptyIpData($ip);
 
-        $response = json_decode(file_get_contents("http://ip-api.com/json/$ip"));
-        if ($response && $response->status == 'success') {
-            $data['country'] = [$response->country  ?? ''];
-            $data['city'] = [$response->city  ?? ''];
-            $data['area'] = [$response->regionName  ?? ''];
-            $data['code'] = [$response->countryCode  ?? ''];
-            $data['long'] = [$response->lon  ?? ''];
-            $data['lat'] = [$response->lat  ?? ''];
-            $data['ip'] = $ip;
-            $data['time'] = date('Y-m-d h:i:s A');
-        } else {
-            $data['country'] = [];
-            $data['city'] = [];
-            $data['area'] = [];
-            $data['code'] = [];
-            $data['long'] = [];
-            $data['lat'] = [];
-            $data['ip'] = '';
-            $data['time'] = date('Y-m-d h:i:s A');
+        if (! filter_var($ip, FILTER_VALIDATE_IP)) {
+            return $empty;
         }
 
-	    return $data;
+        try {
+            $response = Http::connectTimeout(2)->timeout(2)->get("http://ip-api.com/json/{$ip}");
+            if (! $response->successful()) {
+                return $empty;
+            }
+
+            $payload = $response->object();
+            if (! $payload || ($payload->status ?? '') !== 'success') {
+                return $empty;
+            }
+
+            return [
+                'country' => [$payload->country ?? ''],
+                'city' => [$payload->city ?? ''],
+                'area' => [$payload->regionName ?? ''],
+                'code' => [$payload->countryCode ?? ''],
+                'long' => [$payload->lon ?? ''],
+                'lat' => [$payload->lat ?? ''],
+                'ip' => $ip,
+                'time' => date('Y-m-d h:i:s A'),
+            ];
+        } catch (\Throwable) {
+            return $empty;
+        }
 	}
+
+    private static function emptyIpData(string $ip = ''): array
+    {
+        return [
+            'country' => [],
+            'city' => [],
+            'area' => [],
+            'code' => [],
+            'long' => [],
+            'lat' => [],
+            'ip' => $ip,
+            'time' => date('Y-m-d h:i:s A'),
+        ];
+    }
 
     /**
     * Get requestor operating system information

@@ -19,6 +19,12 @@ class SendDailyDigest extends Command
 
         $result = DailyDigestService::send();
 
+        if (! empty($result['skipped'])) {
+            $this->warn('Daily digest skipped: DAILY_DIGEST notification template is missing or disabled.');
+
+            return self::FAILURE;
+        }
+
         $this->info("Daily digest sent to {$result['buyers']} buyer(s) and {$result['providers']} provider(s).");
 
         return self::SUCCESS;

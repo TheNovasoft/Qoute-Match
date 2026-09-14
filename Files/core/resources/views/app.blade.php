@@ -32,5 +32,24 @@
     @unless (request()->is('admin') || request()->is('admin/*'))
         @php echo loadExtension('tawk-chat') @endphp
     @endunless
+    <script>
+        (function () {
+            var hide = function () {
+                document.querySelectorAll('.preloader').forEach(function (el) {
+                    el.style.display = 'none';
+                });
+                var bar = document.getElementById('nprogress');
+                if (bar) {
+                    bar.remove();
+                }
+            };
+            if (document.readyState === 'complete') {
+                hide();
+            } else {
+                window.addEventListener('load', hide, { once: true });
+            }
+            setTimeout(hide, 4000);
+        })();
+    </script>
 </body>
 </html>

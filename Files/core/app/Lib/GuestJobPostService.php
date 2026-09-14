@@ -170,9 +170,10 @@ class GuestJobPostService
         }
         $buyer->customer_type = 'individual';
         $buyer->username = suggestUsername($email);
-        $buyer->password = Hash::make(
-            filled($contact['password'] ?? null) ? $contact['password'] : Str::random(16)
-        );
+        $plainPassword = filled($contact['password'] ?? null)
+            ? (string) $contact['password']
+            : Str::password(24);
+        $buyer->password = $plainPassword;
         $buyer->status = Status::USER_ACTIVE;
         $buyer->profile_complete = Status::YES;
         $buyer->kv = gs('kv') ? Status::NO : Status::YES;

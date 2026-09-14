@@ -11,15 +11,15 @@ Route::namespace('User\Auth')->name('user.')->middleware('guest')->group(functio
 
     Route::controller('RegisterController')->group(function () {
         Route::get('register', 'showRegistrationForm')->name('register');
-        Route::post('register', 'register');
+        Route::post('register', 'register')->middleware('throttle:5,1');
         Route::post('check-user', 'checkUser')->name('checkUser')->withoutMiddleware('guest');
     });
 
     Route::controller('ForgotPasswordController')->prefix('password')->name('password.')->group(function () {
         Route::get('reset', 'showLinkRequestForm')->name('request');
-        Route::post('email', 'sendResetCodeEmail')->name('email');
+        Route::post('email', 'sendResetCodeEmail')->middleware('throttle:5,1')->name('email');
         Route::get('code-verify', 'codeVerify')->name('code.verify');
-        Route::post('verify-code', 'verifyCode')->name('verify.code');
+        Route::post('verify-code', 'verifyCode')->middleware('throttle:5,1')->name('verify.code');
     });
 
     Route::controller('ResetPasswordController')->group(function () {
@@ -104,6 +104,7 @@ Route::middleware('auth')->name('user.')->group(function () {
                 Route::post('profile-education-skip', 'skipEducation')->name('skip.profile.education');
 
                 Route::get('profile-portfolio', 'portfolio')->name('profile.portfolio');
+                Route::post('profile-portfolio-skip', 'skipPortfolio')->name('skip.profile.portfolio');
                 Route::post('store-profile-portfolio/{id?}', 'submitPortfolios')->name('store.profile.portfolio');
                 Route::post('status-profile-portfolio/{id}', 'statusPortfolio')->name('status.profile.portfolio');
 

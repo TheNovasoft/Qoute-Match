@@ -19,7 +19,14 @@ export default function BuyerMasterLayout({ children, pageTitle }) {
         buyer?.notification_unread_count ?? 0,
     );
 
-    useEffect(() => router.on('navigate', () => setSidebarOpen(false)), []);
+    useEffect(() => {
+        const remove = router.on('navigate', () => setSidebarOpen(false));
+        return () => {
+            if (typeof remove === 'function') {
+                remove();
+            }
+        };
+    }, []);
 
     return (
         <AppLayout pageTitle={pageTitle} showPreloader={false}>

@@ -33,6 +33,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password'          => 'hashed',
         'kyc_data'          => 'object',
         'ver_code_send_at'  => 'datetime',
         'last_seen_at'      => 'datetime',

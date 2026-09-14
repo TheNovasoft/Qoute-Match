@@ -5,20 +5,12 @@ namespace App\Providers;
 use App\Constants\Status;
 use App\Lib\MailConfigurator;
 use App\Lib\Searchable;
-use App\Models\AdminNotification;
-use App\Models\Buyer;
-use App\Models\Dispute;
-use App\Models\Deposit;
 use App\Models\Frontend;
-use App\Models\Job;
-use App\Models\Project;
-use App\Models\ProviderVerification;
-use App\Models\Review;
-use App\Models\SupportTicket;
 use App\Models\User;
-use App\Models\Withdrawal;
+use App\Models\Buyer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 
@@ -40,7 +32,29 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        MailConfigurator::syncFromEnv();
+        if ($this->app->bound('debugbar') && ! config('app.debug')) {
+            $this->app->make('debugbar')->disable();
+        }
+
+        if (! $this->app->runningInConsole()) {
+            $request = request();
+            if ($this->app->environment('local') && $request->getHost()) {
+                URL::forceRootUrl($request->getSchemeAndHttpHost());
+            }
+
+            if ($this->app->bound('debugbar')) {
+                $enabled = config('debugbar.enabled');
+                if ($enabled === false || $enabled === 'false' || $request->header('X-Inertia')) {
+                    $this->app->make('debugbar')->disable();
+                }
+            }
+        }
+
+        if ($this->app->runningInConsole()) {
+            MailConfigurator::syncFromEnv();
+        } else {
+            MailConfigurator::syncFromEnvIfStale();
+        }
 
         $envFilePath = base_path('.env');
         if (! cache()->get('SystemInstalled')) {
@@ -69,56 +83,11 @@ class AppServiceProvider extends ServiceProvider
 
 
         view()->composer('admin.partials.sidenav', function ($view) {
-            if (Schema::hasTable('jobs') && Schema::hasColumn('jobs', 'deadline_expired_notified_at')) {
-                try {
-                    \App\Lib\QuoteDeadlineService::processExpiryNotificationsIfNeeded();
-                } catch (\Throwable) {
-                    // Avoid breaking admin if migration pending
-                }
-            }
-
-            $view->with([
-                'jobPendingCount'  => Job::pending()->where('status', Status::JOB_PUBLISH)->count(),
-                'jobRejectedCount' => Job::rejected()->count(),
-                'jobDraftedCount'  => Job::drafted()->count(),
-
-                'projectReportedCount'  => Project::reported()->count(),
-                'openDisputesCount'     => Schema::hasTable('disputes') ? Dispute::active()->count() : 0,
-
-                'incompleteProfileUsersCount'  => User::incompleteProfile()->count(),
-                'pendingProviderApprovalCount' => User::pendingProviderApproval()->count(),
-                'bannedUsersCount'           => User::banned()->count(),
-                'emailUnverifiedUsersCount' => User::emailUnverified()->count(),
-                'mobileUnverifiedUsersCount'   => User::mobileUnverified()->count(),
-                'kycUnverifiedUsersCount'   => User::kycUnverified()->count(),
-                'kycPendingUsersCount'   => User::kycPending()->count(),
-                'pendingProviderVerificationsCount' => ProviderVerification::where('status', Status::VERIFICATION_PENDING)->count(),
-                'pendingReviewsCount' => Review::where('status', Status::REVIEW_PENDING)->count(),
-                'disputedReviewsCount' => Schema::hasColumn('reviews', 'investigation_status')
-                    ? Review::whereIn('investigation_status', [
-                        Status::REVIEW_INVESTIGATION_OPEN,
-                        Status::REVIEW_INVESTIGATION_ACTIVE,
-                    ])->count()
-                    : 0,
-
-                'bannedBuyersCount'   => Buyer::banned()->count(),
-                'emailUnverifiedBuyersCount' => Buyer::emailUnverified()->count(),
-                'mobileUnverifiedBuyersCount'   => Buyer::mobileUnverified()->count(),
-                'kycUnverifiedBuyersCount'   => Buyer::kycUnverified()->count(),
-                'kycPendingBuyersCount'   => Buyer::kycPending()->count(),
-
-                'pendingTicketCount'   => SupportTicket::whereIN('status', [Status::TICKET_OPEN, Status::TICKET_REPLY])->count(),
-                'pendingDepositsCount'    => Deposit::pending()->count(),
-                'pendingWithdrawCount'    => Withdrawal::pending()->count(),
-                'updateAvailable'    => version_compare(gs('available_version'), systemDetails()['version'], '>') ? 'v' . gs('available_version') : false,
-            ]);
+            $view->with(\App\Lib\AdminSidebarBadgeCounts::sidenav());
         });
 
         view()->composer('admin.partials.topnav', function ($view) {
-            $view->with([
-                'adminNotifications' => AdminNotification::where('is_read', Status::NO)->with('user')->orderBy('id', 'desc')->take(10)->get(),
-                'adminNotificationCount' => AdminNotification::where('is_read', Status::NO)->count(),
-            ]);
+            $view->with(\App\Lib\AdminSidebarBadgeCounts::topnav());
         });
 
 

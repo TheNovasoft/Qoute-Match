@@ -6,7 +6,7 @@
 
     <div class="row mb-3">
         <div class="col-12 d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <a href="{{ route('admin.marketplace.forms.index') }}" class="btn btn-sm btn-outline--primary">
+            <a href="{{ route('admin.marketplace.forms.index', ['_' => time()]) }}" class="btn btn-sm btn-outline--primary" data-inertia="false">
                 <i class="las la-arrow-left"></i> @lang('Back to forms')
             </a>
             <span class="text-muted small">@lang('Drag to reorder fields, then click Save Fields once to apply.')</span>

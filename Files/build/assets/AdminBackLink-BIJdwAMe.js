@@ -1,0 +1,1 @@
+import{j as o,L as r}from"./app-ClvbkD54.js";import{a as m}from"./adminBack-iEfZeTyC.js";function c({href:n,label:a="← Back",className:t="btn btn-sm btn-outline--dark admin-back-btn"}){return o.jsx(r,{href:n||"#",onClick:i=>m(i,n),className:t,children:a})}export{c as A};

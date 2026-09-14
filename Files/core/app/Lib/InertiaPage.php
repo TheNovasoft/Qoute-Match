@@ -10,11 +10,11 @@ class InertiaPage
     {
         return [
             'title' => null,
-            'description' => $seoContents->description ?? null,
-            'keywords' => $seoContents->keywords ?? null,
-            'metaRobots' => $seoContents->meta_robots ?? null,
-            'socialTitle' => $seoContents->social_title ?? null,
-            'socialDescription' => $seoContents->social_description ?? null,
+            'description' => $seoContents?->description ?? null,
+            'keywords' => $seoContents?->keywords ?? null,
+            'metaRobots' => $seoContents?->meta_robots ?? null,
+            'socialTitle' => $seoContents?->social_title ?? null,
+            'socialDescription' => $seoContents?->social_description ?? null,
             'image' => $fallbackImage,
         ];
     }
