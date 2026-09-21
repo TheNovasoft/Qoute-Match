@@ -111,7 +111,9 @@ export function validateStep(step, data) {
             setError(errors, 'email', VALIDATION_MSG.EMAIL_MAX);
         }
 
-        if (phone && phone.length > 30) {
+        if (!phone) {
+            setError(errors, 'phone', VALIDATION_MSG.PHONE_REQUIRED);
+        } else if (phone.length > 30) {
             setError(errors, 'phone', VALIDATION_MSG.PHONE_MAX);
         }
 

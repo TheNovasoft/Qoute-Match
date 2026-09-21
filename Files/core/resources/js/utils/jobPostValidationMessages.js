@@ -11,6 +11,7 @@ export const VALIDATION_MSG = {
     EMAIL_REQUIRED: 'Email is required.',
     EMAIL_INVALID: 'Please enter a valid email address.',
     EMAIL_MAX: 'Email must be 100 characters or less.',
+    PHONE_REQUIRED: 'Please enter your phone number.',
     PHONE_MAX: 'Phone must be 30 characters or less.',
     COUNTRY_REQUIRED: 'Please select a country.',
     CITY_REQUIRED: 'Please select or enter a city.',

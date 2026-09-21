@@ -2750,6 +2750,24 @@ body.admin-panel .sidebar.bg--dark {
     background: var(--ink) !important;
     box-shadow: none !important;
     border: none !important;
+    z-index: 1300 !important;
+}
+
+/* Full-width content sat above the fixed sidebar and swallowed clicks on the left rail */
+@media (min-width: 992px) {
+    body.admin-panel .page-wrapper > .container-fluid {
+        margin-left: 250px;
+        width: calc(100% - 250px);
+        max-width: calc(100% - 250px);
+    }
+
+    body.admin-panel .page-wrapper > .container-fluid .body-wrapper {
+        margin-left: 0 !important;
+    }
+}
+
+body.admin-panel .sidebar-mobile-overlay:not(.show) {
+    pointer-events: none !important;
 }
 
 body.admin-panel .sidebar__menu .sidebar-menu-item > a,
