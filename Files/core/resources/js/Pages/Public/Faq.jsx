@@ -26,8 +26,9 @@ export default function Faq({ pageTitle, seo }) {
                             <h1 className="mb-2">Help & FAQ</h1>
                             <p className="text-muted mb-5">Quick answers for customers and providers.</p>
 
-                            <h4 className="mb-3">For Customers</h4>
-                            <div className="accordion mb-5" id="customerFaq">
+                            <div className="faq-section faq-section--customer mb-5">
+                                <h4 className="faq-section__title mb-3">For Customers</h4>
+                                <div className="accordion faq-section__accordion" id="customerFaq">
                                 {customerFaq.map((item, index) => (
                                     <div className="accordion-item" key={item.q}>
                                         <h2 className="accordion-header">
@@ -40,10 +41,12 @@ export default function Faq({ pageTitle, seo }) {
                                         </div>
                                     </div>
                                 ))}
+                                </div>
                             </div>
 
-                            <h4 className="mb-3">For Providers</h4>
-                            <div className="accordion" id="providerFaq">
+                            <div className="faq-section faq-section--provider">
+                                <h4 className="faq-section__title mb-3">For Providers</h4>
+                                <div className="accordion faq-section__accordion" id="providerFaq">
                                 {providerFaq.map((item, index) => (
                                     <div className="accordion-item" key={item.q}>
                                         <h2 className="accordion-header">
@@ -56,6 +59,7 @@ export default function Faq({ pageTitle, seo }) {
                                         </div>
                                     </div>
                                 ))}
+                                </div>
                             </div>
                         </div>
                     </div>

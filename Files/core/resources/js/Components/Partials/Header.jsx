@@ -24,7 +24,7 @@ export default function Header() {
     return (
         <header className="header" id="header">
             <div className="container">
-                <nav className="navbar navbar-expand-xl navbar-light">
+                <nav className="navbar navbar-expand-xl navbar-light header-navbar">
                     <Link className="navbar-brand logo" href={routes.home}>
                         <img src={site.logo} alt={site.name} />
                     </Link>
@@ -49,8 +49,8 @@ export default function Header() {
                         </span>
                     </button>
 
-                    <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                        <ul className="navbar-nav nav-menu me-auto align-items-xl-center">
+                    <div className="collapse navbar-collapse justify-content-xl-center" id="navbarSupportedContent">
+                        <ul className="navbar-nav nav-menu mx-xl-auto align-items-xl-center justify-content-xl-center">
                             <li className={`nav-item${isNavActive(currentUrl, routes.home, { exact: true }) ? ' active' : ''}`}>
                                 <Link className={navClass(routes.home, true)} href={routes.home}>Home</Link>
                             </li>
