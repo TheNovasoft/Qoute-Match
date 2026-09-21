@@ -162,12 +162,14 @@ class JobExploreController extends Controller
             ? $user->bids()->where('job_id', $job->id)->exists()
             : false;
 
-        if (!$this->jobQuery()->where('id', $job->id)->exists() && !$hasProviderBid) {
+        $viewerBuyerId = auth()->guard('buyer')->id();
+        $isJobOwner = $viewerBuyerId && (int) $viewerBuyerId === (int) $job->buyer_id;
+
+        if (! $this->jobQuery()->where('id', $job->id)->exists() && ! $hasProviderBid && ! $isJobOwner) {
             abort(404);
         }
 
-        $viewerBuyerId = auth()->guard('buyer')->id();
-        if (! $viewerBuyerId || (int) $viewerBuyerId !== (int) $job->buyer_id) {
+        if (! $isJobOwner) {
             $job->increment('view_count');
         }
 

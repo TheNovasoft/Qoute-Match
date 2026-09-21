@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Lib\FormTranslateLocale;
 use App\Lib\FriendlyNotify;
 use App\Lib\GuestJobPostService;
+use App\Lib\JobSlugGenerator;
 use App\Lib\QuoteMessagingService;
 use App\Lib\RequestFormService;
 use App\Models\AdminNotification;
@@ -59,13 +60,19 @@ class ManageJobController extends Controller
             default => 'Small Project',
         };
 
-        [$approvalLabel, $approvalClass] = match ((int) $job->is_approved) {
-            Status::NO => ['Pending', 'badge--warning'],
-            Status::JOB_APPROVED => ['Yes', 'badge--success'],
-            default => ['Rejected', 'badge--danger'],
-        };
+        if ((int) $job->status === Status::JOB_DRAFT) {
+            $approvalLabel = '—';
+            $approvalClass = 'badge--dark';
+        } else {
+            [$approvalLabel, $approvalClass] = match ((int) $job->is_approved) {
+                Status::NO => ['Pending', 'badge--warning'],
+                Status::JOB_APPROVED => ['Yes', 'badge--success'],
+                default => ['Rejected', 'badge--danger'],
+            };
+        }
 
         [$statusLabel, $statusClass] = match ((int) $job->status) {
+            Status::JOB_DRAFT => ['Drafted', 'badge--dark'],
             Status::JOB_PUBLISH => ['Published', 'badge--primary'],
             Status::JOB_PROCESSING => ['Processing', 'badge--warning'],
             Status::JOB_COMPLETED => ['Completed', 'badge--success'],
@@ -92,11 +99,19 @@ class ManageJobController extends Controller
                 : null,
             'scope' => $scope,
             'deadline' => showDateTime($job->deadline, 'd M, Y'),
+            'isDraft' => (int) $job->status === Status::JOB_DRAFT,
+            'editUrl' => route('buyer.job.post.details', $job->id),
+            'exploreUrl' => filled($job->slug) ? route('explore.bid.job', $job->slug) : null,
+            'slug' => $job->slug,
         ];
     }
 
     private function buyerCanEditJob(Job $job): bool
     {
+        if ((int) $job->status === Status::JOB_DRAFT) {
+            return true;
+        }
+
         if ((int) $job->is_approved === Status::NO) {
             return true;
         }
@@ -206,7 +221,7 @@ class ManageJobController extends Controller
     {
         // Always generate a unique slug — never rely on the client value alone.
         $request->merge([
-            'slug' => $this->uniqueJobSlug($request->title ?? '', $id, $request->slug),
+            'slug' => JobSlugGenerator::unique($request->title ?? '', (int) $id, $request->slug),
         ]);
 
         $request->validate([
@@ -286,7 +301,7 @@ class ManageJobController extends Controller
     public function storeComplete(Request $request, $id = 0)
     {
         $request->merge([
-            'slug' => $this->uniqueJobSlug($request->title ?? '', $id, $request->slug),
+            'slug' => JobSlugGenerator::unique($request->title ?? '', (int) $id, $request->slug),
         ]);
 
         $request->validate([
@@ -305,7 +320,12 @@ class ManageJobController extends Controller
             'custom_budget'  => 'required|in:0,1',
             'deadline'            => 'nullable|date',
             'quote_validity_days' => 'nullable|integer|min:1|max:365',
+            'status' => 'nullable|in:0,1',
+            'save_as_draft' => 'nullable|boolean',
         ]);
+
+        $saveAsDraft = $request->boolean('save_as_draft')
+            || (int) $request->input('status', Status::JOB_PUBLISH) === Status::JOB_DRAFT;
 
         $category = Category::active()->with(['requestForm', 'subcategories' => fn ($q) => $q->active()])->findOrFail($request->category_id);
         $subcategoryId = $this->resolveSubcategoryId($category, $request->subcategory_id);
@@ -392,13 +412,19 @@ class ManageJobController extends Controller
             ? (int) $request->quote_validity_days
             : null;
         $job->questions = [];
-        $job->status = Status::JOB_PUBLISH;
-        $job->is_approved = Status::JOB_APPROVED;
+
+        if ($saveAsDraft) {
+            $job->status = Status::JOB_DRAFT;
+            $job->is_approved = Status::NO;
+        } else {
+            $job->status = Status::JOB_PUBLISH;
+            $job->is_approved = Status::JOB_APPROVED;
+        }
 
         $job->save();
         $job->skills()->sync($skillIds);
 
-        if (!$wasPublished) {
+        if (! $saveAsDraft && ! $wasPublished) {
             \App\Lib\InvoiceService::forJobPublished($job);
 
             $adminNotification = new AdminNotification();
@@ -415,7 +441,14 @@ class ManageJobController extends Controller
             }
         }
 
+        if ($saveAsDraft) {
+            $notify[] = ['success', 'Your job has been saved as a draft. You can publish it from your job list when ready.'];
+
+            return to_route('buyer.job.post.index')->withNotify($notify);
+        }
+
         $notify[] = ['success', $id ? 'Job post updated successfully' : 'Job post created successfully'];
+
         return to_route('buyer.job.post.view', $job->id)->withNotify($notify);
     }
 
@@ -621,24 +654,6 @@ class ManageJobController extends Controller
         throw \Illuminate\Validation\ValidationException::withMessages([
             'subcategory_id' => 'Please choose a subcategory for this job.',
         ]);
-    }
-
-    private function uniqueJobSlug(string $title, $ignoreId = 0, ?string $preferredSlug = null): string
-    {
-        $base = Str::slug(filled($preferredSlug) ? $preferredSlug : $title) ?: 'job';
-        $slug = $base;
-        $i = 1;
-
-        while (
-            Job::where('slug', $slug)
-                ->when($ignoreId, fn ($query) => $query->where('id', '<>', $ignoreId))
-                ->exists()
-        ) {
-            $slug = $base . '-' . $i;
-            $i++;
-        }
-
-        return $slug;
     }
 
     public function toggleShortlist($bidId)
@@ -865,6 +880,7 @@ class ManageJobController extends Controller
             ],
             'stats' => [
                 'total' => $activeBids->count(),
+                'matching' => $bidModels->count(),
                 'rejected' => $rejectedCount,
                 'shortlisted' => $activeBids->where('is_shortlist', Status::YES)->count(),
                 'lowestPrice' => $statsLowest !== null ? showAmount($statsLowest) : null,

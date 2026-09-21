@@ -54,6 +54,11 @@ export default function Detail({ pageTitle, buyer }) {
                     <div className="card shadow-sm">
                         <div className="card-header bg-white"><h6 className="mb-0">Actions</h6></div>
                         <div className="card-body d-grid gap-2">
+                            {buyer.actions.loginUrl && (
+                                <a href={buyer.actions.loginUrl} target="_blank" rel="noreferrer" className="btn btn-outline--primary btn-sm">
+                                    Login as Buyer
+                                </a>
+                            )}
                             <a href={buyer.actions.kycUrl} className="btn btn-outline--dark btn-sm">KYC Details</a>
                         </div>
                     </div>

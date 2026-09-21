@@ -23,6 +23,7 @@ export default function JobDetails({
         budget: job?.budget || '',
         custom_budget: job?.custom_budget,
         deadline: job?.deadline || '',
+        quote_validity_days: job?.quote_validity_days ? String(job.quote_validity_days) : '30',
         questions: job?.questions || [''],
         request_data: job?.request_data || null,
     };
