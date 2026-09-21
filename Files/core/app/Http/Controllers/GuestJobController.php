@@ -346,7 +346,7 @@ class GuestJobController extends Controller
             'firstname' => 'required|string|max:40',
             'lastname' => 'required|string|max:40',
             'email' => 'required|string|email|max:100',
-            'phone' => 'nullable|string|max:30',
+            'phone' => 'required|string|max:30',
         ]);
 
         $budget = $request->custom_budget == '1' ? 0 : ($request->budget ?? 0);
@@ -379,6 +379,11 @@ class GuestJobController extends Controller
             'questions' => array_values(array_filter($request->questions ?? [])),
             'status' => $request->status,
         ]);
+
+        $plainPassword = session()->pull('guest_job_plain_password');
+        if (filled($plainPassword)) {
+            GuestJobPostService::notifyGuestAccountCreated($buyer, $plainPassword, $job);
+        }
 
         Auth::guard('buyer')->login($buyer);
 

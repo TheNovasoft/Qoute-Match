@@ -313,7 +313,7 @@ export default function JobPostFlowField({
 
                             className={inputClass(errors.phone)}
 
-                            placeholder={tx('Phone (optional)')}
+                            placeholder={tx('Phone number')}
 
                             value={data.phone || ''}
 

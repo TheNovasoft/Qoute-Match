@@ -14,6 +14,7 @@ export const UOM_OPTIONS = [
 export const WEIGHT_UNIT_OPTIONS = [
     { value: 'kg', label: 'Kg' },
     { value: 'gm', label: 'Gm' },
+    { value: 'lb', label: 'Lb' },
 ];
 
 export const CONTAINERS = {
@@ -45,7 +46,14 @@ export function toKilograms(value, unit) {
         return 0;
     }
 
-    return unit === 'gm' ? amount / 1000 : amount;
+    if (unit === 'gm') {
+        return amount / 1000;
+    }
+    if (unit === 'lb') {
+        return amount / LB_PER_KG;
+    }
+
+    return amount;
 }
 
 function round(value, decimals = 3) {
@@ -279,14 +287,23 @@ export function buildCbmApiPayload({
         return null;
     }
 
+    const weightAmount = Number(weight) > 0 ? Number(weight) : 0;
+    let apiWeight = weightAmount;
+    let apiWeightUnit = weightUnit;
+
+    if (weightAmount > 0 && weightUnit === 'lb') {
+        apiWeight = round(toKilograms(weightAmount, 'lb'), 3);
+        apiWeightUnit = 'kg';
+    }
+
     return {
         lv: l,
         bv: w,
         hv: h,
         qv: Math.max(1, Number(qty) || 1),
         uom,
-        wv: Number(weight) > 0 ? Number(weight) : 0,
-        wu: weightUnit,
+        wv: apiWeight,
+        wu: apiWeightUnit,
     };
 }
 

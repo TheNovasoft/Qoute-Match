@@ -13,13 +13,13 @@ import {
 function ResultField({ label, value, suffix = '', tx, labelExtra = '' }) {
     return (
         <div className="col-md-6 col-lg-4">
-            <label className="form-label text-muted small mb-1">
+            <label className="form-label cbm-calculator__result-label mb-1">
                 {tx(label)}
                 {labelExtra ? ` — ${tx(labelExtra)}` : ''}
             </label>
             <input
                 type="text"
-                className="form-control form--control bg-light"
+                className="form-control form--control cbm-calculator__result-value"
                 value={value !== null && value !== undefined && value !== '' ? `${value}${suffix}` : '—'}
                 readOnly
             />
