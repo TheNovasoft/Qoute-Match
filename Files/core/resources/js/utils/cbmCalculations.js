@@ -326,3 +326,60 @@ export function mapCbmApiResponse(response) {
         container40hc: response.maxhc40qty,
     };
 }
+
+/** Sum CBM / weight metrics across multiple LCL box entries (inputs-only per box). */
+export function aggregateCbmResultsFromBoxes(boxValues, externalWeightKg = '') {
+    const totals = {
+        volumeM3: 0,
+        volumeFt3: 0,
+        totalWeightKg: 0,
+        totalWeightLb: 0,
+        volumetricWeightSeaKg: 0,
+        volumetricWeightSeaLb: 0,
+        volumetricWeightAirKg: 0,
+        volumetricWeightAirLb: 0,
+    };
+    let hasAny = false;
+
+    (boxValues || []).forEach((stored) => {
+        if (!String(stored || '').trim()) {
+            return;
+        }
+
+        const parsed = parseStoredCbmValue(stored);
+        const weight = parsed.weight || externalWeightKg || '';
+        const results = calculateCbmResults({ ...parsed, weight });
+
+        if (!results) {
+            return;
+        }
+
+        hasAny = true;
+        totals.volumeM3 += results.volumeM3 || 0;
+        totals.volumeFt3 += results.volumeFt3 || 0;
+        totals.totalWeightKg += results.totalWeightKg || 0;
+        totals.totalWeightLb += results.totalWeightLb || 0;
+        totals.volumetricWeightSeaKg += results.volumetricWeightSeaKg || 0;
+        totals.volumetricWeightSeaLb += results.volumetricWeightSeaLb || 0;
+        totals.volumetricWeightAirKg += results.volumetricWeightAirKg || 0;
+        totals.volumetricWeightAirLb += results.volumetricWeightAirLb || 0;
+    });
+
+    if (!hasAny) {
+        return null;
+    }
+
+    return {
+        volumeM3: round(totals.volumeM3, 3),
+        volumeFt3: round(totals.volumeFt3, 3),
+        totalWeightKg: totals.totalWeightKg > 0 ? round(totals.totalWeightKg, 3) : null,
+        totalWeightLb: totals.totalWeightLb > 0 ? round(totals.totalWeightLb, 3) : null,
+        volumetricWeightSeaKg: round(totals.volumetricWeightSeaKg, 3),
+        volumetricWeightSeaLb: round(totals.volumetricWeightSeaLb, 3),
+        volumetricWeightAirKg: round(totals.volumetricWeightAirKg, 3),
+        volumetricWeightAirLb: round(totals.volumetricWeightAirLb, 3),
+        container20: null,
+        container40: null,
+        container40hc: null,
+    };
+}

@@ -161,8 +161,8 @@ class GuestJobPostService
 
         $buyer = new Buyer();
         $buyer->email = $email;
-        $buyer->firstname = trim($contact['firstname']);
-        $buyer->lastname = trim($contact['lastname']);
+        $buyer->firstname = trim($contact['firstname'] ?? '') ?: (Str::before($email, '@') ?: 'Customer');
+        $buyer->lastname = trim($contact['lastname'] ?? '') ?: 'Customer';
         $buyer->phone = $contact['phone'] ?? null;
         // Notify/SMS use `mobile`; keep it in sync with the contact phone.
         if (!empty($contact['phone'])) {
@@ -277,9 +277,8 @@ class GuestJobPostService
         $job->status = $budgetData['status'];
 
         if ((int) $budgetData['status'] === Status::JOB_PUBLISH) {
-            $job->is_approved = (int) gs('job_auto_approved') === Status::ENABLE
-                ? Status::JOB_APPROVED
-                : Status::JOB_PENDING;
+            // Match logged-in customer post flow so new requests appear on Browse / Find Jobs.
+            $job->is_approved = Status::JOB_APPROVED;
         }
 
         $job->save();
