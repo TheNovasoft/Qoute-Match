@@ -123,8 +123,9 @@ trait SupportTicketManager
 
         $notify[] = ['success', 'Ticket opened successfully!'];
 
+        session()->flash('notify', $notify);
 
-        return to_route($this->redirectLink, $ticket->ticket)->withNotify($notify);
+        return Inertia::location(route($this->redirectLink, $ticket->ticket));
     }
 
     public function viewTicket($ticket)
@@ -291,7 +292,7 @@ trait SupportTicketManager
 
     protected function storeSupportAttachments($messageId)
     {
-        $path = public_path(getFilePath('ticket'));
+        $path = getFilePath('ticket');
         $files = $this->files;
         if (!$files) {
             return 200;

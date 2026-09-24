@@ -252,7 +252,7 @@ class ProjectController extends Controller
             $message->message = 'REPORTED:: ' . $request->report_reason;
             $message->conversation_id = $conversation->id;
             $message->user_id = $freelancer->id;
-            $message->user_read_at = now();
+            $message->read_at = now();
             $message->save();
         }
 

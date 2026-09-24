@@ -120,6 +120,7 @@ class DashboardResource
             'blockUrl' => $role === 'buyer' && $activeId
                 ? route('buyer.conversation.block', $activeId)
                 : null,
+            'conversationBlocked' => $conversation && (int) $conversation->status === Status::BLOCK,
             'role' => $role,
         ];
     }
@@ -216,6 +217,7 @@ class DashboardResource
                 'rating' => (int) $project->review->rating,
                 'text' => __($project->review->review),
                 'scores' => self::reviewScores($project->review->scores),
+                'scoresMap' => is_array($project->review->scores) ? $project->review->scores : [],
             ] : null,
             'buyerReview' => $project->buyerReview ? [
                 'rating' => (int) $project->buyerReview->rating,
@@ -230,6 +232,14 @@ class DashboardResource
                 ? route('user.project.upload', $project->id)
                 : null,
             'completeUrl' => $role === 'buyer' ? route('buyer.project.complete', $project->id) : null,
+            'reviewUpdateUrl' => $role === 'buyer'
+                && (int) $project->status === Status::PROJECT_COMPLETED
+                && $project->review
+                ? route('buyer.project.update.review-rating', $project->id)
+                : null,
+            'reviewBuyerUrl' => $role === 'freelancer' && (int) $project->status === Status::PROJECT_COMPLETED
+                ? route('user.project.store.review-rating', $project->id)
+                : null,
             'reportUrl' => $role === 'buyer' ? route('buyer.project.report', $project->id) : route('user.project.report', $project->id),
             'indexUrl' => $role === 'buyer' ? route('buyer.project.index') : route('user.project.index'),
             'invoiceUrl' => self::projectInvoiceUrl($project, $role),

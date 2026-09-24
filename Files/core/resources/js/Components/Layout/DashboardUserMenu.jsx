@@ -61,10 +61,10 @@ export default function DashboardUserMenu({
                 )}
                 <div className="notification">
                     <Link
-                        className="notification-link dashboard-user-menu__notify"
+                        className="notification-link dashboard-user-menu__notify position-relative"
                         href={conversationUrl}
                         onClick={(event) => event.stopPropagation()}
-                        aria-label="Messages"
+                        aria-label={unreadCount > 0 ? `Messages, ${unreadCount} unread` : 'Messages'}
                         data-message-notify-link
                     >
                         <i className="las la-envelope"></i>

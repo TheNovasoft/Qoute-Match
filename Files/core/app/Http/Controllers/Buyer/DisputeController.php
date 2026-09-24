@@ -23,7 +23,7 @@ class DisputeController extends Controller
 
         return Inertia::render('Buyer/Disputes/Index', [
             'pageTitle' => $pageTitle,
-            'disputes' => DashboardResource::disputes($disputes),
+            'disputes' => DashboardResource::disputes($disputes, 'buyer'),
         ]);
     }
 

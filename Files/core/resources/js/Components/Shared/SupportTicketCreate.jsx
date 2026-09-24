@@ -10,7 +10,21 @@ export default function SupportTicketCreate({ storeUrl, indexUrl }) {
 
     const submit = (event) => {
         event.preventDefault();
-        form.post(storeUrl, { forceFormData: true });
+        form.transform((data) => {
+            const payload = {
+                priority: data.priority,
+                subject: data.subject,
+                message: data.message,
+            };
+            if (data.attachments?.length) {
+                payload.attachments = data.attachments;
+            }
+            return payload;
+        }).post(storeUrl, {
+            forceFormData: true,
+            preserveScroll: false,
+            onSuccess: () => form.reset(),
+        });
     };
 
     return (

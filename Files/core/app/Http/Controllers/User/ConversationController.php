@@ -66,12 +66,6 @@ class ConversationController extends Controller
             )
             ->get();
 
-            Message::whereHas('conversation', function ($query) use ($freelancer) {
-                $query->where('user_id', $freelancer->id);
-            })
-            ->whereNull('read_at')
-            ->update(['read_at' => now()]);
-
         return Inertia::render('User/Conversation', array_merge(
             ['pageTitle' => $pageTitle],
             DashboardResource::conversationProps(

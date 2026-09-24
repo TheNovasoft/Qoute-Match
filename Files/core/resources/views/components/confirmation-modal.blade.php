@@ -29,9 +29,9 @@
         "use strict";
         $(document).on('click','.confirmationBtn', function () {
             var modal   = $('#confirmationModal');
-            let data    = $(this).data();
-            modal.find('.question').text(`${data.question}`);
-            modal.find('form').attr('action', `${data.action}`);
+            var $btn    = $(this);
+            modal.find('.question').text($btn.attr('data-question') || $btn.data('question') || '');
+            modal.find('form').attr('action', $btn.attr('data-action') || $btn.data('action') || '');
             modal.modal('show');
         });
     })(jQuery);

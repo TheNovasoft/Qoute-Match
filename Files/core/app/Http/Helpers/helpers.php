@@ -293,6 +293,9 @@ function menuActive($routeName, $type = null, $param = null) {
 }
 
 function fileUploader($file, $location, $size = null, $old = null, $thumb = null, $filename = null) {
+    if (is_string($location) && !str_starts_with($location, DIRECTORY_SEPARATOR) && !preg_match('/^[A-Za-z]:[\\\\\\/]/', $location)) {
+        $location = public_path($location);
+    }
 
     $fileManager           = new FileManager($file);
     $fileManager->path     = $location;
