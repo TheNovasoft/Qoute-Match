@@ -37,11 +37,18 @@ function ActionMenu({ job, isOpen, onToggle, onClose, onDetails, routes }) {
                         </Link>
                     </li>
                 )}
-                <li className="action-dropdown__item">
-                    <Link href={`${routes.buyerJobView}/${job.id}`} className="action-dropdown__link">
-                        <span className="text"><i className="las la-expand-arrows-alt"></i> Explore</span>
-                    </Link>
-                </li>
+                {job.exploreUrl && (
+                    <li className="action-dropdown__item">
+                        <a
+                            href={job.exploreUrl}
+                            className="action-dropdown__link"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <span className="text"><i className="las la-expand-arrows-alt"></i> Explore</span>
+                        </a>
+                    </li>
+                )}
                 {job.canViewBids && (
                     <li className="action-dropdown__item">
                         <Link href={job.compareQuotesUrl ?? `${routes.buyerJobBids}/${job.id}`} className="action-dropdown__link">
@@ -135,6 +142,14 @@ export default function Index({ pageTitle, jobs, filters }) {
                                         <td data-label="Shortlisted">{job.shortlistedCount ?? 0}</td>
                                         <td data-label="Status">
                                             <span className={`badge ${job.statusClass}`}>{job.statusLabel}</span>
+                                            {job.isDraft && job.canEdit && (
+                                                <Link
+                                                    href={job.editUrl ?? `${routes.buyerJobPostDetails}/${job.id}`}
+                                                    className="d-block small text--base mt-1"
+                                                >
+                                                    Edit draft
+                                                </Link>
+                                            )}
                                         </td>
                                         <td data-label="Action">
                                             <ActionMenu

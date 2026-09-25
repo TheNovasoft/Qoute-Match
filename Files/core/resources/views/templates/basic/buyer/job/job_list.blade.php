@@ -66,11 +66,14 @@
                                                 @lang('Edit')</span>
                                         </a></li>
                                 @endif
-                                <li class="action-dropdown__item"><a class="action-dropdown__link"
-                                        href="{{ route('buyer.job.post.view', $job->id) }}">
-                                        <span class="text"><i class="las la-expand-arrows-alt"></i>
-                                            @lang('Explore') </span>
-                                    </a></li>
+                                @if ($job->slug)
+                                    <li class="action-dropdown__item"><a class="action-dropdown__link"
+                                            href="{{ route('explore.bid.job', $job->slug) }}" target="_blank"
+                                            rel="noopener noreferrer">
+                                            <span class="text"><i class="las la-expand-arrows-alt"></i>
+                                                @lang('Explore') </span>
+                                        </a></li>
+                                @endif
 
                                 @if ($job->is_approved)
                                     <li class="action-dropdown__item"><a class="action-dropdown__link"

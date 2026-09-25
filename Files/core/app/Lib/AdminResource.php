@@ -927,6 +927,7 @@ class AdminResource
             ],
             'actions' => [
                 'kycUrl' => route('admin.buyers.kyc.details', $buyer->id),
+                'loginUrl' => route('admin.buyers.login', $buyer->id),
             ],
             'indexUrl' => self::listReturnUrl($routes, $routes['all']),
         ];
