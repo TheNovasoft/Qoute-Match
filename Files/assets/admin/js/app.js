@@ -32,9 +32,10 @@ $(document).on('click', '.sidebar .nav-link', function () {
   }
 });
 
-$('.sidebar-dropdown > a').on('click', function (e) {
+$(document).on('click', '.sidebar-dropdown > a', function (e) {
   if ($(this).parent().find('.sidebar-submenu').length) {
     e.preventDefault();
+    e.stopPropagation();
     var $submenu = $(this).parent().find('.sidebar-submenu').first();
     if ($submenu.is(':visible')) {
       $(this).find('.side-menu__sub-icon').removeClass('transform rotate-180');
@@ -54,13 +55,7 @@ $('.sidebar-dropdown > a').on('click', function (e) {
   }
 });
 
-// Mark sidebar item active immediately on click (before Inertia finishes)
-$(document).on('click', '.sidebar .sidebar-menu-item > a.nav-link[href]', function () {
-  var href = this.getAttribute('href');
-  if (!href || href === '#' || href.indexOf('javascript:') === 0) return;
-  $('.sidebar .sidebar-menu-item').removeClass('active');
-  $(this).closest('.sidebar-menu-item').addClass('active');
-});
+// Active state for admin Inertia pages is synced in resources/js/utils/adminSidebar.js
 
 
 function proPicURL(input) {

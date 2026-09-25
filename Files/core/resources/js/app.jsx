@@ -2,6 +2,7 @@ import { createInertiaApp, Head, Link, progress, router } from '@inertiajs/react
 import { createRoot } from 'react-dom/client';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import InertiaErrorBoundary from '@/Components/Shared/InertiaErrorBoundary';
+import { bindAdminSidebarInertiaNav } from '@/utils/adminInertiaNav';
 import { bindAdminSidebarSync } from '@/utils/adminSidebar';
 import './bootstrap';
 
@@ -43,6 +44,7 @@ router.on('exception', (event) => {
     resetProgressBar();
 });
 
+bindAdminSidebarInertiaNav();
 bindAdminSidebarSync(router);
 
 createInertiaApp({
