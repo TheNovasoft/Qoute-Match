@@ -85,8 +85,14 @@ class Push extends NotifyProcess implements Notifiable{
         $message = $this->getMessage();
         if ($message) {
             try {
-                $credentialsFilePath = getFilePath('pushConfig').'/push_config.json';
+                $credentialsFilePath = public_path(getFilePath('pushConfig').'/push_config.json');
+                if (! is_readable($credentialsFilePath)) {
+                    return false;
+                }
                 $serviceAccount = json_decode(file_get_contents($credentialsFilePath), true);
+                if (! is_array($serviceAccount)) {
+                    return false;
+                }
                 $privateKey = $serviceAccount['private_key'];
                 $clientEmail = $serviceAccount['client_email'];
 

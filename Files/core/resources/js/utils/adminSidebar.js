@@ -1,14 +1,45 @@
+import { bindAdminSidebarInertiaNav } from '@/utils/adminInertiaNav';
+
 /**
  * Keep Blade admin sidebar active state in sync with Inertia tab/nav clicks.
  * Avoid re-toggling already-open submenus (prevents jump/flash).
  */
+function scoreSidebarPath(path, hrefPath) {
+    if (!hrefPath || hrefPath === '#') {
+        return 0;
+    }
+    if (path === hrefPath) {
+        return 10_000 + hrefPath.length;
+    }
+    if (hrefPath !== '/' && path.startsWith(`${hrefPath}/`)) {
+        return hrefPath.length;
+    }
+    return 0;
+}
+
+function resetSidebarMenuState(sidebar) {
+    sidebar.querySelectorAll('li.sidebar-menu-item').forEach((item) => item.classList.remove('active'));
+    sidebar.querySelectorAll('.sidebar-dropdown').forEach((dropdown) => {
+        dropdown.classList.remove('active');
+        const trigger = dropdown.querySelector(':scope > a');
+        const submenu = dropdown.querySelector(':scope > .sidebar-submenu');
+        if (trigger) {
+            trigger.classList.remove('side-menu--open');
+            trigger.querySelector('.side-menu__sub-icon')?.classList.remove('transform', 'rotate-180');
+        }
+        if (submenu) {
+            submenu.classList.remove('sidebar-submenu__open');
+            submenu.style.display = 'none';
+        }
+    });
+}
+
 export function syncAdminSidebar(pathname = window.location.pathname) {
     const path = String(pathname || '').replace(/\/+$/, '') || '/';
     const sidebar = document.querySelector('.sidebar');
     if (!sidebar) return;
 
-    const items = Array.from(sidebar.querySelectorAll('li.sidebar-menu-item'));
-    items.forEach((item) => item.classList.remove('active'));
+    resetSidebarMenuState(sidebar);
 
     const submenuLinks = Array.from(
         sidebar.querySelectorAll('.sidebar-submenu a.nav-link[href]')
@@ -18,10 +49,9 @@ export function syncAdminSidebar(pathname = window.location.pathname) {
     submenuLinks.forEach((link) => {
         try {
             const hrefPath = new URL(link.href, window.location.origin).pathname.replace(/\/+$/, '') || '/';
-            if (path === hrefPath || path.startsWith(`${hrefPath}/`)) {
-                if (!best || hrefPath.length > best.hrefPath.length) {
-                    best = { link, hrefPath };
-                }
+            const score = scoreSidebarPath(path, hrefPath);
+            if (score && (!best || score > best.score)) {
+                best = { link, hrefPath, score };
             }
         } catch (_) {
             // ignore invalid href
@@ -33,10 +63,9 @@ export function syncAdminSidebar(pathname = window.location.pathname) {
         topLinks.forEach((link) => {
             try {
                 const hrefPath = new URL(link.href, window.location.origin).pathname.replace(/\/+$/, '') || '/';
-                if (path === hrefPath || path.startsWith(`${hrefPath}/`)) {
-                    if (!best || hrefPath.length > best.hrefPath.length) {
-                        best = { link, hrefPath };
-                    }
+                const score = scoreSidebarPath(path, hrefPath);
+                if (score && (!best || score > best.score)) {
+                    best = { link, hrefPath, score };
                 }
             } catch (_) {
                 // ignore
@@ -62,83 +91,23 @@ export function syncAdminSidebar(pathname = window.location.pathname) {
         if (icon) icon.classList.add('transform', 'rotate-180');
     }
 
-    if (submenu && !submenu.classList.contains('sidebar-submenu__open')) {
+    if (submenu) {
         submenu.classList.add('sidebar-submenu__open');
         submenu.style.display = 'block';
     }
 }
 
-function closeSidebarDropdown(dropdown) {
-    const trigger = dropdown?.querySelector(':scope > a');
-    const submenu = dropdown?.querySelector(':scope > .sidebar-submenu');
-    if (trigger) {
-        trigger.classList.remove('side-menu--open');
-        const icon = trigger.querySelector('.side-menu__sub-icon');
-        if (icon) {
-            icon.classList.remove('transform', 'rotate-180');
-        }
-    }
-    if (submenu) {
-        submenu.classList.remove('sidebar-submenu__open');
-        submenu.style.display = 'none';
-    }
-}
-
-function toggleSidebarDropdown(dropdown) {
-    const submenu = dropdown?.querySelector(':scope > .sidebar-submenu');
-    if (!submenu) {
-        return;
-    }
-
-    const isOpen = submenu.classList.contains('sidebar-submenu__open') || submenu.style.display === 'block';
-    document.querySelectorAll('.sidebar li.sidebar-dropdown').forEach((item) => {
-        if (item !== dropdown) {
-            closeSidebarDropdown(item);
-        }
-    });
-
-    const trigger = dropdown.querySelector(':scope > a');
-    if (isOpen) {
-        closeSidebarDropdown(dropdown);
-        return;
-    }
-
-    if (trigger) {
-        trigger.classList.add('side-menu--open');
-        const icon = trigger.querySelector('.side-menu__sub-icon');
-        if (icon) {
-            icon.classList.add('transform', 'rotate-180');
-        }
-    }
-    submenu.classList.add('sidebar-submenu__open');
-    submenu.style.display = 'block';
-}
-
-let adminSidebarInteractionsBound = false;
+let adminSidebarMobileBound = false;
 
 export function bindAdminSidebarInteractions() {
-    const sidebar = document.querySelector('.sidebar');
-    if (!sidebar || adminSidebarInteractionsBound) {
+    if (adminSidebarMobileBound) {
         return;
     }
 
-    adminSidebarInteractionsBound = true;
+    adminSidebarMobileBound = true;
 
-    sidebar.addEventListener('click', (event) => {
-        const trigger = event.target.closest('.sidebar-dropdown > a');
-        if (!trigger || !sidebar.contains(trigger)) {
-            return;
-        }
-
-        const dropdown = trigger.closest('.sidebar-dropdown');
-        const submenu = dropdown?.querySelector(':scope > .sidebar-submenu');
-        if (!submenu) {
-            return;
-        }
-
-        event.preventDefault();
-        toggleSidebarDropdown(dropdown);
-    });
+    // Dropdown toggle is handled by assets/admin/js/app.js (jQuery). A duplicate
+    // listener here caused open-then-close on every click on Inertia admin pages.
 
     document.querySelector('.sidebar-mobile-overlay')?.addEventListener('click', () => {
         document.querySelector('.sidebar')?.classList.remove('open');
@@ -147,23 +116,35 @@ export function bindAdminSidebarInteractions() {
     });
 }
 
+let sidebarSyncTimer = null;
+
 export function bindAdminSidebarSync(router) {
     const run = (event) => {
         bindAdminSidebarInteractions();
+        bindAdminSidebarInertiaNav();
 
-        const url = event?.detail?.page?.url || window.location.href;
         let path = window.location.pathname;
-        try {
-            path = new URL(url, window.location.origin).pathname;
-        } catch (_) {
-            // keep pathname fallback
+        const pageUrl = event?.detail?.page?.url;
+        if (pageUrl) {
+            try {
+                path = new URL(pageUrl, window.location.origin).pathname;
+            } catch (_) {
+                // keep pathname fallback
+            }
         }
-        requestAnimationFrame(() => syncAdminSidebar(path));
+
+        if (sidebarSyncTimer) {
+            clearTimeout(sidebarSyncTimer);
+        }
+        sidebarSyncTimer = setTimeout(() => {
+            sidebarSyncTimer = null;
+            syncAdminSidebar(path);
+        }, 0);
     };
 
     run();
     if (!router?.on) return;
-    router.on('navigate', run);
+    // Do not sync on "navigate" — page.url is still the previous route and breaks Review tabs.
     router.on('success', run);
     router.on('finish', run);
 }

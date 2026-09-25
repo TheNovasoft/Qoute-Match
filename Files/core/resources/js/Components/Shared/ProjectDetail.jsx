@@ -27,11 +27,20 @@ export default function ProjectDetail({
     disputeTypes = [],
 }) {
     const [showComplete, setShowComplete] = useState(false);
+    const [showEditReview, setShowEditReview] = useState(false);
+    const [showRateBuyer, setShowRateBuyer] = useState(false);
     const [showReport, setShowReport] = useState(false);
+    const [buyerRating, setBuyerRating] = useState(5);
     const [scores, setScores] = useState({});
+    const [editScores, setEditScores] = useState({});
 
     const completeForm = useForm({ review: '', scores: {} });
+    const editReviewForm = useForm({
+        review: project.review?.text || '',
+        scores: project.review?.scoresMap || {},
+    });
     const reportForm = useForm({ report_reason: '', dispute_type: 'other' });
+    const rateBuyerForm = useForm({ rating: 5, review: '' });
     const milestoneForm = useForm({
         milestones: [{ title: '', amount: '' }, { title: '', amount: '' }],
     });
@@ -58,9 +67,42 @@ export default function ProjectDetail({
         completeForm.post(project.completeUrl, { onSuccess: () => setShowComplete(false) });
     };
 
+    const openEditReview = () => {
+        editReviewForm.setData({
+            review: project.review?.text || '',
+            scores: project.review?.scoresMap || {},
+        });
+        setEditScores(project.review?.scoresMap || {});
+        setShowEditReview(true);
+    };
+
+    const submitEditReview = (event) => {
+        event.preventDefault();
+        if (!project.reviewUpdateUrl) {
+            return;
+        }
+        editReviewForm.transform((data) => ({ ...data, scores: editScores }));
+        editReviewForm.post(project.reviewUpdateUrl, {
+            preserveScroll: true,
+            onSuccess: () => setShowEditReview(false),
+        });
+    };
+
     const submitReport = (event) => {
         event.preventDefault();
         reportForm.post(project.reportUrl, { onSuccess: () => setShowReport(false) });
+    };
+
+    const submitRateBuyer = (event) => {
+        event.preventDefault();
+        if (!project.reviewBuyerUrl) {
+            return;
+        }
+        rateBuyerForm.transform((data) => ({ ...data, rating: buyerRating }));
+        rateBuyerForm.post(project.reviewBuyerUrl, {
+            preserveScroll: true,
+            onSuccess: () => setShowRateBuyer(false),
+        });
     };
 
     const showBuyerActions = role === 'buyer' && project.status?.label === 'Reviewing' && canReport;
@@ -88,6 +130,11 @@ export default function ProjectDetail({
                         )}
                         {project.uploadUrl && (
                             <Link href={project.uploadUrl} className="btn btn--base btn--sm">Upload Work</Link>
+                        )}
+                        {role === 'freelancer' && project.reviewBuyerUrl && !project.buyerReview && (
+                            <button type="button" className="btn btn--success btn--sm" onClick={() => setShowRateBuyer(true)}>
+                                <i className="las la-star" /> Rate customer
+                            </button>
                         )}
                     </div>
                 </div>
@@ -176,11 +223,25 @@ export default function ProjectDetail({
                                     </div>
                                 )}
                             </div>
+                            {project.buyerReview && role === 'freelancer' && (
+                                <div>
+                                    <h6 className="text--success mb-1">Your Rating &amp; Review for Buyer</h6>
+                                    <StarDisplay rating={project.buyerReview.rating} />
+                                    {project.buyerReview.text && <p className="mt-2">{project.buyerReview.text}</p>}
+                                </div>
+                            )}
                             {project.review && (
                                 <div>
-                                    <h6 className="text--success mb-1">
-                                        {role === 'buyer' ? 'Your Rating & Review for the Freelancer' : "Buyer's Rating for You"}
-                                    </h6>
+                                    <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1">
+                                        <h6 className="text--success mb-0">
+                                            {role === 'buyer' ? 'Your Rating & Review for the Freelancer' : "Buyer's Rating for You"}
+                                        </h6>
+                                        {role === 'buyer' && project.reviewUpdateUrl && (
+                                            <button type="button" className="btn btn--sm btn-outline--base" onClick={openEditReview}>
+                                                Edit review
+                                            </button>
+                                        )}
+                                    </div>
                                     <StarDisplay rating={project.review.rating} />
                                     {project.review.text && <p className="mt-2">{project.review.text}</p>}
                                     <StructuredReviewScores scores={project.review.scores} compact />
@@ -317,6 +378,50 @@ export default function ProjectDetail({
                 </div>
             </div>
 
+            {showEditReview && (
+                <div className="modal custom--modal show d-block" tabIndex="-1">
+                    <div className="modal-dialog modal-dialog-centered modal-lg">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Edit your review</h5>
+                                <button type="button" className="close" onClick={() => setShowEditReview(false)}>
+                                    <i className="las la-times" />
+                                </button>
+                            </div>
+                            <form onSubmit={submitEditReview}>
+                                <div className="modal-body">
+                                    <StructuredReviewForm
+                                        key={`edit-review-${project.id}`}
+                                        dimensions={reviewDimensions}
+                                        scores={project.review?.scoresMap}
+                                        onChange={setEditScores}
+                                    />
+                                    <div className="form-group">
+                                        <label htmlFor="edit-review-text" className="form--label">Write a Review</label>
+                                        <textarea
+                                            id="edit-review-text"
+                                            className="form--control"
+                                            rows={4}
+                                            required
+                                            value={editReviewForm.data.review}
+                                            onChange={(e) => editReviewForm.setData('review', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-outline--dark" onClick={() => setShowEditReview(false)}>
+                                        Cancel
+                                    </button>
+                                    <button type="submit" className="btn btn--base" disabled={editReviewForm.processing}>
+                                        Save changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {showComplete && (
                 <div className="modal custom--modal show d-block" tabIndex="-1">
                     <div className="modal-dialog modal-dialog-centered modal-lg">
@@ -345,6 +450,61 @@ export default function ProjectDetail({
                                 </div>
                                 <div className="modal-footer">
                                     <button type="submit" className="btn btn--base" disabled={completeForm.processing}>Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showRateBuyer && (
+                <div className="modal custom--modal show d-block" tabIndex="-1">
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Rate customer</h5>
+                                <button type="button" className="close" onClick={() => setShowRateBuyer(false)}>
+                                    <i className="las la-times" />
+                                </button>
+                            </div>
+                            <form onSubmit={submitRateBuyer}>
+                                <div className="modal-body">
+                                    <div className="form-group mb-3">
+                                        <label className="form--label">Rating</label>
+                                        <div className="star-rating d-flex gap-1">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <button
+                                                    key={star}
+                                                    type="button"
+                                                    className="btn btn-link p-0 border-0"
+                                                    onClick={() => setBuyerRating(star)}
+                                                    aria-label={`${star} stars`}
+                                                >
+                                                    <i className={`las la-star fs-4 ${star <= buyerRating ? 'text--warning' : 'text-muted'}`} />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="rate-buyer-review" className="form--label">Review</label>
+                                        <textarea
+                                            id="rate-buyer-review"
+                                            className="form--control"
+                                            rows={4}
+                                            required
+                                            value={rateBuyerForm.data.review}
+                                            onChange={(e) => rateBuyerForm.setData('review', e.target.value)}
+                                            placeholder="How was this customer to work with?"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-outline--dark" onClick={() => setShowRateBuyer(false)}>
+                                        Cancel
+                                    </button>
+                                    <button type="submit" className="btn btn--base" disabled={rateBuyerForm.processing}>
+                                        Submit
+                                    </button>
                                 </div>
                             </form>
                         </div>

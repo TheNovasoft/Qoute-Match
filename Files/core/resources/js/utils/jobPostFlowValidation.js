@@ -93,15 +93,8 @@ export function validateStep(step, data) {
     }
 
     if (step.type === 'contact') {
-        const name = trim(data.firstname);
         const email = trim(data.email);
         const phone = trim(data.phone);
-
-        if (!name) {
-            setError(errors, 'firstname', VALIDATION_MSG.NAME_REQUIRED);
-        } else if (name.length > 40) {
-            setError(errors, 'firstname', VALIDATION_MSG.NAME_MAX);
-        }
 
         if (!email) {
             setError(errors, 'email', VALIDATION_MSG.EMAIL_REQUIRED);
@@ -270,7 +263,7 @@ export function stepFieldKeys(step) {
         case 'title-description':
             return ['title', 'description'];
         case 'contact':
-            return ['firstname', 'email', 'phone'];
+            return ['email', 'phone'];
         case 'country-city':
             return [step.countryField, step.cityField].filter(Boolean);
         case 'origin-destination':

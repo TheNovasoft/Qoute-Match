@@ -7,6 +7,20 @@ export const profileSteps = [
     { key: 4, label: 'Portfolio', routeKey: 'userProfilePortfolio', minStep: 3 },
 ];
 
+/** Next profile wizard URL from the provider's current step (0–3). */
+export function profileContinueHref(routes, userStep) {
+    const step = Number(userStep) || 0;
+    const target = profileSteps.find((item) => item.minStep === step) ?? profileSteps[profileSteps.length - 1];
+    const fallbacks = {
+        userProfileSkill: '/provider/profile-skill',
+        userProfileSetting: '/provider/profile-setting',
+        userProfileEducation: '/provider/profile-education',
+        userProfilePortfolio: '/provider/profile-portfolio',
+    };
+
+    return routes?.[target.routeKey] ?? fallbacks[target.routeKey] ?? '/provider/profile-skill';
+}
+
 export default function ProfileSteps({ currentRouteKey, userStep }) {
     const { routes } = usePage().props;
 

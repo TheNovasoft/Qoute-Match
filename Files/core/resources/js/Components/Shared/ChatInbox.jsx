@@ -57,6 +57,7 @@ export default function ChatInbox({
     fileBaseUrl,
     deleteUrl,
     blockUrl,
+    conversationBlocked = false,
 }) {
     const [messages, setMessages] = useState(initialMessages);
     const [text, setText] = useState('');
@@ -240,8 +241,12 @@ export default function ChatInbox({
                                             </div>
                                             <div className="d-flex gap-2">
                                                 {blockUrl && (
-                                                    <button type="button" className="btn btn--sm btn-outline--danger" onClick={handleBlock}>
-                                                        Block
+                                                    <button
+                                                        type="button"
+                                                        className={`btn btn--sm ${conversationBlocked ? 'btn-outline--dark' : 'btn-outline--danger'}`}
+                                                        onClick={handleBlock}
+                                                    >
+                                                        {conversationBlocked ? 'Unblock' : 'Block'}
                                                     </button>
                                                 )}
                                                 {deleteUrl && (
@@ -268,59 +273,81 @@ export default function ChatInbox({
 
                                 {activeConversationId && storeUrl && (
                                     <div className="chat-box__footer">
-                                        <div className="chat-send-area">
-                                            <form className="send__msg" id="messageForm" onSubmit={sendMessage} data-store-url={storeUrl}>
-                                                {files.length > 0 && (
-                                                    <div className="files-here show">
-                                                        <span>
-                                                            Selected <b>{files.length}</b> Files
-                                                            <i
-                                                                className="las la-times removeFile"
-                                                                role="button"
-                                                                tabIndex={0}
-                                                                onClick={() => setFiles([])}
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                <div className="d-flex align-center gap-2">
-                                                    <div className="input-group">
-                                                        <textarea
-                                                            className="form--control form-control"
-                                                            id="messageInput"
-                                                            name="message"
-                                                            value={text}
-                                                            onChange={(e) => setText(e.target.value)}
-                                                            placeholder="Type your message here ..."
-                                                            rows={1}
-                                                            onKeyDown={(e) => {
-                                                                if (e.key === 'Enter' && !e.shiftKey) {
-                                                                    e.preventDefault();
-                                                                    sendMessage(e);
-                                                                }
-                                                            }}
-                                                        />
-                                                        <span className="btn--base btn-sm chat-send-btn">
-                                                            <label htmlFor="chatFileUpload">
-                                                                <i className="las la-paperclip" />
-                                                            </label>
-                                                            <input
-                                                                className="messageFileUpload"
-                                                                id="chatFileUpload"
-                                                                type="file"
-                                                                hidden
-                                                                multiple
-                                                                accept="image/jpg,image/jpeg,image/png,.pdf,.docx,.doc"
-                                                                onChange={(e) => setFiles([...e.target.files])}
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <button className="chating-btn" type="submit" disabled={sending}>
-                                                        <i className="las la-paper-plane" />
+                                        {conversationBlocked ? (
+                                            <div className="alert alert-warning mb-0 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                                <span>
+                                                    {role === 'buyer'
+                                                        ? 'You blocked this provider. Unblock to send messages again.'
+                                                        : 'This conversation is blocked. You cannot send messages here.'}
+                                                </span>
+                                                {role === 'buyer' && blockUrl && (
+                                                    <button type="button" className="btn btn--sm btn-outline--dark" onClick={handleBlock}>
+                                                        Unblock
                                                     </button>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="chat-send-area">
+                                                <div className="chat-send-field">
+                                                    <form className="send__msg" id="messageForm" onSubmit={sendMessage} data-store-url={storeUrl}>
+                                                        {files.length > 0 && (
+                                                            <div className="files-here show">
+                                                                <span>
+                                                                    Selected <b>{files.length}</b> Files
+                                                                    <i
+                                                                        className="las la-times removeFile"
+                                                                        role="button"
+                                                                        tabIndex={0}
+                                                                        onClick={() => setFiles([])}
+                                                                    />
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        <div className="d-flex align-items-center gap-2">
+                                                            <div className="input-group position-relative flex-grow-1">
+                                                                <textarea
+                                                                    className="form--control form-control"
+                                                                    id="messageInput"
+                                                                    name="message"
+                                                                    value={text}
+                                                                    onChange={(e) => setText(e.target.value)}
+                                                                    placeholder="Type your message here ..."
+                                                                    rows={1}
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                                                            e.preventDefault();
+                                                                            sendMessage(e);
+                                                                        }
+                                                                    }}
+                                                                />
+                                                                <span className="btn--base btn-sm chat-send-btn">
+                                                                    <label htmlFor="chatFileUpload" className="mb-0">
+                                                                        <i className="las la-paperclip" />
+                                                                    </label>
+                                                                    <input
+                                                                        className="messageFileUpload"
+                                                                        id="chatFileUpload"
+                                                                        type="file"
+                                                                        hidden
+                                                                        multiple
+                                                                        accept="image/jpg,image/jpeg,image/png,.pdf,.docx,.doc"
+                                                                        onChange={(e) => setFiles(Array.from(e.target.files || []))}
+                                                                    />
+                                                                </span>
+                                                            </div>
+                                                            <button
+                                                                className="chating-btn flex-shrink-0"
+                                                                type="submit"
+                                                                disabled={sending}
+                                                                aria-label="Send message"
+                                                            >
+                                                                <i className="las la-paper-plane" />
+                                                            </button>
+                                                        </div>
+                                                    </form>
                                                 </div>
-                                            </form>
-                                        </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>

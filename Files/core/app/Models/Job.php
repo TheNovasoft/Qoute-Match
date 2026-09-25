@@ -92,7 +92,8 @@ class Job extends Model
         return $query
             ->whereDoesntHave('bids', fn ($q) => $q->where('status', Status::BID_ACCEPTED))
             ->where(function ($q) use ($graceStart) {
-                $q->whereDate('deadline', '>=', today())
+                $q->whereNull('deadline')
+                    ->orWhereDate('deadline', '>=', today())
                     ->orWhere(function ($q2) use ($graceStart) {
                         $q2->whereDate('deadline', '<', today())
                             ->whereDate('deadline', '>=', $graceStart);

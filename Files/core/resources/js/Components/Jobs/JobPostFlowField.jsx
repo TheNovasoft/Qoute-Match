@@ -267,25 +267,7 @@ export default function JobPostFlowField({
 
                     <div className="col-md-6">
 
-                        <input
-
-                            type="text"
-
-                            className={inputClass(errors.firstname)}
-
-                            placeholder={tx('Your name')}
-
-                            value={data.firstname || ''}
-
-                            onChange={(e) => onChange('firstname', e.target.value)}
-
-                        />
-
-                        <FieldError message={errors.firstname} tx={tx} />
-
-                    </div>
-
-                    <div className="col-md-6">
+                        <label className="form-label job-flow-title-desc__label mb-2">{tx('Email')}</label>
 
                         <input
 
@@ -293,7 +275,9 @@ export default function JobPostFlowField({
 
                             className={inputClass(errors.email)}
 
-                            placeholder={tx('Email')}
+                            placeholder={tx('you@example.com')}
+
+                            autoComplete="email"
 
                             value={data.email || ''}
 
@@ -307,13 +291,17 @@ export default function JobPostFlowField({
 
                     <div className="col-md-6">
 
+                        <label className="form-label job-flow-title-desc__label mb-2">{tx('Contact number')}</label>
+
                         <input
 
-                            type="text"
+                            type="tel"
 
                             className={inputClass(errors.phone)}
 
                             placeholder={tx('Phone number')}
+
+                            autoComplete="tel"
 
                             value={data.phone || ''}
 

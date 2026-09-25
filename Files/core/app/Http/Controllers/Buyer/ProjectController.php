@@ -303,7 +303,7 @@ class ProjectController extends Controller
             $transaction->trx_type = '-';
             $transaction->remark = 'completed_project';
             $transaction->details = 'Project completed for job ' . $job->title;
-            $transaction->trx = $trxData ? $trxData->trx : null;
+            $transaction->trx = $trxData?->trx ?? $trx;
             $transaction->save();
         } else {
             $finalIncome = 0;

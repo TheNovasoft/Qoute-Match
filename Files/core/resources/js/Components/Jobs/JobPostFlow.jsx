@@ -450,7 +450,10 @@ function JobPostFlowInner({
             category_id: Number(categoryId),
             subcategory_id: Number(subcategoryId),
             skill_ids: skillIds,
-            lastname: mergedData.lastname || mergedData.firstname || 'Customer',
+            firstname: mergedData.firstname?.trim()
+                || (mergedData.email ? String(mergedData.email).split('@')[0] : '')
+                || 'Customer',
+            lastname: mergedData.lastname?.trim() || mergedData.firstname?.trim() || 'Customer',
             budget: mergedData.custom_budget === '1' ? 0 : (mergedData.budget || 0),
             project_scope: mergedData.project_scope || '2',
             job_longevity: mergedData.job_longevity || '2',
