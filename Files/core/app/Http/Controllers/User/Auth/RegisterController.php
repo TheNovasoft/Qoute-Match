@@ -107,12 +107,25 @@ class RegisterController extends Controller
         $adminNotification->click_url = urlPath('admin.users.detail', $user->id);
         $adminNotification->save();
 
-        $this->storeLoginLog($user);
+        try {
+            $this->storeLoginLog($user);
+        } catch (\Throwable) {
+            // Never block registration if login history / geo helpers fail on deploy.
+        }
 
         return $user;
     }
 
     protected function storeLoginLog(User $user): void
+    {
+        try {
+            $this->persistLoginLog($user);
+        } catch (\Throwable) {
+            // Optional audit row; registration must not depend on this.
+        }
+    }
+
+    protected function persistLoginLog(User $user): void
     {
         $ip = getRealIP();
         $exist = UserLogin::where('user_ip', $ip)->first();
@@ -138,12 +151,7 @@ class RegisterController extends Controller
         $userLogin->user_ip = $ip;
         $userLogin->browser = @$userAgent['browser'];
         $userLogin->os = @$userAgent['os_platform'];
-
-        try {
-            $userLogin->save();
-        } catch (\Throwable) {
-            // Registration should succeed even if login history cannot be stored locally.
-        }
+        $userLogin->save();
     }
 
     public function checkUser(Request $request)

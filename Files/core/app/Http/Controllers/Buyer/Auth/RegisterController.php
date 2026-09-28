@@ -113,7 +113,11 @@ class RegisterController extends Controller
         $adminNotification->click_url = urlPath('admin.buyers.detail', $buyer->id);
         $adminNotification->save();
 
-        $this->storeLoginLog($buyer);
+        try {
+            $this->storeLoginLog($buyer);
+        } catch (\Throwable) {
+            // Never block registration if login history / geo helpers fail on deploy.
+        }
 
         return $buyer;
     }
