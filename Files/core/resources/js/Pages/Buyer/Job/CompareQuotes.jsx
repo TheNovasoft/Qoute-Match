@@ -17,8 +17,8 @@ function formatProviderRating(rating, reviewsCount) {
 
 const FILTER_HELP = {
     sort: 'Recommended balances price, rating, and availability. Use Lowest price when cost matters most.',
-    min_price: 'Only show quotes at or above this amount. Leave blank for no minimum.',
-    max_price: 'Only show quotes at or below this amount. Leave blank for no maximum.',
+    min_price: 'Hide quotes above this amount. Leave blank to show all prices.',
+    max_price: 'Hide quotes below this amount. Useful when you have a fixed budget cap.',
     verified: 'Only show providers whose identity has been checked by our team.',
     insured: 'Only show providers with approved insurance documents on file.',
     company: 'Only show providers with a verified company registration.',
@@ -29,26 +29,6 @@ const FILTER_HELP = {
 function FilterHint({ text }) {
     if (!text) return null;
     return <small className="text-muted d-block mt-1 compare-filter-hint">{text}</small>;
-}
-
-function filterValuesActive(f) {
-    if (!f || typeof f !== 'object') {
-        return false;
-    }
-
-    if (String(f.min_price ?? '').trim() !== '') {
-        return true;
-    }
-    if (String(f.max_price ?? '').trim() !== '') {
-        return true;
-    }
-    if (f.sort && f.sort !== 'recommended') {
-        return true;
-    }
-
-    return ['verified', 'insured', 'company', 'licence', 'shortlisted'].some(
-        (key) => Number(f[key]) === 1 || f[key] === true || f[key] === '1',
-    );
 }
 
 function SingleQuoteWaitingBanner({ job, onShare }) {
@@ -231,10 +211,17 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
         return [...labels];
     }, [bids]);
 
-    const hasActiveFilters = useMemo(
-        () => filterValuesActive(filters) || filterValuesActive(localFilters),
-        [filters, localFilters],
-    );
+    const escrowAcceptance = useMemo(() => {
+        if (!hireRequirements?.escrowEnabled) {
+            return { needsDeposit: false };
+        }
+        const acceptable = (bids || []).filter((bid) => bid.canAccept);
+        if (!acceptable.length) {
+            return { needsDeposit: false };
+        }
+        const maxShortfallRaw = Math.max(...acceptable.map((bid) => Number(bid.shortfallRaw ?? 0)));
+        return { needsDeposit: maxShortfallRaw > 0 };
+    }, [bids, hireRequirements?.escrowEnabled]);
 
     const applyFilters = (event) => {
         if (event) event.preventDefault();
@@ -366,11 +353,21 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                 )}
 
                 {hireRequirements?.escrowEnabled && (
-                    <div className="alert alert-warning mb-4">
-                        Accepting a quote requires your wallet balance to cover the quote amount (escrow is enabled).
-                        Your balance: <strong>{hireRequirements.buyerBalance}</strong>.
-                        {' '}
-                        <Link href={depositUrl} className="alert-link">Add money</Link>
+                    <div className={`alert mb-4 ${escrowAcceptance.needsDeposit ? 'alert-warning' : 'alert-success'}`}>
+                        {escrowAcceptance.needsDeposit ? (
+                            <>
+                                Your wallet balance must cover the quote amount (escrow is enabled).
+                                Balance: <strong>{hireRequirements.buyerBalance}</strong>.
+                                {' '}
+                                <Link href={depositUrl} className="alert-link">Add money</Link>
+                            </>
+                        ) : (
+                            <>
+                                Your balance (<strong>{hireRequirements.buyerBalance}</strong>) covers the active quote
+                                {stats?.lowestPrice ? <> (lowest: {stats.lowestPrice})</> : null}.
+                                Scroll down and click <strong>Accept quote</strong>.
+                            </>
+                        )}
                     </div>
                 )}
 
@@ -381,11 +378,6 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                 <div className="card-body">
                                     <small className="text-muted">Active quotes</small>
                                     <h4 className="mb-0">{stats.total}</h4>
-                                    {stats.total > 0 && stats.matching != null && stats.matching !== stats.total && (
-                                        <small className="text--base d-block">
-                                            Showing {stats.matching} matching your filters
-                                        </small>
-                                    )}
                                     {stats.rejected > 0 && (
                                         <small className="text-muted">{stats.rejected} rejected and hidden</small>
                                     )}
@@ -433,7 +425,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
 
                 <form className="card custom--card mb-4 compare-quotes-filters" onSubmit={applyFilters}>
                     <div className="card-body">
-                        <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 compare-quotes-filters__header">
+                        <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                             <div>
                                 <h6 className="mb-0">Filter & sort quotes</h6>
                                 {localFilters.sort && (
@@ -441,22 +433,10 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                         Sorted by: <strong>{sortLabels[localFilters.sort] || localFilters.sort}</strong>
                                     </small>
                                 )}
-                                {hasActiveFilters && (
-                                    <small className="text--base d-block mt-1">
-                                        Filters are applied — use Clear filters to show all quotes again.
-                                    </small>
-                                )}
                             </div>
-                            {hasActiveFilters && (
-                                <button
-                                    type="button"
-                                    className="btn btn-sm btn-outline--base compare-quotes-filters__clear flex-shrink-0"
-                                    onClick={clearFilters}
-                                >
-                                    <i className="las la-times me-1" aria-hidden="true" />
-                                    Clear filters
-                                </button>
-                            )}
+                            <button type="button" className="btn btn-sm btn-link text-muted p-0" onClick={clearFilters}>
+                                Clear filters
+                            </button>
                         </div>
                         <div className="row g-3 align-items-end">
                             <div className="col-12 col-md-6 col-lg-3">
@@ -500,18 +480,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                                 <FilterHint text={FILTER_HELP.max_price} />
                             </div>
                             <div className="col-12 col-md-6 col-lg-2">
-                                <div className="d-grid gap-2">
-                                    <button type="submit" className="btn btn--base w-100">Apply filters</button>
-                                    {hasActiveFilters && (
-                                        <button
-                                            type="button"
-                                            className="btn btn-outline--base w-100 d-md-none"
-                                            onClick={clearFilters}
-                                        >
-                                            Clear filters
-                                        </button>
-                                    )}
-                                </div>
+                                <button type="submit" className="btn btn--base w-100">Apply filters</button>
                             </div>
                         </div>
                         <div className="row g-3 mt-2 compare-quotes-filters__checks">
@@ -579,48 +548,7 @@ export default function CompareQuotes({ pageTitle, job, bids, filters, stats, hi
                     </div>
                 </form>
 
-                {!bids.length && stats?.total > 0 && hasActiveFilters && (
-                    <div className="card custom--card mb-4 border-warning">
-                        <div className="card-body text-center py-5">
-                            <i className="las la-filter fs-1 text-warning mb-3 d-block" aria-hidden="true" />
-                            <h5 className="mb-2">No quotes match your filters</h5>
-                            <p className="text-muted mb-4">
-                                You have <strong>{stats.total}</strong> active quote{stats.total === 1 ? '' : 's'}, but
-                                none fit the current Min/Max price or checkbox filters. Clear filters or widen your price range.
-                            </p>
-                            <button type="button" className="btn btn--base btn-sm" onClick={clearFilters}>
-                                Clear filters
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {!bids.length && stats?.total === 0 && stats?.rejected > 0 && (
-                    <div className="card custom--card mb-4">
-                        <div className="card-body text-center py-5">
-                            <i className="las la-user-times fs-1 text-muted mb-3 d-block" aria-hidden="true" />
-                            <h5 className="mb-2">No active quotes</h5>
-                            <p className="text-muted mb-4">
-                                {stats.rejected} quote{stats.rejected === 1 ? ' was' : 's were'} rejected and hidden here.
-                                Share your job link so providers can send new quotes, or wait for more responses.
-                            </p>
-                            <div className="d-flex flex-wrap justify-content-center gap-2">
-                                {job.publicUrl && (
-                                    <button
-                                        type="button"
-                                        className="btn btn--base btn-sm"
-                                        onClick={() => navigator.clipboard?.writeText(job.publicUrl)}
-                                    >
-                                        Copy share link
-                                    </button>
-                                )}
-                                <Link href={job.viewUrl} className="btn btn-outline--base btn-sm">View job</Link>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {!bids.length && stats?.total === 0 && !(stats?.rejected > 0) && (
+                {!bids.length && (
                     <div className="card custom--card mb-4">
                         <div className="card-body text-center py-5">
                             <i className="las la-inbox fs-1 text-muted mb-3 d-block" aria-hidden="true" />
