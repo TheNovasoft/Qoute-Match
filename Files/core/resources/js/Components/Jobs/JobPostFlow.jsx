@@ -423,7 +423,7 @@ function JobPostFlowInner({
         window.setTimeout(() => scrollToStep(stepRefs.current[stepId]), 100);
     };
 
-    const buildSubmitPayload = (asDraft = false) => {
+    const buildSubmitPayload = () => {
         const categoryId = coreRef.current.category_id || form.data.category_id;
         const subcategoryId = coreRef.current.subcategory_id || form.data.subcategory_id;
         const mergedData = { ...form.data, ...flowData, category_id: categoryId, subcategory_id: subcategoryId };
@@ -459,13 +459,12 @@ function JobPostFlowInner({
             job_longevity: mergedData.job_longevity || '2',
             skill_level: mergedData.skill_level || '3',
             custom_budget: mergedData.custom_budget || '1',
-            status: asDraft ? '0' : '1',
-            save_as_draft: asDraft ? '1' : '0',
+            status: '1',
         };
     };
 
-    const postComplete = (asDraft) => {
-        const payload = buildSubmitPayload(asDraft);
+    const submitJob = () => {
+        const payload = buildSubmitPayload();
 
         if (!payload.category_id || Number.isNaN(payload.category_id)) {
             startEdit('category');
@@ -489,22 +488,6 @@ function JobPostFlowInner({
         });
     };
 
-    const submitJob = () => postComplete(false);
-
-    const submitDraft = () => postComplete(true);
-
-    useEffect(() => {
-        if (!jobId || !draft.title || !draft.category_id) {
-            return;
-        }
-        setCompletedIds((prev) => {
-            if (prev.length > 0) {
-                return prev;
-            }
-            return visibleSteps.filter((step) => step.type !== 'review').map((step) => step.id);
-        });
-    }, [jobId, draft.title, draft.category_id, visibleSteps]);
-
     const renderReview = () => (
         <div className="job-flow-review">
             {visibleSteps.filter((s) => s.type !== 'review').map((step) => (
@@ -518,26 +501,14 @@ function JobPostFlowInner({
                     <p className="job-flow-review__value">{tx(summarizeStep(step, flowData, categories))}</p>
                 </div>
             ))}
-            <div className="job-flow-review__actions d-flex flex-wrap gap-2 justify-content-center">
-                {isBuyer && (
-                    <button
-                        type="button"
-                        className="btn btn-outline--base job-flow-submit"
-                        onClick={submitDraft}
-                        disabled={form.processing}
-                    >
-                        {form.processing ? tx('Saving…') : tx('Save as Draft')}
-                    </button>
-                )}
-                <button
-                    type="button"
-                    className="btn btn--base job-flow-submit"
-                    onClick={submitJob}
-                    disabled={form.processing}
-                >
-                    {form.processing ? tx('Posting…') : tx(isBuyer ? 'Post job' : 'Post job free')}
-                </button>
-            </div>
+            <button
+                type="button"
+                className="btn btn--base job-flow-submit"
+                onClick={submitJob}
+                disabled={form.processing}
+            >
+                {form.processing ? tx('Posting…') : tx(isBuyer ? 'Post job' : 'Post job free')}
+            </button>
         </div>
     );
 

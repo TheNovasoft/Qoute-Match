@@ -262,11 +262,7 @@ class GuestJobPostService
         $job = new Job();
         $job->buyer_id = $buyer->id;
         $job->title = $draft['title'];
-        $job->slug = JobSlugGenerator::unique(
-            (string) ($draft['title'] ?? ''),
-            0,
-            (string) ($draft['slug'] ?? '')
-        );
+        $job->slug = $draft['slug'];
         $job->category_id = $draft['category_id'];
         $job->subcategory_id = $draft['subcategory_id'];
         $job->description = $draft['description'];

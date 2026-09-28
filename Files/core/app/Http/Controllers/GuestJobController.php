@@ -52,9 +52,16 @@ class GuestJobController extends Controller
             return $redirect;
         }
 
-        $request->merge([
-            'slug' => \App\Lib\JobSlugGenerator::unique($request->title ?? '', 0, $request->slug),
-        ]);
+        $base = \Illuminate\Support\Str::slug(
+            filled($request->slug) ? $request->slug : ($request->title ?? 'job')
+        ) ?: 'job';
+        $slug = $base;
+        $i = 1;
+        while (Job::where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $i;
+            $i++;
+        }
+        $request->merge(['slug' => $slug]);
 
         $request->validate([
             'title' => 'required|string|max:255',
@@ -119,9 +126,16 @@ class GuestJobController extends Controller
             return $redirect;
         }
 
-        $request->merge([
-            'slug' => \App\Lib\JobSlugGenerator::unique($request->title ?? '', 0, $request->slug),
-        ]);
+        $base = \Illuminate\Support\Str::slug(
+            filled($request->slug) ? $request->slug : ($request->title ?? 'job')
+        ) ?: 'job';
+        $slug = $base;
+        $i = 1;
+        while (Job::where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $i;
+            $i++;
+        }
+        $request->merge(['slug' => $slug]);
 
         $request->validate([
             'title' => 'required|string|max:255',
