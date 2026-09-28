@@ -5575,3 +5575,163 @@ h6.mb-2 {
 .provider-presence--offline {
   color: #6b7280;
 }
+
+/* Header: centered nav + visible Explore dropdown active state */
+@media (min-width: 1200px) {
+  .header .header-navbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 12px;
+  }
+
+  .header .header-navbar .navbar-brand {
+    flex-shrink: 0;
+  }
+
+  .header .header-navbar .navbar-collapse {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .header .header-navbar .nav-menu {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .header .header-navbar .header-actions {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+}
+
+body .header .dropdown-menu .dropdown-menu__link.active,
+body .header .dropdown-menu .dropdown-item.active {
+  background-color: hsl(var(--base)) !important;
+  color: #fff !important;
+}
+
+body .header .dropdown-menu .dropdown-menu__link.active:hover,
+body .header .dropdown-menu .dropdown-item.active:hover,
+body .header .dropdown-menu .dropdown-menu__link.active:focus,
+body .header .dropdown-menu .dropdown-item.active:focus {
+  background-color: hsl(var(--base-d-200, var(--base))) !important;
+  color: #fff !important;
+}
+
+/* Talent browse — modern filter panel */
+.talent-filter-panel {
+  border: 1px solid hsl(var(--border-color) / 0.35);
+  box-shadow: 0 8px 28px hsl(var(--black) / 0.06);
+}
+
+.talent-filter-panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid hsl(var(--border-color) / 0.25);
+}
+
+.talent-filter-panel__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: hsl(var(--heading-color));
+}
+
+.talent-filter-panel__count {
+  font-size: 0.95rem;
+  color: hsl(var(--body-color));
+}
+
+.talent-filter-panel__form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  gap: 16px;
+  align-items: end;
+}
+
+.talent-filter-panel__field .form--label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: hsl(var(--body-color));
+}
+
+.talent-filter-panel__field--search {
+  grid-column: span 1;
+}
+
+.talent-filter-panel__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 140px;
+}
+
+@media (max-width: 1199px) {
+  .talent-filter-panel__form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .talent-filter-panel__field--search {
+    grid-column: span 2;
+  }
+
+  .talent-filter-panel__actions {
+    grid-column: span 2;
+    flex-direction: row;
+  }
+
+  .talent-filter-panel__actions .btn {
+    flex: 1;
+  }
+}
+
+@media (max-width: 575px) {
+  .talent-filter-panel__form {
+    grid-template-columns: 1fr;
+  }
+
+  .talent-filter-panel__field--search,
+  .talent-filter-panel__actions {
+    grid-column: span 1;
+  }
+
+  .talent-filter-panel__actions {
+    flex-direction: column;
+  }
+}
+
+/* FAQ — customer vs provider sections */
+.faq-section {
+  border-radius: 12px;
+  padding: 24px 28px;
+}
+
+.faq-section--customer {
+  background: hsl(var(--white));
+  border: 1px solid hsl(var(--border-color) / 0.35);
+}
+
+.faq-section--provider {
+  background: hsl(var(--section-bg, 220 14% 96%) / 1);
+  background-color: #f3f4f6;
+  border: 1px solid hsl(var(--border-color) / 0.25);
+}
+
+.faq-section__title {
+  font-weight: 600;
+}
+
+.faq-section--provider .accordion-item {
+  background: transparent;
+}
+
+.faq-section--customer .accordion-item {
+  background: hsl(var(--white));
+}
