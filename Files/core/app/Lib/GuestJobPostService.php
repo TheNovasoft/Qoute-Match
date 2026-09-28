@@ -161,8 +161,8 @@ class GuestJobPostService
 
         $buyer = new Buyer();
         $buyer->email = $email;
-        $buyer->firstname = trim($contact['firstname']);
-        $buyer->lastname = trim($contact['lastname']);
+        $buyer->firstname = trim($contact['firstname'] ?? '') ?: (Str::before($email, '@') ?: 'Customer');
+        $buyer->lastname = trim($contact['lastname'] ?? '') ?: 'Customer';
         $buyer->phone = $contact['phone'] ?? null;
         // Notify/SMS use `mobile`; keep it in sync with the contact phone.
         if (!empty($contact['phone'])) {
@@ -192,7 +192,31 @@ class GuestJobPostService
         $adminNotification->click_url = urlPath('admin.buyers.detail', $buyer->id);
         $adminNotification->save();
 
+        session(['guest_job_plain_password' => $plainPassword]);
+
         return $buyer;
+    }
+
+    public static function notifyGuestAccountCreated(Buyer $buyer, string $plainPassword, ?Job $job = null): void
+    {
+        $loginUrl = route('buyer.login');
+        $jobLine = $job
+            ? 'Your quote request "' . $job->title . '" has been submitted successfully.'
+            : 'Your quote request has been submitted successfully.';
+
+        $message = implode("\n\n", array_filter([
+            'Hello ' . $buyer->firstname . ',',
+            $jobLine,
+            'We created a free customer account so you can track quotes and manage your requests.',
+            'Sign-in email: ' . $buyer->email,
+            'Temporary password: ' . $plainPassword,
+            'For your security, please sign in and change your password as soon as possible: ' . $loginUrl,
+        ]));
+
+        notify($buyer, 'DEFAULT', [
+            'subject' => 'Your request was submitted — account created',
+            'message' => $message,
+        ], ['email']);
     }
 
     public static function hasPendingPublish(): bool
@@ -257,6 +281,7 @@ class GuestJobPostService
         $job->status = $budgetData['status'];
 
         if ((int) $budgetData['status'] === Status::JOB_PUBLISH) {
+            // Match logged-in customer post flow so new requests appear on Browse / Find Jobs.
             $job->is_approved = Status::JOB_APPROVED;
         }
 

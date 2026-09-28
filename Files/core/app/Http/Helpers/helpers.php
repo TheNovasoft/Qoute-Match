@@ -191,6 +191,30 @@ function osBrowser() {
     return $osBrowser;
 }
 
+/**
+ * Normalize getIpInfo() fields for user_logins (scalar or array from geo API).
+ */
+function loginGeoValue(array $info, string $key): ?string
+{
+    if (! array_key_exists($key, $info)) {
+        return null;
+    }
+
+    $value = $info[$key];
+
+    if (is_array($value)) {
+        $parts = array_filter($value, static fn ($v) => $v !== null && $v !== '');
+
+        return $parts === [] ? null : implode(',', $parts);
+    }
+
+    if ($value === null || $value === '') {
+        return null;
+    }
+
+    return (string) $value;
+}
+
 function getTemplates() {
     return null;
 }
@@ -293,6 +317,9 @@ function menuActive($routeName, $type = null, $param = null) {
 }
 
 function fileUploader($file, $location, $size = null, $old = null, $thumb = null, $filename = null) {
+    if (is_string($location) && !str_starts_with($location, DIRECTORY_SEPARATOR) && !preg_match('/^[A-Za-z]:[\\\\\\/]/', $location)) {
+        $location = public_path($location);
+    }
 
     $fileManager           = new FileManager($file);
     $fileManager->path     = $location;

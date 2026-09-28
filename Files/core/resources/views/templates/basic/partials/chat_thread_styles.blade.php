@@ -171,6 +171,23 @@
     .chating-btn {
         width: 46px !important;
         height: 46px !important;
+        flex-shrink: 0;
+    }
+
+    .send__msg .input-group {
+        position: relative;
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .send__msg .chat-send-btn label {
+        cursor: pointer;
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
     }
 
     .chat-box__thread .empty-message {

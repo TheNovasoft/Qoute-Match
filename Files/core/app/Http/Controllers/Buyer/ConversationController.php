@@ -107,12 +107,6 @@ class ConversationController extends Controller
             )
             ->get();
 
-        Message::whereHas('conversation', function ($query) use ($buyer) {
-            $query->where('buyer_id', $buyer->id);
-        })
-            ->whereNull('buyer_read_at')
-            ->update(['buyer_read_at' => now()]);
-
         $id = $conversation->id;
         return Inertia::render('Buyer/Conversation', array_merge(
             ['pageTitle' => $pageTitle],

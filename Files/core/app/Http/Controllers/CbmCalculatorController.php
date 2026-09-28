@@ -17,8 +17,15 @@ class CbmCalculatorController extends Controller
             'qv' => 'nullable|integer|min:1',
             'uom' => 'nullable|in:mm,cm,meter',
             'wv' => 'nullable|numeric|min:0',
-            'wu' => 'nullable|in:kg,gm',
+            'wu' => 'nullable|in:kg,gm,lb',
         ]);
+
+        $weightUnit = $validated['wu'] ?? 'kg';
+        $weightValue = (float) ($validated['wv'] ?? 0);
+        if ($weightValue > 0 && $weightUnit === 'lb') {
+            $weightValue = round($weightValue / 2.2046226218, 3);
+            $weightUnit = 'kg';
+        }
 
         $payload = [
             'lv' => (float) $validated['lv'],
@@ -29,8 +36,8 @@ class CbmCalculatorController extends Controller
             'hvinch' => 0,
             'qv' => (int) ($validated['qv'] ?? 1),
             'uom' => $validated['uom'] ?? 'cm',
-            'wv' => (float) ($validated['wv'] ?? 0),
-            'wu' => $validated['wu'] ?? 'kg',
+            'wv' => $weightValue,
+            'wu' => $weightUnit,
         ];
 
         try {

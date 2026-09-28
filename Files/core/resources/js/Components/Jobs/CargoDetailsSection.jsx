@@ -1,8 +1,12 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import CbmCalculator from '@/Components/Jobs/CbmCalculator';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import CbmCalculator, { CbmResultField } from '@/Components/Jobs/CbmCalculator';
 import { useJobPostFormTranslation } from '@/Components/Jobs/JobPostFormTranslationProvider';
 import WizardOptionCard from '@/Components/Jobs/WizardOptionCard';
-import { formatStoredCbmBoxes, parseStoredCbmBoxes } from '@/utils/cbmCalculations';
+import {
+    aggregateCbmResultsFromBoxes,
+    formatStoredCbmBoxes,
+    parseStoredCbmBoxes,
+} from '@/utils/cbmCalculations';
 
 function FieldError({ message, tx }) {
     if (!message) {
@@ -42,6 +46,13 @@ export default function CargoDetailsSection({
         const boxes = parseStoredCbmBoxes(cbmValue);
         return boxes.length ? boxes : [''];
     });
+    const [visibleBoxCount, setVisibleBoxCount] = useState(() => {
+        const boxes = parseStoredCbmBoxes(cbmValue);
+        if (boxes.length > 1) {
+            return boxes.length;
+        }
+        return 1;
+    });
     const [enteringBoxIndex, setEnteringBoxIndex] = useState(null);
     const boxRefs = useRef([]);
     const scrollLockRef = useRef(null);
@@ -79,12 +90,14 @@ export default function CargoDetailsSection({
         if (mode === 'same') {
             const nextBoxes = [boxValues[0] || ''];
             setBoxValues(nextBoxes);
+            setVisibleBoxCount(1);
             syncCbmField(nextBoxes, false);
             return;
         }
 
         const nextBoxes = boxValues.length ? [...boxValues] : [''];
         setBoxValues(nextBoxes);
+        setVisibleBoxCount(nextBoxes.length > 1 ? nextBoxes.length : 1);
         syncCbmField(nextBoxes, true);
     };
 
@@ -103,6 +116,7 @@ export default function CargoDetailsSection({
         lockScrollPosition();
         const nextIndex = boxValues.length;
         setBoxValues((prev) => [...prev, '']);
+        setVisibleBoxCount((prev) => prev + 1);
         setEnteringBoxIndex(nextIndex);
     };
 
@@ -135,7 +149,16 @@ export default function CargoDetailsSection({
         { value: 'multiple', label: 'Multiple different products' },
     ];
 
-    const boxesToRender = lclPackMode === 'multiple' ? boxValues : [boxValues[0] || ''];
+    const boxesToRender = lclPackMode === 'multiple'
+        ? boxValues.slice(0, visibleBoxCount)
+        : [boxValues[0] || ''];
+
+    const combinedCbmResults = useMemo(() => {
+        if (!showCbm || lclPackMode !== 'multiple') {
+            return null;
+        }
+        return aggregateCbmResultsFromBoxes(boxValues, data[step.weightField] || '');
+    }, [showCbm, lclPackMode, boxValues, data, step.weightField]);
 
     return (
         <>
@@ -217,7 +240,18 @@ export default function CargoDetailsSection({
                     }}
                 >
                     {lclPackMode === 'multiple' && (
-                        <h6 className="cargo-box-item__title mb-2">{tx('Box')} {index + 1}</h6>
+                        <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
+                            <h6 className="cargo-box-item__title mb-0">{tx('Box')} {index + 1}</h6>
+                            {index === 0 && (
+                                <button
+                                    type="button"
+                                    className="cargo-add-box-btn cargo-add-box-btn--inline"
+                                    onClick={handleAddBox}
+                                >
+                                    + {tx('Add box')}
+                                </button>
+                            )}
+                        </div>
                     )}
                     {isWizard && lclPackMode === 'same' && (
                         <label className="form-label">{step.cbmMeta?.name}</label>
@@ -228,19 +262,32 @@ export default function CargoDetailsSection({
                         onChange={(value) => handleBoxChange(index, value)}
                         weightKg={data[step.weightField] || ''}
                         hideWeightInput
+                        hideResults={lclPackMode === 'multiple'}
                     />
                 </div>
             ))}
 
             {showCbm && isLcl && lclPackMode === 'multiple' && (
                 <div className="col-12">
-                    <button
-                        type="button"
-                        className="cargo-add-box-btn"
-                        onClick={handleAddBox}
-                    >
-                        + {tx('Add box')}
-                    </button>
+                    <div className="cbm-calculator__results mt-2 pt-3 border-top">
+                        <h6 className="mb-3">{tx('Results')}</h6>
+                        {combinedCbmResults ? (
+                            <div className="row gy-3 cbm-calculator__results-grid">
+                                <CbmResultField tx={tx} label="Volume (Cubic Meter)" value={combinedCbmResults.volumeM3} suffix=" m³" />
+                                <CbmResultField tx={tx} label="Volume (Cubic Feet)" value={combinedCbmResults.volumeFt3} suffix=" ft³" />
+                                <CbmResultField tx={tx} label="Weight (Kg)" value={combinedCbmResults.totalWeightKg} suffix=" kg" />
+                                <CbmResultField tx={tx} label="Weight (lb)" value={combinedCbmResults.totalWeightLb} suffix=" lb" />
+                                <CbmResultField tx={tx} label="Volumetric Weight Sea (Kg)" value={combinedCbmResults.volumetricWeightSeaKg} suffix=" kg" />
+                                <CbmResultField tx={tx} label="Volumetric Weight Sea (lb)" value={combinedCbmResults.volumetricWeightSeaLb} suffix=" lb" />
+                                <CbmResultField tx={tx} label="Volumetric Weight Air (Kg)" value={combinedCbmResults.volumetricWeightAirKg} suffix=" kg" />
+                                <CbmResultField tx={tx} label="Volumetric Weight Air (lb)" value={combinedCbmResults.volumetricWeightAirLb} suffix=" lb" />
+                            </div>
+                        ) : (
+                            <p className="text-muted small mb-0">
+                                {tx('Enter length, width, and height to calculate CBM, volumetric weight, and container capacity.')}
+                            </p>
+                        )}
+                    </div>
                 </div>
             )}
 

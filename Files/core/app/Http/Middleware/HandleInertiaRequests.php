@@ -57,7 +57,7 @@ class HandleInertiaRequests extends Middleware
                     'name' => $admin->name ?? $admin->username,
                 ] : null,
             ],
-            'adminNav' => $isAdminPanel ? \App\Lib\AdminResource::adminNav() : [],
+            'adminNav' => [],
             'flash' => [
                 'notify' => fn () => session('notify', []),
                 'success' => fn () => $request->session()->get('success'),
@@ -112,7 +112,7 @@ class HandleInertiaRequests extends Middleware
         $isAdminPanel = $request->is('admin') || $request->is('admin/*');
 
         return [
-            'routes' => fn () => $this->inertiaRoutes(),
+            'routes' => fn () => $isAdminPanel ? [] : $this->inertiaRoutes(),
             'footerData' => fn () => $isAdminPanel
                 ? []
                 : Cache::remember('inertia_footer_data_v1', 600, fn () => \App\Lib\SectionDataBuilder::footer()),

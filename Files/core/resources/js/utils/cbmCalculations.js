@@ -14,6 +14,7 @@ export const UOM_OPTIONS = [
 export const WEIGHT_UNIT_OPTIONS = [
     { value: 'kg', label: 'Kg' },
     { value: 'gm', label: 'Gm' },
+    { value: 'lb', label: 'Lb' },
 ];
 
 export const CONTAINERS = {
@@ -45,7 +46,14 @@ export function toKilograms(value, unit) {
         return 0;
     }
 
-    return unit === 'gm' ? amount / 1000 : amount;
+    if (unit === 'gm') {
+        return amount / 1000;
+    }
+    if (unit === 'lb') {
+        return amount / LB_PER_KG;
+    }
+
+    return amount;
 }
 
 function round(value, decimals = 3) {
@@ -279,14 +287,23 @@ export function buildCbmApiPayload({
         return null;
     }
 
+    const weightAmount = Number(weight) > 0 ? Number(weight) : 0;
+    let apiWeight = weightAmount;
+    let apiWeightUnit = weightUnit;
+
+    if (weightAmount > 0 && weightUnit === 'lb') {
+        apiWeight = round(toKilograms(weightAmount, 'lb'), 3);
+        apiWeightUnit = 'kg';
+    }
+
     return {
         lv: l,
         bv: w,
         hv: h,
         qv: Math.max(1, Number(qty) || 1),
         uom,
-        wv: Number(weight) > 0 ? Number(weight) : 0,
-        wu: weightUnit,
+        wv: apiWeight,
+        wu: apiWeightUnit,
     };
 }
 
@@ -307,5 +324,62 @@ export function mapCbmApiResponse(response) {
         container20: response.max20qty,
         container40: response.max40qty,
         container40hc: response.maxhc40qty,
+    };
+}
+
+/** Sum CBM / weight metrics across multiple LCL box entries (inputs-only per box). */
+export function aggregateCbmResultsFromBoxes(boxValues, externalWeightKg = '') {
+    const totals = {
+        volumeM3: 0,
+        volumeFt3: 0,
+        totalWeightKg: 0,
+        totalWeightLb: 0,
+        volumetricWeightSeaKg: 0,
+        volumetricWeightSeaLb: 0,
+        volumetricWeightAirKg: 0,
+        volumetricWeightAirLb: 0,
+    };
+    let hasAny = false;
+
+    (boxValues || []).forEach((stored) => {
+        if (!String(stored || '').trim()) {
+            return;
+        }
+
+        const parsed = parseStoredCbmValue(stored);
+        const weight = parsed.weight || externalWeightKg || '';
+        const results = calculateCbmResults({ ...parsed, weight });
+
+        if (!results) {
+            return;
+        }
+
+        hasAny = true;
+        totals.volumeM3 += results.volumeM3 || 0;
+        totals.volumeFt3 += results.volumeFt3 || 0;
+        totals.totalWeightKg += results.totalWeightKg || 0;
+        totals.totalWeightLb += results.totalWeightLb || 0;
+        totals.volumetricWeightSeaKg += results.volumetricWeightSeaKg || 0;
+        totals.volumetricWeightSeaLb += results.volumetricWeightSeaLb || 0;
+        totals.volumetricWeightAirKg += results.volumetricWeightAirKg || 0;
+        totals.volumetricWeightAirLb += results.volumetricWeightAirLb || 0;
+    });
+
+    if (!hasAny) {
+        return null;
+    }
+
+    return {
+        volumeM3: round(totals.volumeM3, 3),
+        volumeFt3: round(totals.volumeFt3, 3),
+        totalWeightKg: totals.totalWeightKg > 0 ? round(totals.totalWeightKg, 3) : null,
+        totalWeightLb: totals.totalWeightLb > 0 ? round(totals.totalWeightLb, 3) : null,
+        volumetricWeightSeaKg: round(totals.volumetricWeightSeaKg, 3),
+        volumetricWeightSeaLb: round(totals.volumetricWeightSeaLb, 3),
+        volumetricWeightAirKg: round(totals.volumetricWeightAirKg, 3),
+        volumetricWeightAirLb: round(totals.volumetricWeightAirLb, 3),
+        container20: null,
+        container40: null,
+        container40hc: null,
     };
 }

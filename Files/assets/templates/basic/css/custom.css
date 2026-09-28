@@ -4327,6 +4327,29 @@ h6.mb-2 {
   overflow-anchor: none;
 }
 
+.cbm-calculator .form-label,
+.cbm-calculator .form-select,
+.cbm-calculator .form-control,
+.cbm-calculator .form-control::placeholder {
+  color: hsl(var(--heading-color)) !important;
+}
+
+.cbm-calculator .form-control::placeholder {
+  opacity: 0.45;
+}
+
+.cbm-calculator__result-label {
+  color: hsl(var(--heading-color)) !important;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.cbm-calculator__result-value {
+  color: hsl(var(--heading-color)) !important;
+  background: #fff !important;
+  font-weight: 600;
+}
+
 .cbm-calculator__results {
   overflow-anchor: none;
 }
