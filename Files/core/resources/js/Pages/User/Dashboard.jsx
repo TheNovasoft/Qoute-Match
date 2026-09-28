@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import MasterLayout from '@/Components/Layout/MasterLayout';
+import { profileContinueHref } from '@/Components/Profile/ProfileSteps';
 
 export default function Dashboard({ pageTitle, widget, user, profileCompletion, profileCompletionBadge }) {
     const { routes } = usePage().props;
@@ -18,7 +19,7 @@ export default function Dashboard({ pageTitle, widget, user, profileCompletion, 
                     <div className="profile-complete-notification">
                         <p>
                             <i className="las la-exclamation-circle"></i> Finish your profile to start bidding.{' '}
-                            <Link className="update-link" href={routes?.userProfileSkill ?? '/freelancer/profile-skill'}>
+                            <Link className="update-link" href={profileContinueHref(routes, user.step)}>
                                 Continue setup
                             </Link>
                             {' '}— one portfolio is enough.

@@ -486,7 +486,7 @@ class NotificationController extends Controller
     public function pushSetting()
     {
         $pageTitle = 'Push Notification Settings';
-        $fileExists = file_exists(getFilePath('pushConfig') . '/push_config.json');
+        $fileExists = is_readable(public_path(getFilePath('pushConfig') . '/push_config.json'));
         return \App\Lib\InertiaBridge::admin('admin.notification.push_setting', compact('pageTitle','fileExists'));
     }
     public function pushSettingUpdate(Request $request)
@@ -538,8 +538,8 @@ class NotificationController extends Controller
     }
     public function pushSettingDownload()
     {
-        $filePath = getFilePath('pushConfig') . '/push_config.json';
-        if (!file_exists($filePath)) {
+        $filePath = public_path(getFilePath('pushConfig') . '/push_config.json');
+        if (! is_readable($filePath)) {
             $notify[] = ['success', "File not found"];
             return back()->withNotify($notify);
         }

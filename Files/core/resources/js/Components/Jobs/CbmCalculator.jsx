@@ -10,16 +10,16 @@ import {
     WEIGHT_UNIT_OPTIONS,
 } from '@/utils/cbmCalculations';
 
-function ResultField({ label, value, suffix = '', tx, labelExtra = '' }) {
+export function CbmResultField({ label, value, suffix = '', tx, labelExtra = '' }) {
     return (
         <div className="col-md-6 col-lg-4">
-            <label className="form-label text-muted small mb-1">
+            <label className="form-label cbm-calculator__result-label mb-1">
                 {tx(label)}
                 {labelExtra ? ` — ${tx(labelExtra)}` : ''}
             </label>
             <input
                 type="text"
-                className="form-control form--control bg-light"
+                className="form-control form--control cbm-calculator__result-value"
                 value={value !== null && value !== undefined && value !== '' ? `${value}${suffix}` : '—'}
                 readOnly
             />
@@ -38,6 +38,7 @@ export default function CbmCalculator({
     weightKg = null,
     onWeightChange = null,
     hideWeightInput = false,
+    hideResults = false,
     compact = false,
 }) {
     const { tx } = useJobPostFormTranslation();
@@ -384,33 +385,35 @@ export default function CbmCalculator({
                 </div>
             </div>
 
-            <div className="cbm-calculator__results mt-4 pt-3 border-top">
-                <div className="d-flex align-items-center justify-content-between gap-2 mb-3 cbm-calculator__results-head">
-                    <h6 className="mb-0">{tx('Results')}</h6>
-                    <span className={`text-muted small cbm-calculator__status${isCalculating ? ' is-visible' : ''}`}>
-                        {tx('Calculating…')}
-                    </span>
+            {!hideResults && (
+                <div className="cbm-calculator__results mt-4 pt-3 border-top">
+                    <div className="d-flex align-items-center justify-content-between gap-2 mb-3 cbm-calculator__results-head">
+                        <h6 className="mb-0">{tx('Results')}</h6>
+                        <span className={`text-muted small cbm-calculator__status${isCalculating ? ' is-visible' : ''}`}>
+                            {tx('Calculating…')}
+                        </span>
+                    </div>
+                    {calcError && (
+                        <p className="text-warning small mb-3">{tx(calcError)}</p>
+                    )}
+                    <div className="row gy-3 cbm-calculator__results-grid">
+                        <CbmResultField tx={tx} label="Volume (Cubic Meter)" labelExtra={uomLabel} value={results?.volumeM3} suffix=" m³" />
+                        <CbmResultField tx={tx} label="Volume (Cubic Feet)" value={results?.volumeFt3} suffix=" ft³" />
+                        <CbmResultField tx={tx} label="Weight (Kg)" value={results?.totalWeightKg} suffix=" kg" />
+                        <CbmResultField tx={tx} label="Weight (lb)" value={results?.totalWeightLb} suffix=" lb" />
+                        <CbmResultField tx={tx} label="Volumetric Weight Sea (Kg)" value={results?.volumetricWeightSeaKg} suffix=" kg" />
+                        <CbmResultField tx={tx} label="Volumetric Weight Sea (lb)" value={results?.volumetricWeightSeaLb} suffix=" lb" />
+                        <CbmResultField tx={tx} label="Volumetric Weight Air (Kg)" value={results?.volumetricWeightAirKg} suffix=" kg" />
+                        <CbmResultField tx={tx} label="Volumetric Weight Air (lb)" value={results?.volumetricWeightAirLb} suffix=" lb" />
+                        <CbmResultField tx={tx} label="20 Feet Container" value={results?.container20} suffix={` ${tx('units')}`} />
+                        <CbmResultField tx={tx} label="40 Feet Container" value={results?.container40} suffix={` ${tx('units')}`} />
+                        <CbmResultField tx={tx} label="40 Feet HC Container" value={results?.container40hc} suffix={` ${tx('units')}`} />
+                    </div>
+                    {!results && (
+                        <p className="text-muted small mt-2 mb-0">{tx('Enter length, width, and height to calculate CBM, volumetric weight, and container capacity.')}</p>
+                    )}
                 </div>
-                {calcError && (
-                    <p className="text-warning small mb-3">{tx(calcError)}</p>
-                )}
-                <div className="row gy-3 cbm-calculator__results-grid">
-                    <ResultField tx={tx} label="Volume (Cubic Meter)" labelExtra={uomLabel} value={results?.volumeM3} suffix=" m³" />
-                    <ResultField tx={tx} label="Volume (Cubic Feet)" value={results?.volumeFt3} suffix=" ft³" />
-                    <ResultField tx={tx} label="Weight (Kg)" value={results?.totalWeightKg} suffix=" kg" />
-                    <ResultField tx={tx} label="Weight (lb)" value={results?.totalWeightLb} suffix=" lb" />
-                    <ResultField tx={tx} label="Volumetric Weight Sea (Kg)" value={results?.volumetricWeightSeaKg} suffix=" kg" />
-                    <ResultField tx={tx} label="Volumetric Weight Sea (lb)" value={results?.volumetricWeightSeaLb} suffix=" lb" />
-                    <ResultField tx={tx} label="Volumetric Weight Air (Kg)" value={results?.volumetricWeightAirKg} suffix=" kg" />
-                    <ResultField tx={tx} label="Volumetric Weight Air (lb)" value={results?.volumetricWeightAirLb} suffix=" lb" />
-                    <ResultField tx={tx} label="20 Feet Container" value={results?.container20} suffix={` ${tx('units')}`} />
-                    <ResultField tx={tx} label="40 Feet Container" value={results?.container40} suffix={` ${tx('units')}`} />
-                    <ResultField tx={tx} label="40 Feet HC Container" value={results?.container40hc} suffix={` ${tx('units')}`} />
-                </div>
-                {!results && (
-                    <p className="text-muted small mt-2 mb-0">{tx('Enter length, width, and height to calculate CBM, volumetric weight, and container capacity.')}</p>
-                )}
-            </div>
+            )}
 
             <p className="text-muted small mt-3 mb-0">
                 {tx('Sea freight volumetric weight uses L × W × H (cm) ÷ 5000. Air freight uses ÷ 6000. Container counts use standard shipping container dimensions.')}

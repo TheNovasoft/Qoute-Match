@@ -311,12 +311,11 @@ function buildScreens(categories, categoryForms, categoryId, { includeContact = 
             {
                 id: 'phone',
                 phase: 2,
-                question: 'Phone number (optional)',
-                hint: 'Providers may call if they need a quick detail.',
+                question: 'What is your phone number?',
+                hint: 'Providers may call if they need a quick detail. We also use this for your account.',
                 type: 'text',
                 field: 'phone',
                 placeholder: 'Your phone number',
-                optional: true,
             },
         );
     }

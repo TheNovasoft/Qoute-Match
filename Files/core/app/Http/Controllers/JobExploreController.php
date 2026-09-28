@@ -51,7 +51,18 @@ class JobExploreController extends Controller
                 $maxBudget = (float) $request->max_budget ?: PHP_FLOAT_MAX;
                 $q->whereBetween('budget', [$minBudget, $maxBudget]);
             })
-            ->when($request->search, fn ($q) => $q->where('title', 'like', '%' . $request->search . '%'));
+            ->when($request->search, function ($q) use ($request) {
+                $term = '%' . trim($request->search) . '%';
+                $q->where(function ($inner) use ($term) {
+                    $inner->where('title', 'like', $term)
+                        ->orWhere('description', 'like', $term)
+                        ->orWhereHas('buyer', function ($buyer) use ($term) {
+                            $buyer->where('firstname', 'like', $term)
+                                ->orWhere('lastname', 'like', $term)
+                                ->orWhere('username', 'like', $term);
+                        });
+                });
+            });
     }
 
     public function freelanceJobs(Request $request)

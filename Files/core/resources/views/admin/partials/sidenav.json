@@ -53,7 +53,7 @@
             {
                 "title": "Review Moderation",
                 "route_name": "admin.reviews.pending",
-                "menu_active": "admin.reviews*",
+                "menu_active": "admin.reviews.pending",
                 "counter": "pendingReviewsCount"
             }
         ]
@@ -518,7 +518,7 @@
                 ],
                 "title": "Review Moderation",
                 "route_name": "admin.reviews.pending",
-                "menu_active": "admin.reviews*",
+                "menu_active": "admin.reviews.pending",
                 "counter": "pendingReviewsCount"
             },
             {

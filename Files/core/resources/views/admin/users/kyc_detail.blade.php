@@ -40,7 +40,11 @@
                     @if($user->kv == Status::KYC_PENDING)
                     <div class="d-flex flex-wrap justify-content-end mt-3">
                         <button class="btn btn-outline--danger me-3" data-bs-toggle="modal" data-bs-target="#kycRejectionModal"><i class="las la-ban"></i>@lang('Reject')</button>
-                        <button class="btn btn-outline--success confirmationBtn" data-question="@lang('Are you sure to approve this documents?')" data-action="{{ route('admin.users.kyc.approve', $user->id) }}"><i class="las la-check"></i>@lang('Approve')</button>
+                        <form action="{{ route('admin.users.kyc.approve', $user->id) }}" method="POST" class="d-inline"
+                            onsubmit="return confirm('@lang('Are you sure to approve this documents?')')">
+                            @csrf
+                            <button type="submit" class="btn btn-outline--success"><i class="las la-check"></i>@lang('Approve')</button>
+                        </form>
                     </div>
                     @endif
                 </div>
@@ -78,5 +82,4 @@
         </div>
     </div>
 
-    <x-confirmation-modal />
 @endsection

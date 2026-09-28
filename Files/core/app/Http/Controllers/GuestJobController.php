@@ -154,18 +154,11 @@ class GuestJobController extends Controller
         ]);
 
         $category = Category::active()->with(['requestForm', 'subcategories' => fn ($q) => $q->active()])->findOrFail($request->category_id);
-        $isFreight = GuestJobPostService::isFreightCategory($category);
-
-        $request->validate($isFreight ? [
+        $request->validate([
             'firstname' => 'nullable|string|max:40',
             'lastname' => 'nullable|string|max:40',
-            'email' => 'nullable|string|email|max:100',
-            'phone' => 'nullable|string|max:30',
-        ] : [
-            'firstname' => 'required|string|max:40',
-            'lastname' => 'required|string|max:40',
             'email' => 'required|string|email|max:100',
-            'phone' => 'nullable|string|max:30',
+            'phone' => 'required|string|max:30',
         ]);
 
         $subcategoryId = self::resolveSubcategoryId($category, $request->subcategory_id);
@@ -219,6 +212,12 @@ class GuestJobController extends Controller
 
         $email = filled($request->email) ? strtolower(trim($request->email)) : '';
 
+        if ($email !== '' && Buyer::where('email', $email)->exists()) {
+            return back()->withErrors([
+                'email' => 'An account with this email already exists. Please log in as a customer to publish your job.',
+            ])->withInput();
+        }
+
         GuestJobPostService::putDraft([
             'title' => $request->title,
             'slug' => $request->slug,
@@ -234,33 +233,47 @@ class GuestJobController extends Controller
             'contact_lastname' => $request->lastname,
             'contact_email' => $email,
             'contact_phone' => $request->phone,
-            'pending_publish' => true,
-            'pending_budget' => [
-                'budget' => $request->custom_budget == '1' ? 0 : ($request->budget ?? 0),
-                'custom_budget' => $request->custom_budget,
-                'deadline' => $request->deadline ?: null,
-                'questions' => [],
-                'status' => Status::JOB_PUBLISH,
-            ],
         ]);
 
-        if ($email !== '' && Buyer::where('email', $email)->exists()) {
+        try {
+            $buyer = GuestJobPostService::createBuyerFromContact([
+                'firstname' => $request->firstname,
+                'lastname' => $request->lastname,
+                'email' => $email,
+                'phone' => $request->phone,
+                'password' => $request->password,
+            ]);
+        } catch (\RuntimeException) {
             return back()->withErrors([
                 'email' => 'An account with this email already exists. Please log in as a customer to publish your job.',
             ])->withInput();
         }
 
+        $job = GuestJobPostService::publishDraft($buyer, [
+            'budget' => $request->custom_budget == '1' ? 0 : ($request->budget ?? 0),
+            'custom_budget' => $request->custom_budget,
+            'deadline' => $request->deadline ?: null,
+            'questions' => [],
+            'status' => Status::JOB_PUBLISH,
+        ]);
+
+        $plainPassword = session()->pull('guest_job_plain_password');
+        if (filled($plainPassword)) {
+            GuestJobPostService::notifyGuestAccountCreated($buyer, $plainPassword, $job);
+        }
+
+        Auth::guard('buyer')->login($buyer);
+
         session([
-            'post_job_success' => [
-                'title' => $request->title,
-                'email' => $email,
-                'firstname' => $request->firstname,
-                'lastname' => $request->lastname,
-                'phone' => $request->phone,
-                'needsAccount' => true,
-                'published' => false,
-                'approved' => false,
-            ],
+            'post_job_success' => array_merge(
+                GuestJobPostService::successPayloadForJob($job, false),
+                [
+                    'email' => $email,
+                    'firstname' => $buyer->firstname,
+                    'lastname' => $buyer->lastname,
+                    'phone' => $request->phone,
+                ],
+            ),
         ]);
 
         return redirect()->route('post.job.success');
@@ -346,7 +359,7 @@ class GuestJobController extends Controller
             'firstname' => 'required|string|max:40',
             'lastname' => 'required|string|max:40',
             'email' => 'required|string|email|max:100',
-            'phone' => 'nullable|string|max:30',
+            'phone' => 'required|string|max:30',
         ]);
 
         $budget = $request->custom_budget == '1' ? 0 : ($request->budget ?? 0);
@@ -379,6 +392,11 @@ class GuestJobController extends Controller
             'questions' => array_values(array_filter($request->questions ?? [])),
             'status' => $request->status,
         ]);
+
+        $plainPassword = session()->pull('guest_job_plain_password');
+        if (filled($plainPassword)) {
+            GuestJobPostService::notifyGuestAccountCreated($buyer, $plainPassword, $job);
+        }
 
         Auth::guard('buyer')->login($buyer);
 

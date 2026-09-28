@@ -195,11 +195,11 @@ export function buildFlowSteps(categories, categoryForms, categoryId, { includeC
         type: 'title-description',
     });
 
-    if (includeContact && !isFreightCategory(categoryId, categories)) {
+    if (includeContact) {
         steps.push({
             id: 'contact',
-            question: 'Your contact details',
-            hint: 'We\'ll use this to create your account when you publish — no password needed here. Already a member? Log in instead.',
+            question: 'Your email and contact number',
+            hint: 'We\'ll send quotes here and reach you if a provider needs a quick detail. Already a member? Log in instead.',
             type: 'contact',
         });
     }
@@ -245,7 +245,7 @@ export function summarizeStep(step, data, categories) {
             return `${ids.length} skill(s) selected`;
         }
         case 'contact':
-            return `${data.firstname || ''} · ${data.email || ''}`.trim();
+            return [data.email, data.phone].filter(Boolean).join(' · ') || '—';
         case 'cards-single':
             return data[step.field] || '—';
         case 'cards-multi':
