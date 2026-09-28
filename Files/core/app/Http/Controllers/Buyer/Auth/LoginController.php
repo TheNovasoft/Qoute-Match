@@ -167,11 +167,11 @@ class LoginController extends Controller
             $userLogin->country =  $exist->country;
         } else {
             $info = json_decode(json_encode(getIpInfo()), true) ?: [];
-            $userLogin->longitude = loginGeoValue($info, 'long');
-            $userLogin->latitude = loginGeoValue($info, 'lat');
-            $userLogin->city = loginGeoValue($info, 'city');
-            $userLogin->country_code = loginGeoValue($info, 'code');
-            $userLogin->country = loginGeoValue($info, 'country');
+            $userLogin->longitude = \loginGeoValue($info, 'long');
+            $userLogin->latitude = \loginGeoValue($info, 'lat');
+            $userLogin->city = \loginGeoValue($info, 'city');
+            $userLogin->country_code = \loginGeoValue($info, 'code');
+            $userLogin->country = \loginGeoValue($info, 'country');
         }
 
         $userAgent = osBrowser();

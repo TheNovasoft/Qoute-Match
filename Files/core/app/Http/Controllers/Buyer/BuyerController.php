@@ -314,7 +314,7 @@ class BuyerController extends Controller
 
         try {
             $info = json_decode(json_encode(getIpInfo()), true) ?: [];
-            $geoCode = loginGeoValue($info, 'code') ?? '';
+            $geoCode = \loginGeoValue($info, 'code') ?? '';
             if (strlen($geoCode) === 2 && isset($countryData[$geoCode])) {
                 $defaultCountryCode = $geoCode;
             }

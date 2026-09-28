@@ -191,6 +191,30 @@ function osBrowser() {
     return $osBrowser;
 }
 
+/**
+ * Normalize getIpInfo() fields for user_logins (scalar or array from geo API).
+ */
+function loginGeoValue(array $info, string $key): ?string
+{
+    if (! array_key_exists($key, $info)) {
+        return null;
+    }
+
+    $value = $info[$key];
+
+    if (is_array($value)) {
+        $parts = array_filter($value, static fn ($v) => $v !== null && $v !== '');
+
+        return $parts === [] ? null : implode(',', $parts);
+    }
+
+    if ($value === null || $value === '') {
+        return null;
+    }
+
+    return (string) $value;
+}
+
 function getTemplates() {
     return null;
 }
