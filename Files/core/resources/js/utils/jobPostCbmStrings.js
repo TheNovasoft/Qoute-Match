@@ -1,7 +1,10 @@
-import { CONTAINERS, UOM_OPTIONS, WEIGHT_UNIT_OPTIONS } from '@/utils/cbmCalculations';
+import { CONTAINERS, MODE_OPTIONS, UOM_OPTIONS, WEIGHT_UNIT_OPTIONS } from '@/utils/cbmCalculations';
 
 export const CBM_UI_STRINGS = [
     'Inputs',
+    'Mode',
+    'Mode: Meter',
+    'Mode: Inches',
     'Mode: Cubic Meter (m³)',
     'UOM',
     'Length',
@@ -10,6 +13,7 @@ export const CBM_UI_STRINGS = [
     'Weight',
     'Unit',
     'Qty',
+    'HS code',
     'Results',
     'Calculating…',
     'Live calculation unavailable. Showing local estimate.',
@@ -26,11 +30,13 @@ export const CBM_UI_STRINGS = [
     '40 Feet HC Container',
     'Enter length, width, and height to calculate CBM, volumetric weight, and container capacity.',
     'Sea freight volumetric weight uses L × W × H (cm) ÷ 5000. Air freight uses ÷ 6000. Container counts use standard shipping container dimensions.',
+    'Sea freight volumetric weight uses L × W × H (inches, converted to cm) ÷ 5000. Air freight uses ÷ 6000. Weight shown in lb.',
     'L cm',
     'W cm',
     'H cm',
     'units',
     'Could not translate. Try again.',
+    ...MODE_OPTIONS.map((option) => option.label),
     ...UOM_OPTIONS.map((option) => option.label),
     ...WEIGHT_UNIT_OPTIONS.map((option) => option.label),
     ...Object.values(CONTAINERS).map((container) => container.label),
