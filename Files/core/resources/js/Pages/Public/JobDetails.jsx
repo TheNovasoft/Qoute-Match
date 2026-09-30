@@ -4,6 +4,7 @@ import FrontendLayout from '@/Components/Layout/FrontendLayout';
 import JobCard, { BidFreelancerCard, SimilarJobItem } from '@/Components/Jobs/JobCard';
 import RequestFormFields from '@/Components/Jobs/RequestFormFields';
 import { EmptyState } from '@/Components/Shared/Pagination';
+import { useT } from '@/hooks/useT';
 
 const EXPLICIT_TOTAL_FIELD_NAMES = ['Total Price'];
 
@@ -26,6 +27,7 @@ export default function JobDetails({
     quoteFields = [],
     existingBid = null,
 }) {
+    const t = useT();
     const { auth, template, routes } = usePage().props;
     const [freelancers, setFreelancers] = useState(biddenFreelancers || []);
     const [similarJobList, setSimilarJobList] = useState(similarJobs || []);
@@ -116,7 +118,7 @@ export default function JobDetails({
         }
     }, [showBidModal]);
 
-    const quoteWizardSteps = ['Your price', 'Timeline', 'Proposal', 'Review'];
+    const quoteWizardSteps = [t('Your price'), t('Timeline'), t('Proposal'), t('Review')];
     const quotePriceLabel = isSummedTotal
         ? `${summedTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${job.currencyText}`
         : (data.bid_amount || (amountQuoteField ? quoteValues[amountQuoteField.label] : '') || '—');
@@ -248,17 +250,17 @@ export default function JobDetails({
                                             <small>{job.timeLabel}</small>
                                         </div>
                                         <div className="right">
-                                            {job.customBudget && <sup className="d-block">Flexible budget available.</sup>}
+                                            {job.customBudget && <sup className="d-block">{t('Flexible budget available.')}</sup>}
                                             <h5 className="price">{job.budget}</h5>
-                                            <small className="text">Quotes: {job.bidsCount}</small>
-                                            <small className="text">Interviews: {job.interviews}</small>
+                                            <small className="text">{t('Quotes')}: {job.bidsCount}</small>
+                                            <small className="text">{t('Interviews')}: {job.interviews}</small>
                                         </div>
                                     </div>
                                     <div className="details-item__content" dangerouslySetInnerHTML={{ __html: job.description }} />
 
                                     {job.requestFields?.length > 0 && (
                                         <div className="request-data-summary mt-4">
-                                            <h6 className="mb-3">Request Details</h6>
+                                            <h6 className="mb-3">{t('Request Details')}</h6>
                                             <div className="row gy-3">
                                                 {job.requestFields.map((field) => (
                                                     <div key={field.name} className="col-md-6">
@@ -266,7 +268,7 @@ export default function JobDetails({
                                                             <span className="request-data-item__label">{field.name}</span>
                                                             {field.isFile ? (
                                                                 <a href={field.value} className="request-data-item__value" target="_blank" rel="noreferrer">
-                                                                    <i className="las la-download"></i> Download file
+                                                                    <i className="las la-download"></i> {t('Download file')}
                                                                 </a>
                                                             ) : (
                                                                 <span className="request-data-item__value">{field.value}</span>
@@ -279,15 +281,15 @@ export default function JobDetails({
                                     )}
 
                                     <div className="project-info">
-                                        <h6 className="project-info__title">About the job</h6>
+                                        <h6 className="project-info__title">{t('About the job')}</h6>
                                         <div className="project-info-wrapper">
                                             {[
-                                                { icon: 'las la-clock', label: 'Posted Job', value: job.postedAt },
-                                                { icon: 'las la-calendar', label: 'Deadline', value: job.deadline },
-                                                { icon: 'las la-brain', label: 'Experience level', value: job.skillLevel },
-                                                { icon: 'las la-briefcase', label: 'Project Scope', value: job.projectScope },
-                                                { icon: 'las la-map-marker', label: 'Job Longevity', value: job.jobLongevity },
-                                                { icon: 'las la-map-marker', label: 'Location', value: '100% Remote job' },
+                                                { icon: 'las la-clock', label: t('Posted Job'), value: job.postedAt },
+                                                { icon: 'las la-calendar', label: t('Deadline'), value: job.deadline },
+                                                { icon: 'las la-brain', label: t('Experience level'), value: job.skillLevel },
+                                                { icon: 'las la-briefcase', label: t('Project Scope'), value: job.projectScope },
+                                                { icon: 'las la-map-marker', label: t('Job Longevity'), value: job.jobLongevity },
+                                                { icon: 'las la-map-marker', label: t('Location'), value: t('100% Remote job') },
                                             ].map((item) => (
                                                 <div key={item.label} className="project-info__item">
                                                     <span className="project-info__icon"><i className={item.icon}></i></span>
@@ -301,7 +303,7 @@ export default function JobDetails({
                                     </div>
 
                                     <div className="skill-expert-wrapper">
-                                        <h6 className="skill-expert-wrapper__title">Skill and expertise</h6>
+                                        <h6 className="skill-expert-wrapper__title">{t('Skill and expertise')}</h6>
                                         <ul className="skill-list">
                                             {job.skills?.map((skill, index) => (
                                                 <li key={index} className="skill-list__item">
@@ -311,7 +313,7 @@ export default function JobDetails({
                                         </ul>
                                         {job.skillMatchPercent !== null && (
                                             <div className="skill-match-box mt-3">
-                                                <h6>Skill Match</h6>
+                                                <h6>{t('Skill Match')}</h6>
                                                 <div className="progress">
                                                     <div className={`progress-bar ${job.skillMatchBar}`} style={{ width: `${job.skillMatchPercent}%`, minWidth: '30px' }}>
                                                         {job.skillMatchPercent}%
@@ -321,7 +323,7 @@ export default function JobDetails({
                                         )}
                                         {job.matchScore !== null && job.matchScore !== undefined && (
                                             <div className="skill-match-box mt-3">
-                                                <h6>Location & Service Match</h6>
+                                                <h6>{t('Location & Service Match')}</h6>
                                                 <div className="progress">
                                                     <div className={`progress-bar ${job.matchScoreBar}`} style={{ width: `${job.matchScore}%`, minWidth: '30px' }}>
                                                         {job.matchScore}%
@@ -334,7 +336,7 @@ export default function JobDetails({
                                     {job.questions?.length > 0 && (
                                         <div className="question-section">
                                             <div className="question-header">
-                                                <h4>Screening questions for providers</h4>
+                                                <h4>{t('Screening questions for providers')}</h4>
                                             </div>
                                             <ul className="question-list">
                                                 {job.questions.map((question, index) => (
@@ -351,17 +353,26 @@ export default function JobDetails({
                                 <div className="details-item">
                                     <div className="bid-wrapper">
                                         <div className="bid-wrapper__top">
-                                            <h6 className="mb-0">{totalBiddenFreelancers} provider{totalBiddenFreelancers === 1 ? '' : 's'} quoted on this job</h6>
+                                            <h6 className="mb-0">
+                                                {totalBiddenFreelancers}{' '}
+                                                {totalBiddenFreelancers === 1 ? t('provider') : t('providers')}{' '}
+                                                {t('quoted on this job')}
+                                            </h6>
                                         </div>
                                         <div className="freelancers-wrapper">
                                             {freelancers.length ? freelancers.map((freelancer) => (
                                                 <BidFreelancerCard key={freelancer.username} freelancer={freelancer} />
-                                            )) : <EmptyState message="No quotes yet" description="Be the first provider to send a quote on this job." />}
+                                            )) : (
+                                                <EmptyState
+                                                    message={t('No quotes yet')}
+                                                    description={t('Be the first provider to send a quote on this job.')}
+                                                />
+                                            )}
                                         </div>
                                         {totalBiddenFreelancers > freelancers.length && (
                                             <div className="bid-wrapper__bottom">
                                                 <button type="button" className="btn-outline--base btn" onClick={loadMoreFreelancers}>
-                                                    Load more
+                                                    {t('Load more')}
                                                 </button>
                                             </div>
                                         )}
@@ -379,56 +390,61 @@ export default function JobDetails({
                                                 {bidState.canEdit ? (
                                                     <button type="button" className="btn btn--base w-100 mt-3"
                                                         onClick={() => openBidModal(true)}>
-                                                        <i className="las la-edit"></i> Edit Quote
+                                                        <i className="las la-edit"></i> {t('Edit Quote')}
                                                     </button>
                                                 ) : (
                                                     <button type="button" className={`btn btn--base w-100 mt-3 ${bidState.disabled ? 'disabled' : ''}`}
                                                         disabled={bidState.disabled} onClick={() => openBidModal(false)}>
-                                                        <i className="lab la-gavel"></i> Send Your Quote
+                                                        <i className="lab la-gavel"></i> {t('Send Your Quote')}
                                                     </button>
                                                 )}
                                                 {bidState.hasBid && !bidState.canEdit && (
                                                     <p className="text-muted small mt-2 mb-0 text-center">
                                                         {bidState.attemptsRemaining > 0
-                                                            ? `You used ${bidState.bidAttempts} of ${bidState.maxAttempts} quote attempts. You can submit again.`
-                                                            : 'You have used all quote attempts on this request.'}
+                                                            ? t('You used :used of :max quote attempts. You can submit again.')
+                                                                .replace(':used', String(bidState.bidAttempts))
+                                                                .replace(':max', String(bidState.maxAttempts))
+                                                            : t('You have used all quote attempts on this request.')}
                                                     </p>
                                                 )}
                                                 {!bidState.hasBid && bidState.attemptsRemaining < bidState.maxAttempts && bidState.attemptsRemaining > 0 && (
                                                     <p className="text-muted small mt-2 mb-0 text-center">
-                                                        {bidState.attemptsRemaining} of {bidState.maxAttempts} quote attempts remaining.
+                                                        {t(':remaining of :max quote attempts remaining.')
+                                                            .replace(':remaining', String(bidState.attemptsRemaining))
+                                                            .replace(':max', String(bidState.maxAttempts))}
                                                     </p>
                                                 )}
                                                 {bidState.canEdit && (
                                                     <p className="text-muted small mt-2 mb-0 text-center">
-                                                        You can update your pending quote anytime.
+                                                        {t('You can update your pending quote anytime.')}
                                                     </p>
                                                 )}
                                                 {bidState.requestUpdatedAfterBid && (
                                                     <div className="alert alert-warning small mt-2 mb-0 py-2">
-                                                        The buyer updated this request after you submitted your quote. Please review the latest details and update your bid if needed.
+                                                        {t('The buyer updated this request after you submitted your quote. Please review the latest details and update your bid if needed.')}
                                                     </div>
                                                 )}
                                                 {bidState.hadRejectedBid && !bidState.hasBid && (
-                                                    <p className="text-muted small mt-2 mb-0 text-center">Your previous quote was rejected. You may submit a new one.</p>
+                                                    <p className="text-muted small mt-2 mb-0 text-center">{t('Your previous quote was rejected. You may submit a new one.')}</p>
                                                 )}
                                                 {!bidState.matchesProvider && bidState.profileComplete && !bidState.hasBid && (
-                                                    <p className="text-muted small mt-2">Outside your usual categories or service areas — you can still submit a quote.</p>
+                                                    <p className="text-muted small mt-2">{t('Outside your usual categories or service areas — you can still submit a quote.')}</p>
                                                 )}
                                                 {!bidState.profileComplete && (
-                                                    <small className="d-flex justify-content-center mt-1">Complete your work profile first!</small>
+                                                    <small className="d-flex justify-content-center mt-1">{t('Complete your work profile first!')}</small>
                                                 )}
                                                 {bidState.needsCreditsForNewQuote && !bidState.canAffordQuote && bidState.monetisation?.enabled && (
                                                     <div className="alert alert-warning small mt-2 mb-0 py-2">
                                                         {bidState.monetisation.unlimited_quotes ? (
-                                                            <span>Your subscription does not include unlimited quotes for new submissions.</span>
+                                                            <span>{t('Your subscription does not include unlimited quotes for new submissions.')}</span>
                                                         ) : (
                                                             <>
-                                                                Insufficient quote tokens. You need {bidState.monetisation.quote_cost} token(s) to submit a new quote
-                                                                (balance: {bidState.monetisation.credits}).
+                                                                {t('Insufficient quote tokens. You need :cost token(s) to submit a new quote (balance: :balance).')
+                                                                    .replace(':cost', String(bidState.monetisation.quote_cost))
+                                                                    .replace(':balance', String(bidState.monetisation.credits))}
                                                                 {' '}
                                                                 <Link href={routes.userLeadCredits ?? '/provider/lead-credits'} className="text--base">
-                                                                    Buy tokens
+                                                                    {t('Buy tokens')}
                                                                 </Link>
                                                             </>
                                                         )}
@@ -436,16 +452,17 @@ export default function JobDetails({
                                                 )}
                                                 {bidState.monetisation?.enabled && bidState.canAffordQuote && bidState.needsCreditsForNewQuote && !bidState.monetisation.unlimited_quotes && (
                                                     <p className="text-muted small mt-2 mb-0 text-center">
-                                                        Submitting a new quote uses {bidState.monetisation.quote_cost} quote token(s).
-                                                        Balance: {bidState.monetisation.credits}.
+                                                        {t('Submitting a new quote uses :cost quote token(s). Balance: :balance.')
+                                                            .replace(':cost', String(bidState.monetisation.quote_cost))
+                                                            .replace(':balance', String(bidState.monetisation.credits))}
                                                     </p>
                                                 )}
                                             </>
                                         ) : (
-                                            <Link href="/provider/login" className="btn btn--base w-100">Send Your Quote</Link>
+                                            <Link href="/provider/login" className="btn btn--base w-100">{t('Send Your Quote')}</Link>
                                         )}
                                         <p className="sidebar-header__text">
-                                            By sending a quote, you have read and agreed to our{' '}
+                                            {t('By sending a quote, you have read and agreed to our')}{' '}
                                             {policies.map((policy, index) => (
                                                 <span key={policy.slug}>
                                                     <Link href={policy.url} className="text--base">{policy.title}</Link>
@@ -461,7 +478,7 @@ export default function JobDetails({
 
                                 <div className="sidebar-item buyer-info-item">
                                     <div className="top">
-                                        <h6 className="sidebar-item__title">About the Buyer</h6>
+                                        <h6 className="sidebar-item__title">{t('About the Buyer')}</h6>
                                         <div className="buyer-info">
                                             <div className="buyer-info__thumb">
                                                 <img src={buyer.image} alt="" />
@@ -474,8 +491,8 @@ export default function JobDetails({
                                                     </div>
                                                 </div>
                                                 <div className="text-wrapper">
-                                                    <p className="text">{buyer.successPercent}% Job Success</p>
-                                                    <p className="text">{buyer.successJobs} Complete Job</p>
+                                                    <p className="text">{buyer.successPercent}% {t('Job Success')}</p>
+                                                    <p className="text">{buyer.successJobs} {t('Complete Job')}</p>
                                                     <p className="text">{buyer.city}, {buyer.country}</p>
                                                 </div>
                                             </div>
@@ -484,7 +501,7 @@ export default function JobDetails({
                                 </div>
 
                                 <div className="sidebar-item">
-                                    <h6 className="sidebar-item__title">Top skill jobs</h6>
+                                    <h6 className="sidebar-item__title">{t('Top skill jobs')}</h6>
                                     <ul className="performer-list">
                                         {topSkills.map((skill) => (
                                             <li key={skill.id} className="performer-list__item">
@@ -496,7 +513,7 @@ export default function JobDetails({
                                 </div>
 
                                 <div className="sidebar-item">
-                                    <h6 className="sidebar-item__title">Similar job posts</h6>
+                                    <h6 className="sidebar-item__title">{t('Similar job posts')}</h6>
                                     <ul className="job-list">
                                         {similarJobList.map((item) => (
                                             <SimilarJobItem key={item.slug} job={item} />
@@ -505,7 +522,7 @@ export default function JobDetails({
                                     {totalSimilarJobs > similarJobList.length && (
                                         <div className="sidebar-item__btn text-center">
                                             <button type="button" className="btn-outline--base btn" onClick={loadMoreSimilarJobs}>
-                                                Load more
+                                                {t('Load more')}
                                             </button>
                                         </div>
                                     )}
@@ -523,7 +540,7 @@ export default function JobDetails({
                             <form onSubmit={handleQuoteWizardSubmit}>
                                 <div className="modal-body p-4">
                                     <div className="d-flex justify-content-between align-items-start gap-2">
-                                        <h5 className="mb-2">{isEditMode ? 'Update your quote' : job.title}</h5>
+                                        <h5 className="mb-2">{isEditMode ? t('Update your quote') : job.title}</h5>
                                         <button type="button" className="btn-close flex-shrink-0" onClick={() => {
                                             setShowBidModal(false);
                                             setIsEditMode(false);
@@ -543,10 +560,10 @@ export default function JobDetails({
 
                                     {quoteStep === 0 && (
                                         <>
-                                            {!isEditMode && <h6 className="mb-3">{job.customBudget ? 'Estimated Budget' : 'Budget'}: {job.budget}</h6>}
+                                            {!isEditMode && <h6 className="mb-3">{job.customBudget ? t('Estimated Budget') : t('Budget')}: {job.budget}</h6>}
                                             {showStandaloneBidAmount && (
                                                 <div className="form-group mb-3">
-                                                    <label className="form-label">Your Quote Amount</label>
+                                                    <label className="form-label">{t('Your Quote Amount')}</label>
                                                     <div className="input-group">
                                                         <input type="number" step="any" className="form-control form--control" name="bid_amount"
                                                             value={data.bid_amount} onChange={(e) => handleBidAmountChange(e.target.value)} required />
@@ -564,7 +581,7 @@ export default function JobDetails({
                                             )}
                                             {isSummedTotal && (
                                                 <div className="quote-total-box d-flex justify-content-between align-items-center mt-3 p-3">
-                                                    <span className="fw-semibold">Total Quote</span>
+                                                    <span className="fw-semibold">{t('Total Quote')}</span>
                                                     <span className="fw-bold fs-5">
                                                         {summedTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {job.currencyText}
                                                     </span>
@@ -578,10 +595,10 @@ export default function JobDetails({
 
                                     {quoteStep === 1 && (
                                         <div className="form-group mb-3">
-                                            <label className="form-label">How long will it take?</label>
+                                            <label className="form-label">{t('How long will it take?')}</label>
                                             <input type="text" className="form-control form--control" name="estimated_time"
                                                 value={data.estimated_time} onChange={(e) => setData('estimated_time', e.target.value)}
-                                                placeholder="e.g. 2 weeks" required />
+                                                placeholder={t('e.g. 2 weeks')} required />
                                             {errors.estimated_time && <small className="text-danger d-block mt-1">{errors.estimated_time}</small>}
                                         </div>
                                     )}
@@ -590,7 +607,7 @@ export default function JobDetails({
                                         <>
                                             {isEditMode && bidState?.requestUpdatedAfterBid && (
                                                 <div className="alert alert-warning small mb-3">
-                                                    The buyer updated this request. Review the latest request details on this page before saving your changes.
+                                                    {t('The buyer updated this request. Review the latest request details on this page before saving your changes.')}
                                                 </div>
                                             )}
                                             {detailsStepFields.length > 0 ? (
@@ -602,7 +619,7 @@ export default function JobDetails({
                                                 />
                                             ) : (
                                                 <div className="form-group mb-3">
-                                                    <label className="form-label">Your Proposal</label>
+                                                    <label className="form-label">{t('Your Proposal')}</label>
                                                     <textarea className="form-control form--control" name="bid_quote" rows="5"
                                                         value={data.bid_quote} onChange={(e) => setData('bid_quote', e.target.value)} required />
                                                 </div>
@@ -613,13 +630,13 @@ export default function JobDetails({
 
                                     {quoteStep === 3 && (
                                         <div className="border rounded p-3 bg-light">
-                                            <p className="mb-2"><strong>Price:</strong> {quotePriceLabel} {typeof quotePriceLabel === 'string' && !quotePriceLabel.includes(job.currencyText) ? job.currencyText : ''}</p>
-                                            <p className="mb-2"><strong>Timeline:</strong> {data.estimated_time || '—'}</p>
+                                            <p className="mb-2"><strong>{t('Price')}:</strong> {quotePriceLabel} {typeof quotePriceLabel === 'string' && !quotePriceLabel.includes(job.currencyText) ? job.currencyText : ''}</p>
+                                            <p className="mb-2"><strong>{t('Timeline')}:</strong> {data.estimated_time || '—'}</p>
                                             {!quoteFields.length && (
-                                                <p className="mb-0"><strong>Proposal:</strong> {(data.bid_quote || '—').slice(0, 200)}{(data.bid_quote?.length > 200 ? '…' : '')}</p>
+                                                <p className="mb-0"><strong>{t('Proposal')}:</strong> {(data.bid_quote || '—').slice(0, 200)}{(data.bid_quote?.length > 200 ? '…' : '')}</p>
                                             )}
                                             {quoteFields.length > 0 && (
-                                                <p className="mb-0 text-muted small">Custom quote fields will be submitted with your quote.</p>
+                                                <p className="mb-0 text-muted small">{t('Custom quote fields will be submitted with your quote.')}</p>
                                             )}
                                         </div>
                                     )}
@@ -631,12 +648,12 @@ export default function JobDetails({
                                             disabled={quoteStep === 0 || processing}
                                             onClick={() => setQuoteStep((step) => Math.max(0, step - 1))}
                                         >
-                                            Back
+                                            {t('Back')}
                                         </button>
                                         <button type="submit" className="btn btn--base order-1 order-sm-2" disabled={processing || !canAdvanceQuoteStep()}>
                                             {quoteStep === quoteWizardSteps.length - 1
-                                                ? (isEditMode ? 'Update Quote' : 'Send Quote')
-                                                : 'Next'}
+                                                ? (isEditMode ? t('Update Quote') : t('Send Quote'))
+                                                : t('Next')}
                                         </button>
                                     </div>
                                 </div>

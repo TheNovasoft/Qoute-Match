@@ -1,5 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import FrontendLayout from '@/Components/Layout/FrontendLayout';
+import { useT } from '@/hooks/useT';
 
 export default function CategoryLocation({
     pageTitle,
@@ -11,6 +12,7 @@ export default function CategoryLocation({
     otherLocations,
 }) {
     const { routes } = usePage().props;
+    const t = useT();
 
     const jsonLd = {
         '@context': 'https://schema.org',
@@ -44,10 +46,10 @@ export default function CategoryLocation({
                             <p className="section-heading__desc mb-4">{intro}</p>
                             <div className="d-flex flex-wrap gap-2">
                                 <Link href={category.postUrl} className="btn btn--base">
-                                    Get Free Quotes
+                                    {t('Get Free Quotes')}
                                 </Link>
                                 <Link href={category.jobsUrl} className="btn btn-outline--base">
-                                    Browse Requests ({category.jobsCount})
+                                    {t('Browse Requests')} ({category.jobsCount})
                                 </Link>
                             </div>
                             <p className="mt-3 mb-0">
@@ -56,13 +58,13 @@ export default function CategoryLocation({
                                 </Link>
                                 {' · '}
                                 <Link href={routes.categories} className="text--base">
-                                    All categories
+                                    {t('All categories')}
                                 </Link>
                             </p>
                         </div>
 
                         <div className="col-lg-7">
-                            <h2 className="h4 mb-4">Subcategories</h2>
+                            <h2 className="h4 mb-4">{t('Subcategories')}</h2>
                             <div className="row gy-3 mb-5">
                                 {category.subcategories.map((sub) => (
                                     <div key={sub.id} className="col-md-6">
@@ -73,10 +75,10 @@ export default function CategoryLocation({
                                             )}
                                             <div className="d-flex flex-wrap gap-2 mt-auto pt-3">
                                                 <Link href={sub.postUrl} className="btn btn--base btn--sm">
-                                                    Get Quotes
+                                                    {t('Get Quotes')}
                                                 </Link>
                                                 <Link href={sub.jobsUrl} className="btn btn-outline--base btn--sm">
-                                                    Browse
+                                                    {t('Browse')}
                                                 </Link>
                                             </div>
                                         </div>
@@ -86,7 +88,7 @@ export default function CategoryLocation({
 
                             {otherLocations.length > 0 && (
                                 <>
-                                    <h2 className="h4 mb-3">Also available in</h2>
+                                    <h2 className="h4 mb-3">{t('Also available in')}</h2>
                                     <div className="d-flex flex-wrap gap-2">
                                         {otherLocations.map((item) => (
                                             <Link

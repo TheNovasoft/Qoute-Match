@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { notify } from '@/utils/helpers';
+import { useT } from '@/hooks/useT';
 
 export default function SubscribeSection({ data }) {
     const [email, setEmail] = useState('');
+    const t = useT();
 
     const submit = async (event) => {
         event.preventDefault();
         if (!email) {
-            notify('error', 'Email field is required');
+            notify('error', t('Email field is required'));
             return;
         }
 
@@ -20,7 +22,7 @@ export default function SubscribeSection({ data }) {
                 notify('error', response.data.error);
             }
         } catch (error) {
-            notify('error', 'Subscription failed');
+            notify('error', t('Subscription failed'));
         }
     };
 
@@ -41,7 +43,7 @@ export default function SubscribeSection({ data }) {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="Enter your email address"
+                                    placeholder={t('Enter your email address')}
                                 />
                                 <button className="input-group-text input-text-style" type="submit">
                                     <i className="fa-regular fa-paper-plane"></i>

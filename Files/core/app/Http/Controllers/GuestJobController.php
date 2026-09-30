@@ -33,7 +33,7 @@ class GuestJobController extends Controller
         $skills = Skill::active()->orderBy('name')->get(['id', 'name', 'category_id']);
 
         return Inertia::render('Public/PostJob/Index', [
-            'pageTitle' => 'Post a Job',
+            'pageTitle' => __('Post a Job'),
             'guestMode' => true,
             'jobPostRoutes' => GuestJobPostService::routes(),
             'draft' => $draft,
@@ -272,6 +272,8 @@ class GuestJobController extends Controller
                     'firstname' => $buyer->firstname,
                     'lastname' => $buyer->lastname,
                     'phone' => $request->phone,
+                    'temp_password' => $plainPassword,
+                    'mail_delivered' => filled($plainPassword),
                 ],
             ),
         ]);
@@ -406,6 +408,12 @@ class GuestJobController extends Controller
                 'title' => $job->title,
                 'published' => (int) $job->status === Status::JOB_PUBLISH,
                 'approved' => (int) $job->is_approved === Status::JOB_APPROVED,
+                'email' => $email,
+                'firstname' => $buyer->firstname,
+                'lastname' => $buyer->lastname,
+                'phone' => $request->phone,
+                'temp_password' => $plainPassword,
+                'mail_delivered' => filled($plainPassword),
             ],
         ]);
 
@@ -464,10 +472,10 @@ class GuestJobController extends Controller
     {
         return $categories->map(fn ($category) => [
             'id' => $category->id,
-            'name' => $category->name,
+            'name' => __($category->name),
             'subcategories' => $category->subcategories->map(fn ($sub) => [
                 'id' => $sub->id,
-                'name' => $sub->name,
+                'name' => __($sub->name),
             ])->values()->all(),
         ])->values()->all();
     }

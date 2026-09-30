@@ -3,7 +3,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import JobPostFlowField from '@/Components/Jobs/JobPostFlowField';
 import FriendlyErrorAlert from '@/Components/Shared/FriendlyErrorAlert';
 import JobPostFormTranslateButton from '@/Components/Jobs/JobPostFormTranslateButton';
-import { JobPostFormTranslationProvider, useJobPostFormTranslation } from '@/Components/Jobs/JobPostFormTranslationProvider';
+import {
+    JobPostFormAutoTranslate,
+    JobPostFormTranslationProvider,
+    useJobPostFormTranslation,
+} from '@/Components/Jobs/JobPostFormTranslationProvider';
 import { collectJobPostFormStrings } from '@/utils/jobPostFormStrings';
 import { stepFieldKeys, validateStep } from '@/utils/jobPostFlowValidation';
 import {
@@ -66,8 +70,9 @@ function JobPostFlowInner({
     mode = 'guest',
     jobId = null,
 }) {
-    const { routes, jobPostRoutes } = usePage().props;
+    const { routes, jobPostRoutes, formTranslateLocale } = usePage().props;
     const { tx } = useJobPostFormTranslation();
+    const descLocale = formTranslateLocale || 'en';
     const isBuyer = mode === 'buyer';
     const dynamicDefaults = valuesFromFields(categoryForms?.[draft.category_id] || []);
 
@@ -228,16 +233,16 @@ function JobPostFlowInner({
             };
             const patch = {};
             if (!titleManual) {
-                patch.title = generateTitle(currentData, categories, categoryForms);
+                patch.title = generateTitle(currentData, categories, categoryForms, descLocale);
             }
             if (!descManual) {
-                patch.description = generateDescription(currentData, categories, categoryForms);
+                patch.description = generateDescription(currentData, categories, categoryForms, descLocale);
             }
             if (Object.keys(patch).length) {
                 form.setData((current) => ({ ...current, ...patch }));
             }
         }
-    }, [form, categories, categoryForms, titleManual, descManual]);
+    }, [form, categories, categoryForms, titleManual, descManual, descLocale]);
 
     useEffect(() => {
         if (activeStepId) {
@@ -313,10 +318,10 @@ function JobPostFlowInner({
         if (step.id === 'title-description') {
             const patch = {};
             if (!payload.title) {
-                patch.title = generateTitle(payload, categories, categoryForms);
+                patch.title = generateTitle(payload, categories, categoryForms, descLocale);
             }
             if (!payload.description) {
-                patch.description = generateDescription(payload, categories, categoryForms);
+                patch.description = generateDescription(payload, categories, categoryForms, descLocale);
             }
             if (Object.keys(patch).length) {
                 form.setData((current) => ({ ...current, ...patch }));
@@ -514,6 +519,7 @@ function JobPostFlowInner({
 
     return (
         <div className="job-flow">
+            <JobPostFormAutoTranslate strings={formStrings} />
             <div className="post-job-flow-intro text-center mb-3 position-relative">
                 <JobPostFormTranslateButton strings={formStrings} />
                 <h1 className="post-job-flow-intro__title mb-2">{tx('Tell us what you need done')}</h1>

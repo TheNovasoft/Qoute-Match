@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { usePage } from '@inertiajs/react';
 import { detectLanguageFromBrowser } from '@/utils/formTranslateLanguages';
 import { translateBatch } from '@/utils/translateClient';
 import {
@@ -190,15 +191,17 @@ export function useJobPostFormTranslation() {
 }
 
 export function JobPostFormAutoTranslate({ strings = [] }) {
-    const { active, ensureTranslated } = useJobPostFormTranslation();
+    const { ensureTranslated } = useJobPostFormTranslation();
+    const { locale } = usePage().props;
+    const siteLang = locale?.current || 'en';
 
     useEffect(() => {
-        if (!active || !strings.length) {
+        if (siteLang === 'en' || !strings.length) {
             return;
         }
 
         ensureTranslated(strings);
-    }, [active, strings, ensureTranslated]);
+    }, [siteLang, strings, ensureTranslated]);
 
     return null;
 }

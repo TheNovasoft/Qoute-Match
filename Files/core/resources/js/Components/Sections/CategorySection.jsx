@@ -1,4 +1,8 @@
+import { useT } from '@/hooks/useT';
+
 export default function CategorySection({ data }) {
+    const t = useT();
+
     if (!data.items?.length) return null;
 
     return (
@@ -21,7 +25,9 @@ export default function CategorySection({ data }) {
                                 <div className="category-item__thumb"><img src={category.image} alt="" /></div>
                                 <div className="category-item__content">
                                     <h5 className="category-item__title">{category.name}</h5>
-                                    <p className="category-item__text">{category.jobsCount} Open Requests</p>
+                                    <p className="category-item__text">
+                                        {category.jobsCount} {t('Open Requests')}
+                                    </p>
                                 </div>
                             </a>
                         </div>

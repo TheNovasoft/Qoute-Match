@@ -577,9 +577,15 @@ function responseError($remark, $notify, $data = null) {
 function getJobTimeDifference($createdAt, $deadline) {
     $createdAt = Carbon::parse($createdAt);
     $deadline  = Carbon::parse($deadline);
+    $locale = app()->getLocale();
+    if ($locale && $locale !== 'en') {
+        $createdAt = $createdAt->locale($locale);
+        $deadline = $deadline->locale($locale);
+    }
     $postedAgo = $createdAt->diffForHumans(null, true, false);
     $endsIn    = $deadline->diffForHumans(null, true, false);
-    return "Posted {$postedAgo}, Ends in {$endsIn}";
+
+    return __('Posted') . ' ' . $postedAgo . ', ' . __('Ends in') . ' ' . $endsIn;
 }
 
 function initializePusher() {

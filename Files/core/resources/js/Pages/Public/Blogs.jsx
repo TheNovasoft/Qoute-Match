@@ -1,8 +1,11 @@
 import { Link } from '@inertiajs/react';
 import FrontendLayout from '@/Components/Layout/FrontendLayout';
 import SectionRenderer from '@/Components/Sections/SectionRenderer';
+import { useT } from '@/hooks/useT';
 
 export default function Blogs({ pageTitle, seo, sections, blogs }) {
+    const t = useT();
+
     return (
         <FrontendLayout pageTitle={pageTitle} seo={seo}>
             <section className="container py-120">
@@ -24,7 +27,7 @@ export default function Blogs({ pageTitle, seo, sections, blogs }) {
                     )) : (
                         <div className="d-flex flex-column justify-content-center align-items-center">
                             <div className="text-center">
-                                <h6 className="text-muted mt-3">Blogs not found</h6>
+                                <h6 className="text-muted mt-3">{t('Blogs not found')}</h6>
                             </div>
                         </div>
                     )}

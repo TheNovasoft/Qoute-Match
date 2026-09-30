@@ -1,73 +1,39 @@
 import { usePage } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
 
+/**
+ * Compact header toggle: shows "UR" while English is active, "ENG" while Urdu is active.
+ */
 export default function LanguageSwitcher({ className = '' }) {
     const { locale, site, routes } = usePage().props;
-    const [open, setOpen] = useState(false);
 
-    const languages = locale?.languages ?? [];
-    const currentCode = locale?.current ?? 'en';
-
-    const currentLang = useMemo(
-        () => languages.find((lang) => lang.code === currentCode) ?? languages[0],
-        [languages, currentCode],
-    );
-
-    if (!site?.multiLanguage || languages.length <= 1) {
+    if (!site?.multiLanguage) {
         return null;
     }
 
-    const langUrl = (code) => {
-        const base = routes?.changeLang ?? '/change';
-        return `${base}/${code}`;
-    };
+    const languages = locale?.languages ?? [];
+    const currentCode = (locale?.current ?? 'en').toLowerCase();
+    const hasUrdu = languages.some((lang) => lang.code === 'ur');
+    const hasEnglish = languages.some((lang) => lang.code === 'en');
 
-    const flagUrl = (lang) => lang.imageUrl || null;
+    if (!hasUrdu || !hasEnglish) {
+        return null;
+    }
+
+    const isUrdu = currentCode === 'ur';
+    const targetCode = isUrdu ? 'en' : 'ur';
+    const label = isUrdu ? 'ENG' : 'UR';
+    const base = routes?.changeLang ?? '/change';
+    const href = `${base}/${targetCode}`;
 
     return (
-        <div className={`header-lang-switcher ${className}${open ? ' is-open' : ''}`}>
-            <button
-                type="button"
-                className="header-lang-switcher__toggle"
-                aria-expanded={open}
-                aria-label="Change language"
-                onClick={() => setOpen((value) => !value)}
-            >
-                <i className="las la-globe" aria-hidden="true" />
-                <span>{currentLang?.name ?? currentCode.toUpperCase()}</span>
-                <i className="las la-angle-down" aria-hidden="true" />
-            </button>
-
-            {open && (
-                <>
-                    <button
-                        type="button"
-                        className="header-lang-switcher__backdrop"
-                        aria-label="Close language menu"
-                        onClick={() => setOpen(false)}
-                    />
-                    <ul className="header-lang-switcher__menu">
-                        {languages.map((lang) => (
-                            <li key={lang.code}>
-                                <a
-                                    href={langUrl(lang.code)}
-                                    className={`header-lang-switcher__option${lang.code === currentCode ? ' is-active' : ''}`}
-                                    onClick={() => setOpen(false)}
-                                >
-                                    {flagUrl(lang) ? (
-                                        <img src={flagUrl(lang)} alt="" className="header-lang-switcher__flag" />
-                                    ) : (
-                                        <span className="header-lang-switcher__flag header-lang-switcher__flag--placeholder">
-                                            {lang.code.toUpperCase()}
-                                        </span>
-                                    )}
-                                    <span>{lang.name}</span>
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
-                </>
-            )}
-        </div>
+        <a
+            href={href}
+            className={`header-lang-toggle${className ? ` ${className}` : ''}`}
+            data-no-translate="1"
+            aria-label={isUrdu ? 'انگریزی پر جائیں' : 'Switch to Urdu'}
+            title={isUrdu ? 'انگریزی پر جائیں' : 'Switch to Urdu'}
+        >
+            {label}
+        </a>
     );
 }

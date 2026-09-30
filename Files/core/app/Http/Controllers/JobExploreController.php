@@ -67,7 +67,7 @@ class JobExploreController extends Controller
 
     public function freelanceJobs(Request $request)
     {
-        $pageTitle = 'Freelance Job';
+        $pageTitle = __('Freelance Job');
         $sections = Page::where('tempname', activeTemplate())->where('slug', 'freelance-jobs')->firstOrFail();
         $seoContents = $sections->seo_content;
         $seoImage = !empty($seoContents->image) ? getImage(getFilePath('seo') . '/' . $seoContents->image, getFileSize('seo')) : null;

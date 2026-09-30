@@ -89,9 +89,9 @@ class SeoLocationService
         return [
             'category' => InertiaResource::categoryDetail($category),
             'location' => self::locationCard($location),
-            'headline' => __($category->name) . ' in ' . __($location->name),
+            'headline' => __($category->name) . ' ' . __('in') . ' ' . __($location->name),
             'intro' => __('Post your :category requirement in :location and compare quotes from verified providers. Customer posting is free.', [
-                'category' => strtolower(__($category->name)),
+                'category' => __($category->name),
                 'location' => __($location->name),
             ]),
             'otherLocations' => $otherLocations->map(fn ($item) => array_merge(

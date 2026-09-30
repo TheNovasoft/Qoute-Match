@@ -17,6 +17,7 @@ import TrustSection from '@/Components/Sections/TrustSection';
 import UserTypesSection from '@/Components/Sections/UserTypesSection';
 import WhyChooseSection from '@/Components/Sections/WhyChooseSection';
 import BrandSlider from '@/Components/Sections/BrandSlider';
+import { useT } from '@/hooks/useT';
 
 const registry = {
     about: AboutSection,
@@ -51,6 +52,7 @@ export default function SectionRenderer({ sections = [] }) {
 
 export function Banner({ data }) {
     const { routes, auth } = usePage().props;
+    const t = useT();
     const postJobUrl = auth?.buyer ? routes.buyerJobPost : routes.postJob;
 
     if (!data) return null;
@@ -71,10 +73,10 @@ export function Banner({ data }) {
                         </div>
                         <div className="d-flex flex-wrap gap-3 align-items-center">
                             <Link href={postJobUrl} className="btn btn--base btn--lg">
-                                Get Quotes
+                                {t('Get Quotes')}
                             </Link>
                             <Link href={routes.forProviders} className="btn btn-outline--base btn--lg">
-                                Join as Provider
+                                {t('Join as Provider')}
                             </Link>
                         </div>
                         <div className="buyer-wrapper mt-4">
@@ -113,6 +115,8 @@ export function Banner({ data }) {
 import VerificationBadges from '@/Components/Shared/VerificationBadges';
 
 export function FreelancerCard({ freelancer }) {
+    const t = useT();
+
     return (
         <div className="freelancer-item">
             {freelancer.badge && (
@@ -143,7 +147,7 @@ export function FreelancerCard({ freelancer }) {
                     ))}
                 </ul>
                 <div className="freelancer-item__btn">
-                    <a href={freelancer.profileUrl} className="btn--base btn btn--sm">View Profile</a>
+                    <a href={freelancer.profileUrl} className="btn--base btn btn--sm">{t('View Profile')}</a>
                 </div>
             </div>
         </div>

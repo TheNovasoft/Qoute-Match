@@ -49,7 +49,7 @@ class FormStaticTranslations
         }
 
         self::$maps = [
-            'ur' => self::urduMap(),
+            'ur' => array_merge(SiteUrduDictionary::all(), self::urduMap()),
             'ar' => self::arabicMap(),
             'hi' => self::hindiMap(),
         ];

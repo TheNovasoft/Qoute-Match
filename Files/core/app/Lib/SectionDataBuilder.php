@@ -331,7 +331,7 @@ class SectionDataBuilder
                 'icon' => @$counter->data_values->icon,
                 'digit' => __(@$counter->data_values->digit),
                 'content' => __(@$counter->data_values->content),
-                'suffix' => $index === 2 ? 'Minute' : 'Million',
+                'suffix' => $index === 2 ? __('Minute') : __('Million'),
             ])->values()->all(),
         ];
     }
@@ -378,42 +378,45 @@ class SectionDataBuilder
         }
 
         $html = (string) ($page['body'] ?? '');
-        $html .= '<h5>Provider pricing (live)</h5>';
-        $html .= '<p>Customer posting remains <strong>free</strong>. Providers purchase credits or subscriptions below.</p>';
+        $html .= '<h5>' . e(__('Provider pricing (live)')) . '</h5>';
+        $html .= '<p>' . __('Customer posting remains <strong>free</strong>. Providers purchase credits or subscriptions below.') . '</p>';
 
         if ($packages->isNotEmpty()) {
-            $html .= '<h6>Lead credit packages</h6><ul>';
+            $html .= '<h6>' . e(__('Lead credit packages')) . '</h6><ul>';
             foreach ($packages as $package) {
-                $html .= '<li><strong>' . e($package->name) . '</strong> — '
-                    . $package->totalCredits() . ' credits for '
-                    . showAmount($package->price) . '</li>';
+                $html .= '<li><strong>' . e(__($package->name)) . '</strong> — '
+                    . e((string) $package->totalCredits()) . ' ' . e(__('credits for')) . ' '
+                    . e(showAmount($package->price)) . '</li>';
             }
             $html .= '</ul>';
         }
 
         if ($plans->isNotEmpty()) {
-            $html .= '<h6>Subscription plans</h6><ul>';
+            $html .= '<h6>' . e(__('Subscription plans')) . '</h6><ul>';
             foreach ($plans as $plan) {
                 $perks = [];
                 if ($plan->unlimited_quotes) {
-                    $perks[] = 'unlimited quotes';
+                    $perks[] = __('unlimited quotes');
                 }
                 if ((int) $plan->monthly_credits > 0) {
-                    $perks[] = $plan->monthly_credits . ' bonus credits';
+                    $perks[] = ((int) $plan->monthly_credits) . ' ' . __('bonus credits');
                 }
                 $perkText = $perks ? ' (' . implode(', ', $perks) . ')' : '';
-                $html .= '<li><strong>' . e($plan->name) . '</strong> — '
-                    . showAmount($plan->price) . ' / ' . (int) $plan->duration_days . ' days'
+                $html .= '<li><strong>' . e(__($plan->name)) . '</strong> — '
+                    . e(showAmount($plan->price)) . ' / ' . (int) $plan->duration_days . ' ' . e(__('days'))
                     . e($perkText) . '</li>';
             }
             $html .= '</ul>';
         }
 
-        $html .= '<p>Each new quote costs <strong>' . LeadCreditService::quoteCost() . '</strong> lead credit(s) unless you have an unlimited subscription.</p>';
-        $html .= '<p><a href="' . route('user.register') . '">Join as a provider</a> or <a href="' . route('user.lead.credits.index') . '">manage lead credits</a> from your dashboard.</p>';
+        $html .= '<p>' . e(__('Each new quote costs')) . ' <strong>' . e((string) LeadCreditService::quoteCost()) . '</strong> '
+            . e(__('lead credit(s) unless you have an unlimited subscription.')) . '</p>';
+        $html .= '<p><a href="' . route('user.register') . '">' . e(__('Join as a provider')) . '</a> '
+            . e(__('or')) . ' <a href="' . route('user.lead.credits.index') . '">' . e(__('manage lead credits')) . '</a> '
+            . e(__('from your dashboard.')) . '</p>';
 
         $page['body'] = $html;
-        $page['buttonText'] = $page['buttonText'] ?: 'Join as Provider';
+        $page['buttonText'] = $page['buttonText'] ?: __('Join as Provider');
         $page['buttonUrl'] = $page['buttonUrl'] ?: route('user.register');
 
         return $page;
@@ -439,10 +442,67 @@ class SectionDataBuilder
         return [
             'heading' => __(@$content->heading),
             'subheading' => __(@$content->subheading),
-            'body' => @$content->body,
+            'body' => self::translateStoredHtml(@$content->body),
             'buttonText' => __(@$content->button_text),
             'buttonUrl' => $buttonUrl,
         ];
+    }
+
+    /**
+     * Replace known English phrases inside CMS HTML bodies for the active locale.
+     */
+    private static function translateStoredHtml(?string $html): string
+    {
+        $html = (string) $html;
+        if ($html === '' || app()->getLocale() !== 'ur') {
+            return $html;
+        }
+
+        $skip = [
+            'in', 'or', 'to', 'and', 'all', 'no', 'yes', 'free', 'more', 'next', 'back',
+            'name', 'email', 'phone', 'job', 'jobs', 'quote', 'quotes', 'days', 'info',
+            'error', 'warning', 'success', 'active', 'draft', 'login', 'register', 'close',
+            'save', 'cancel', 'submit', 'search', 'filter', 'status', 'details', 'address',
+            'budget', 'deadline', 'location', 'provider', 'providers', 'customer', 'customers',
+            'request', 'requests', 'profile', 'settings', 'messages', 'inbox', 'optional',
+            'required', 'pending', 'completed', 'rejected', 'approved', 'published', 'minute',
+            'million', 'share', 'bids', 'fixed', 'reviews', 'disputes', 'gdpr',
+        ];
+
+        $map = SiteUrduDictionary::all();
+        uksort($map, fn ($a, $b) => mb_strlen((string) $b) <=> mb_strlen((string) $a));
+
+        foreach ($map as $english => $urdu) {
+            if (!is_string($english) || !is_string($urdu) || $english === '' || $urdu === '') {
+                continue;
+            }
+            if (mb_strlen($english) < 8 || in_array(strtolower($english), $skip, true)) {
+                continue;
+            }
+            if (str_contains($html, $english)) {
+                $html = str_replace($english, $urdu, $html);
+            }
+        }
+
+        // Short headings only inside heading tags (after long phrases).
+        $headingMap = [
+            'Reviews' => 'جائزے',
+            'Disputes' => 'تنازعات',
+            'GDPR' => 'جی ڈی پی آر',
+            'Examples:' => 'مثالیں:',
+            'How it works' => 'یہ کیسے کام کرتا ہے',
+            'Monetisation' => 'مونٹائزیشن',
+            'Always free' => 'ہمیشہ مفت',
+        ];
+        foreach ($headingMap as $english => $urdu) {
+            $html = preg_replace(
+                '/(<(?:h[1-6]|strong|b)[^>]*>\s*)' . preg_quote($english, '/') . '(\s*<\/)/iu',
+                '$1' . $urdu . '$2',
+                $html
+            ) ?? $html;
+        }
+
+        return $html;
     }
 
     private static function userTypes(): array

@@ -86,7 +86,11 @@ class HandleInertiaRequests extends Middleware
             ],
             'navigation' => fn () => $isAdminPanel
                 ? ['pages' => collect(), 'aboutPage' => null, 'extraPages' => collect(), 'extraLinks' => []]
-                : Cache::remember('inertia_frontend_navigation_v1', 300, fn () => FrontendNavigation::data()),
+                : Cache::remember(
+                    'inertia_frontend_navigation_v2_' . app()->getLocale(),
+                    300,
+                    fn () => FrontendNavigation::data()
+                ),
             'locale' => fn () => $this->sharedLocale(),
             'seoDefaults' => fn () => $isAdminPanel
                 ? null
@@ -115,7 +119,11 @@ class HandleInertiaRequests extends Middleware
             'routes' => fn () => $isAdminPanel ? [] : $this->inertiaRoutes(),
             'footerData' => fn () => $isAdminPanel
                 ? []
-                : Cache::remember('inertia_footer_data_v1', 600, fn () => \App\Lib\SectionDataBuilder::footer()),
+                : Cache::remember(
+                    'inertia_footer_data_v2_' . app()->getLocale(),
+                    600,
+                    fn () => \App\Lib\SectionDataBuilder::footer()
+                ),
         ];
     }
 
@@ -137,7 +145,20 @@ class HandleInertiaRequests extends Middleware
                     : null,
                 'is_default' => (bool) $lang->is_default,
             ]),
+            'strings' => $this->localeStrings($currentLang?->code ?? config('app.locale')),
         ];
+    }
+
+    private function localeStrings(string $code): array
+    {
+        $path = resource_path('lang/' . $code . '.json');
+        if (! is_file($path)) {
+            return [];
+        }
+
+        $decoded = json_decode((string) file_get_contents($path), true);
+
+        return is_array($decoded) ? $decoded : [];
     }
 
     private function sharedCookieSettings(bool $isAdminPanel): array
@@ -150,7 +171,7 @@ class HandleInertiaRequests extends Middleware
 
         return [
             'enabled' => ($cookie?->data_values->status ?? Status::DISABLE) == Status::ENABLE,
-            'shortDesc' => $cookie?->data_values->short_desc ?? 'We use cookies to improve your experience on QuoteMatch.',
+            'shortDesc' => __($cookie?->data_values->short_desc ?? 'We use cookies to improve your experience on QuoteMatch.'),
         ];
     }
 
