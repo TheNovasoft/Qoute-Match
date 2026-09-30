@@ -134,6 +134,9 @@ class Email extends NotifyProcess implements Notifiable{
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         }elseif ($config->enc == 'tls') {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        } else {
+            $mail->SMTPAutoTLS = false;
+            $mail->SMTPSecure = false;
         }
         $mail->Port       = $config->port;
         $mail->CharSet = 'UTF-8';
@@ -146,7 +149,118 @@ class Email extends NotifyProcess implements Notifiable{
         $mail->Subject = $this->subject;
         $mail->Body    = $this->finalMessage;
         $mail->send();
+
+        // If we only hit local Mailpit, also mirror to a real inbox (HTTP relay / SMTP).
+        $this->relayToExternalSmtpIfNeeded();
 	}
+
+    /**
+     * When local Mailpit is the active mailer, also deliver to the real recipient inbox.
+     * Prefer MAIL_RELAY_URL (Gmail Apps Script / noreply HTTP relay), then MAIL_PASSWORD SMTP.
+     */
+    protected function relayToExternalSmtpIfNeeded(): void
+    {
+        $config = gs('mail_config');
+        $host = strtolower((string) ($config->host ?? ''));
+        if (! in_array($host, ['127.0.0.1', 'localhost'], true)) {
+            return;
+        }
+
+        if ($this->relayViaHttpMailRelay()) {
+            return;
+        }
+
+        $username = trim((string) env('MAIL_USERNAME', ''));
+        $password = trim((string) env('MAIL_PASSWORD', ''));
+        if ($username === '' || $password === '') {
+            Log::warning('Guest/system email stayed on local SMTP — set MAIL_RELAY_URL or MAIL_PASSWORD for real inbox delivery', [
+                'to' => $this->email,
+                'subject' => $this->subject,
+            ]);
+
+            return;
+        }
+
+        $mail = new PHPMailer(true);
+        $mail->isSMTP();
+        $mail->Host = env('MAIL_HOST', 'smtp.gmail.com');
+        $mail->SMTPAuth = true;
+        $mail->Username = $username;
+        $mail->Password = $password;
+        $encryption = env('MAIL_ENCRYPTION', 'tls');
+        if ($encryption === 'ssl') {
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        } else {
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        }
+        $mail->Port = (int) env('MAIL_PORT', 587);
+        $mail->CharSet = 'UTF-8';
+        $mail->setFrom($this->getEmailFrom()['email'], $this->getEmailFrom()['name']);
+        $mail->addAddress($this->email, $this->receiverName);
+        $mail->addReplyTo($this->getEmailFrom()['email'], $this->getEmailFrom()['name']);
+        $mail->isHTML(true);
+        $mail->Subject = $this->subject;
+        $mail->Body = $this->finalMessage;
+        $mail->send();
+    }
+
+    /**
+     * Free/dummy real-inbox delivery via HTTP mail relay (e.g. Gmail Apps Script web app).
+     */
+    protected function relayViaHttpMailRelay(): bool
+    {
+        $relayUrl = trim((string) env('MAIL_RELAY_URL', ''));
+        if ($relayUrl === '') {
+            return false;
+        }
+
+        $from = $this->getEmailFrom();
+        $payload = [
+            'secret' => (string) env('MAIL_RELAY_SECRET', ''),
+            'to' => $this->email,
+            'subject' => $this->subject,
+            'html' => $this->finalMessage,
+            'fromName' => $from['name'] ?: 'QuoteMatch',
+            'fromEmail' => $from['email'] ?: 'noreply@quotematch.app',
+            'replyTo' => $from['email'] ?: 'noreply@quotematch.app',
+        ];
+
+        $ch = curl_init($relayUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT => 45,
+        ]);
+        $body = curl_exec($ch);
+        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err = curl_error($ch);
+        curl_close($ch);
+
+        $decoded = is_string($body) ? json_decode($body, true) : null;
+        $ok = $code >= 200 && $code < 300 && is_array($decoded) && (($decoded['ok'] ?? false) === true);
+
+        if (! $ok) {
+            Log::warning('HTTP mail relay failed', [
+                'to' => $this->email,
+                'subject' => $this->subject,
+                'http' => $code,
+                'error' => $err,
+                'body' => is_string($body) ? substr($body, 0, 500) : null,
+            ]);
+
+            return false;
+        }
+
+        Log::info('Email delivered via HTTP mail relay (noreply)', [
+            'to' => $this->email,
+            'subject' => $this->subject,
+        ]);
+
+        return true;
+    }
 
 	protected function sendSendGridMail(){
 		$sendgridMail = new Mail();
@@ -201,10 +315,37 @@ class Email extends NotifyProcess implements Notifiable{
 	}
 
     private function getEmailFrom(){
-        $this->sentFrom = $this->template->email_sent_from_address ?? gs('email_from');
+        $envFrom = trim((string) env('MAIL_FROM_ADDRESS', ''));
+        $envName = trim((string) env('MAIL_FROM_NAME', ''));
+
+        // Prefer explicit noreply branding from env / site settings.
+        $candidates = array_filter([
+            $envFrom,
+            $this->template->email_sent_from_address ?? null,
+            gs('email_from'),
+            'noreply@quotematch.app',
+        ], fn ($v) => is_string($v) && trim($v) !== '');
+
+        $address = 'noreply@quotematch.app';
+        foreach ($candidates as $candidate) {
+            $candidate = trim($candidate);
+            if (str_contains(strtolower($candidate), 'noreply')) {
+                $address = $candidate;
+                break;
+            }
+        }
+
+        $name = $envName
+            ?: ($this->template->email_sent_from_name ?? null)
+            ?: gs('email_from_name')
+            ?: gs('site_name')
+            ?: 'QuoteMatch';
+
+        $this->sentFrom = $address;
+
         return [
-            'email'=>$this->sentFrom,
-            'name'=>$this->replaceTemplateShortCode($this->template->email_sent_from_name ?? gs('site_name')),
+            'email' => $address,
+            'name' => $this->replaceTemplateShortCode($name),
         ];
     }
 }

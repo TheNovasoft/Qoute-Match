@@ -36,7 +36,11 @@ class MailConfigurator
 
         $username = trim((string) env('MAIL_USERNAME', ''));
         $password = trim((string) env('MAIL_PASSWORD', ''));
+        $host = trim((string) env('MAIL_HOST', ''));
+        $fromAddress = trim((string) env('MAIL_FROM_ADDRESS', ''));
+        $fromName = trim((string) env('MAIL_FROM_NAME', ''));
 
+        // Real SMTP (e.g. Gmail) when username + app password are configured.
         if ($username !== '' && $password !== '') {
             $encryption = env('MAIL_ENCRYPTION', 'tls');
             if ($encryption === 'null' || $encryption === null) {
@@ -45,19 +49,17 @@ class MailConfigurator
 
             $general->mail_config = (object) [
                 'name' => 'smtp',
-                'host' => env('MAIL_HOST', 'smtp.gmail.com'),
+                'host' => $host !== '' ? $host : 'smtp.gmail.com',
                 'port' => (string) env('MAIL_PORT', '587'),
                 'enc' => $encryption,
                 'username' => $username,
                 'password' => $password,
             ];
 
-            $fromAddress = trim((string) env('MAIL_FROM_ADDRESS', ''));
             if ($fromAddress !== '') {
                 $general->email_from = $fromAddress;
             }
 
-            $fromName = trim((string) env('MAIL_FROM_NAME', ''));
             if ($fromName !== '') {
                 $general->email_from_name = $fromName;
             }
@@ -69,10 +71,7 @@ class MailConfigurator
             return;
         }
 
-        if (! app()->environment('local')) {
-            return;
-        }
-
+        // Local Mailpit / smtp4dev — real SMTP without inbox credentials.
         if (self::isSmtpPortOpen('127.0.0.1', 1025)) {
             $general->mail_config = (object) [
                 'name' => 'smtp',
@@ -82,15 +81,28 @@ class MailConfigurator
                 'username' => '',
                 'password' => '',
             ];
-            if (empty($general->email_from)) {
+            if ($fromAddress !== '') {
+                $general->email_from = $fromAddress;
+            } elseif (empty($general->email_from)) {
                 $general->email_from = 'noreply@quotematch.test';
             }
-        } else {
-            $general->mail_config = (object) [
-                'name' => 'log',
-            ];
+            if ($fromName !== '') {
+                $general->email_from_name = $fromName;
+            }
+            $general->en = 1;
+            $general->save();
+            Cache::forget('GeneralSetting');
+
+            return;
         }
 
+        if (! app()->environment('local')) {
+            return;
+        }
+
+        $general->mail_config = (object) [
+            'name' => 'log',
+        ];
         $general->en = 1;
         $general->save();
         Cache::forget('GeneralSetting');

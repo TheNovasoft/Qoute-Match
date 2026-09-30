@@ -228,11 +228,14 @@ class NotifyProcess{
     */
 	protected function getSubject(){
 		if ($this->template) {
-			$subject = $this->template->subject;
+			$subject = (string) ($this->template->subject ?? '');
 			if ($this->shortCodes) {
 			    foreach ($this->shortCodes as $code => $value) {
 			        $subject = str_replace('{{' . $code . '}}', $value, $subject);
 			    }
+                if ($subject === '' && ! empty($this->shortCodes['subject'])) {
+                    $subject = (string) $this->shortCodes['subject'];
+                }
 		    }
 			$this->subject = $subject;
 		}

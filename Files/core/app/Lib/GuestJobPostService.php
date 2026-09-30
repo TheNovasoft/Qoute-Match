@@ -199,24 +199,54 @@ class GuestJobPostService
 
     public static function notifyGuestAccountCreated(Buyer $buyer, string $plainPassword, ?Job $job = null): void
     {
+        MailConfigurator::syncFromEnv();
+
         $loginUrl = route('buyer.login');
         $jobLine = $job
-            ? 'Your quote request "' . $job->title . '" has been submitted successfully.'
+            ? 'Your quote request "' . e($job->title) . '" has been submitted successfully.'
             : 'Your quote request has been submitted successfully.';
 
-        $message = implode("\n\n", array_filter([
-            'Hello ' . $buyer->firstname . ',',
-            $jobLine,
-            'We created a free customer account so you can track quotes and manage your requests.',
-            'Sign-in email: ' . $buyer->email,
-            'Temporary password: ' . $plainPassword,
-            'For your security, please sign in and change your password as soon as possible: ' . $loginUrl,
-        ]));
+        $email = e($buyer->email);
+        $password = e($plainPassword);
+        $loginHref = e($loginUrl);
 
-        notify($buyer, 'DEFAULT', [
-            'subject' => 'Your request was submitted — account created',
-            'message' => $message,
-        ], ['email']);
+        // HTML so credentials stay on separate bold lines (plain \n collapses in email HTML).
+        $message = implode('', [
+            '<p style="margin:0 0 16px 0;">' . $jobLine . '</p>',
+            '<p style="margin:0 0 16px 0;">We created a free customer account so you can track quotes and manage your requests.</p>',
+            '<p style="margin:0 0 8px 0;"><strong>email :</strong> ' . $email . '</p>',
+            '<p style="margin:0 0 16px 0;"><strong>password :</strong> ' . $password . '</p>',
+            '<p style="margin:0 0 8px 0;">For your security, please sign in and change your password as soon as possible:</p>',
+            '<p style="margin:0;"><a href="' . $loginHref . '" style="color:#0071e3;">' . $loginHref . '</a></p>',
+        ]);
+
+        // Soft greeting in global template (avoid "Hello username Customer" + raw username line).
+        $mailUser = (object) [
+            'email' => $buyer->email,
+            'fullname' => 'Customer',
+            'username' => '',
+        ];
+
+        try {
+            $sent = notify($mailUser, 'DEFAULT', [
+                'subject' => 'Your request was submitted - account created',
+                'message' => $message,
+            ], ['email']);
+
+            if ($sent === false) {
+                \Illuminate\Support\Facades\Log::warning('Guest job account email was not accepted by the mailer', [
+                    'buyer_id' => $buyer->id,
+                    'email' => $buyer->email,
+                    'mailer' => gs('mail_config')->name ?? null,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Guest job account email failed', [
+                'buyer_id' => $buyer->id,
+                'email' => $buyer->email,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     public static function hasPendingPublish(): bool
