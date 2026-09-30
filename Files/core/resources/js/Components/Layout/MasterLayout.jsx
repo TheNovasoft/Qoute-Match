@@ -283,12 +283,24 @@ export default function MasterLayout({ children, pageTitle, backUrl }) {
                                 </div>
                                 <DashboardUserMenu
                                     user={user}
-                                    roleLabel="Provider"
+                                    roleLabel="Foreman"
                                     unreadCount={unreadCount}
                                     notificationUnreadCount={notificationUnreadCount}
                                     conversationUrl={conversationHref}
                                     notificationsUrl={notificationsHref}
-                                    menuItems={[
+                                    menuItems={isSimple ? [
+                                        {
+                                            label: 'My Profile',
+                                            href: settingsHref,
+                                            icon: 'fas fa-user-circle',
+                                        },
+                                        {
+                                            label: 'Logout',
+                                            href: logoutHref,
+                                            icon: 'fas fa-sign-out-alt',
+                                            danger: true,
+                                        },
+                                    ] : [
                                         {
                                             label: 'My Profile',
                                             href: settingsHref,

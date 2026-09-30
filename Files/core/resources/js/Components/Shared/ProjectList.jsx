@@ -21,7 +21,12 @@ export default function ProjectList({ projects, filters, statusOptions = [], rol
     return (
         <div className="card shadow-sm dashboard-list-card">
             <div className="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-3">
-                <h5 className="card-title mb-0">My Projects</h5>
+                <div>
+                    <h5 className="card-title mb-0">{role === 'freelancer' ? 'My jobs' : 'My Projects'}</h5>
+                    {role === 'freelancer' && (
+                        <p className="text-muted mb-0 small">Jobs you were hired for.</p>
+                    )}
+                </div>
 
                 {role === 'buyer' && (
                     <button type="button" className="btn btn-sm btn-outline--primary" onClick={() => setShowFilter((v) => !v)}>
@@ -36,7 +41,7 @@ export default function ProjectList({ projects, filters, statusOptions = [], rol
                             type="search"
                             value={data.search}
                             onChange={(e) => setData('search', e.target.value)}
-                            placeholder="Search here..."
+                            placeholder="Search jobs..."
                         />
                         <button className="table-search-text" type="submit" aria-label="Search">
                             <i className="las la-search" />
@@ -96,24 +101,40 @@ export default function ProjectList({ projects, filters, statusOptions = [], rol
                     <thead>
                         <tr>
                             <th>Job</th>
-                            <th>{role === 'buyer' ? 'Freelancer' : 'Buyer'}</th>
-                            <th>Estimate Time</th>
-                            <th>Budget</th>
+                            <th>{role === 'buyer' ? 'Freelancer' : 'Customer'}</th>
+                            {role === 'buyer' && <th>Estimate Time</th>}
+                            <th>{role === 'freelancer' ? 'Your pay' : 'Budget'}</th>
                             <th>Status</th>
-                            <th>Assigned at</th>
+                            <th>{role === 'freelancer' ? 'Started' : 'Assigned at'}</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {rows.length === 0 ? (
                             <tr>
-                                <td colSpan={7} className="text-center text-muted py-4">No projects found.</td>
+                                <td colSpan={role === 'freelancer' ? 6 : 7} className="text-center py-5">
+                                    {role === 'freelancer' ? (
+                                        <>
+                                            <p className="text-muted mb-3">No hired jobs yet.</p>
+                                            <Link href="/freelance-jobs" className="btn btn--base">
+                                                <i className="las la-search" /> Find jobs
+                                            </Link>
+                                        </>
+                                    ) : (
+                                        <span className="text-muted">No projects found.</span>
+                                    )}
+                                </td>
                             </tr>
                         ) : (
                             rows.map((project) => (
                                 <tr key={project.id}>
-                                    <td data-label="Job"><span className="clamping">{project.jobTitle}</span></td>
-                                    <td data-label={role === 'buyer' ? 'Freelancer' : 'Buyer'}>
+                                    <td data-label="Job">
+                                        <span className="clamping">{project.jobTitle}</span>
+                                        {role === 'freelancer' && project.estimatedTime ? (
+                                            <span className="small d-block text-muted">Time: {project.estimatedTime}</span>
+                                        ) : null}
+                                    </td>
+                                    <td data-label={role === 'buyer' ? 'Freelancer' : 'Customer'}>
                                         <span className="d-inline-flex align-items-center flex-wrap gap-1">
                                             {project.counterparty.fullname}
                                             {project.counterparty.verificationBadges && (
@@ -128,22 +149,24 @@ export default function ProjectList({ projects, filters, statusOptions = [], rol
                                             <span className="d-block small text-muted">{project.counterparty.username}</span>
                                         )}
                                     </td>
-                                    <td data-label="Estimate Time"><span className="clamping">{project.estimatedTime}</span></td>
-                                    <td data-label="Budget">
+                                    {role === 'buyer' && (
+                                        <td data-label="Estimate Time"><span className="clamping">{project.estimatedTime}</span></td>
+                                    )}
+                                    <td data-label={role === 'freelancer' ? 'Your pay' : 'Budget'}>
                                         <div className="bid-budget-cell">
                                             <span className="bid-budget-cell__amount">{project.bidAmount}</span>
                                             <span className={`bid-budget-cell__type ${project.customBudget ? 'text--info' : 'text--primary'}`}>
-                                                {project.customBudget ? 'Customized' : 'Fixed'}
+                                                {project.customBudget ? 'Custom' : 'Fixed'}
                                             </span>
                                         </div>
                                     </td>
                                     <td data-label="Status"><StatusBadge status={project.status} /></td>
-                                    <td data-label="Assigned at">{project.assignedAt}</td>
+                                    <td data-label={role === 'freelancer' ? 'Started' : 'Assigned at'}>{project.assignedAt}</td>
                                     <td data-label="Action">
                                         <div className="d-flex flex-wrap gap-2">
                                             {project.canViewDetail ? (
-                                                <Link href={project.detailUrl} className="btn btn-sm btn-outline--primary">
-                                                    Details
+                                                <Link href={project.detailUrl} className="btn btn-sm btn--base">
+                                                    {role === 'freelancer' ? 'Open' : 'Details'}
                                                 </Link>
                                             ) : (
                                                 <span className="btn btn-sm btn-outline--primary disabled">Details</span>
@@ -153,7 +176,7 @@ export default function ProjectList({ projects, filters, statusOptions = [], rol
                                                     Upload
                                                 </Link>
                                             )}
-                                            {project.rehireUrl && (
+                                            {role === 'buyer' && project.rehireUrl && (
                                                 <Link href={project.rehireUrl} method="post" as="button" className="btn btn-sm btn--base">
                                                     Hire Again
                                                 </Link>

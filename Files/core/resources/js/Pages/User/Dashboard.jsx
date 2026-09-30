@@ -13,7 +13,6 @@ export default function Dashboard({ pageTitle, widget, user, profileCompletion, 
         { href: quotesHref, label: 'Quotes sent', value: widget.total_bid, icon: 'las la-gavel' },
         { href: jobsHref, label: 'Jobs in progress', value: widget.total_running_project, icon: 'las la-briefcase' },
         { href: jobsHref, label: 'Jobs finished', value: widget.total_completed_project, icon: 'las la-check-circle' },
-        { href: routes?.userTransactions ?? '/freelancer/transactions', label: 'Total earned', value: widget.total_earning, icon: 'las la-coins' },
     ];
 
     const steps = [
@@ -108,7 +107,7 @@ export default function Dashboard({ pageTitle, widget, user, profileCompletion, 
 
                         <div className="row gy-4 dashboard-widget-grid">
                             {cards.map((card) => (
-                                <div className="col-xxl-3 col-sm-6" key={card.label}>
+                                <div className="col-md-4 col-sm-6" key={card.label}>
                                     <Link className="dashboard-widget" href={card.href}>
                                         <div className="dashboard-widget__main">
                                             <div className="dashboard-widget__icon flex-center">

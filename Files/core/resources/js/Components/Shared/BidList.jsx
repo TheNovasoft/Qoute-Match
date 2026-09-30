@@ -23,8 +23,8 @@ export default function BidList({ bids, indexUrl }) {
         <div className="card shadow-sm dashboard-list-card">
             <div className="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div>
-                    <h5 className="card-title mb-1">Your submitted quotes</h5>
-                    <p className="text-muted mb-0 small">To place a new bid, browse open customer requests first.</p>
+                    <h5 className="card-title mb-1">My quotes</h5>
+                    <p className="text-muted mb-0 small">Quotes you sent to customers. To send a new one, find a job first.</p>
                 </div>
                 <div className="d-flex flex-wrap align-items-center gap-2">
                     <form className="table-search" onSubmit={submitSearch}>
@@ -33,14 +33,14 @@ export default function BidList({ bids, indexUrl }) {
                             type="search"
                             value={data.search}
                             onChange={(e) => setData('search', e.target.value)}
-                            placeholder="Search here..."
+                            placeholder="Search quotes..."
                         />
                         <button className="table-search-text" type="submit" aria-label="Search">
                             <i className="las la-search" />
                         </button>
                     </form>
-                    <Link href="/freelance-jobs" className="btn btn--base btn-sm">
-                        <i className="las la-search" /> Browse Requests
+                    <Link href="/freelance-jobs" className="btn btn--base">
+                        <i className="las la-search" /> Find jobs
                     </Link>
                 </div>
             </div>
@@ -49,9 +49,8 @@ export default function BidList({ bids, indexUrl }) {
                     <thead>
                         <tr>
                             <th>Job</th>
-                            <th>Buyer</th>
-                            <th>Estimate Time</th>
-                            <th>Budget</th>
+                            <th>Customer</th>
+                            <th>Your price</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
@@ -59,7 +58,12 @@ export default function BidList({ bids, indexUrl }) {
                     <tbody>
                         {rows.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="text-center text-muted py-4">No quotes submitted yet.</td>
+                                <td colSpan={5} className="text-center py-5">
+                                    <p className="text-muted mb-3">No quotes yet.</p>
+                                    <Link href="/freelance-jobs" className="btn btn--base">
+                                        <i className="las la-search" /> Find jobs to quote
+                                    </Link>
+                                </td>
                             </tr>
                         ) : (
                             rows.map((bid) => (
@@ -70,24 +74,24 @@ export default function BidList({ bids, indexUrl }) {
                                         ) : (
                                             <span className="clamping">{bid.jobTitle}</span>
                                         )}
+                                        {bid.estimatedTime ? (
+                                            <span className="small d-block text-muted">Time: {bid.estimatedTime}</span>
+                                        ) : null}
                                     </td>
-                                    <td data-label="Buyer">
+                                    <td data-label="Customer">
                                         <div>
                                             {bid.buyer.fullname}
-                                            <span className="small d-block">
-                                                <a href={bid.buyer.jobsUrl} target="_blank" rel="noreferrer">@{bid.buyer.username}</a>
-                                            </span>
+                                            <span className="small d-block text-muted">@{bid.buyer.username}</span>
                                         </div>
                                     </td>
-                                    <td data-label="Estimate Time"><span className="clamping">{bid.estimatedTime}</span></td>
-                                    <td data-label="Budget">
+                                    <td data-label="Your price">
                                         <div className="bid-budget-cell">
                                             <span className="bid-budget-cell__amount">{bid.bidAmount}</span>
                                             <span className="bid-budget-cell__type text--primary">
-                                                {bid.customBudget ? 'Customized' : 'Fixed'}
+                                                {bid.customBudget ? 'Custom' : 'Fixed'}
                                             </span>
                                             <span className="bid-budget-cell__request text-muted">
-                                                Request budget: {bid.jobBudget}
+                                                Customer budget: {bid.jobBudget}
                                             </span>
                                         </div>
                                     </td>
@@ -95,7 +99,7 @@ export default function BidList({ bids, indexUrl }) {
                                         <div className="bid-status-cell">
                                             <StatusBadge status={bid.status} />
                                             {bid.requestUpdated && (
-                                                <span className="badge badge--info">Request updated</span>
+                                                <span className="badge badge--info">Updated</span>
                                             )}
                                         </div>
                                     </td>
@@ -106,24 +110,27 @@ export default function BidList({ bids, indexUrl }) {
                                                 className="btn btn-sm btn-outline--primary"
                                                 onClick={() => setQuoteModal(bid)}
                                             >
-                                                Quote
+                                                View
                                             </button>
-                                            {bid.withdrawUrl && bid.status?.label === 'Pending' && (
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-sm btn-outline--primary"
-                                                    onClick={() => setWithdrawModal({ url: bid.withdrawUrl, question: 'Are you sure to withdraw this job proposal / bid?' })}
-                                                >
-                                                    Withdraw
-                                                </button>
-                                            )}
                                             {bid.canEdit && (
                                                 <Link href={bid.editUrl} className="btn btn-sm btn--base">
-                                                    Edit Bid
+                                                    Edit
                                                 </Link>
                                             )}
                                             {bid.projectUrl && (
-                                                <Link href={bid.projectUrl} className="btn btn-sm btn-outline--primary">Project</Link>
+                                                <Link href={bid.projectUrl} className="btn btn-sm btn-outline--primary">Open job</Link>
+                                            )}
+                                            {bid.withdrawUrl && bid.status?.label === 'Pending' && (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-outline--danger"
+                                                    onClick={() => setWithdrawModal({
+                                                        url: bid.withdrawUrl,
+                                                        question: 'Withdraw this quote? The customer will no longer see it.',
+                                                    })}
+                                                >
+                                                    Withdraw
+                                                </button>
                                             )}
                                         </div>
                                     </td>
@@ -162,7 +169,7 @@ export default function BidList({ bids, indexUrl }) {
                     <div className="modal-dialog modal-dialog-centered">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title">Confirmation Alert!</h5>
+                                <h5 className="modal-title">Withdraw quote?</h5>
                                 <button type="button" className="close" onClick={() => setWithdrawModal(null)}>
                                     <i className="las la-times" />
                                 </button>
@@ -172,7 +179,7 @@ export default function BidList({ bids, indexUrl }) {
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn--danger" onClick={() => setWithdrawModal(null)}>No</button>
-                                <button type="button" className="btn btn--base" onClick={confirmWithdraw}>Yes</button>
+                                <button type="button" className="btn btn--base" onClick={confirmWithdraw}>Yes, withdraw</button>
                             </div>
                         </div>
                     </div>
