@@ -31,6 +31,39 @@ function SidebarLink({ href, icon, label, active, badge, asButton, cta }) {
     );
 }
 
+function ChatBadge({ unreadCount }) {
+    return (
+        <span
+            className={`sidebar-chat-notify ${unreadCount > 0 ? 'shake text--warning' : 'd-none'}`}
+            data-sidebar-chat-notify
+        >
+            {unreadCount > 0 && (
+                <>
+                    <i className="las la-bell"></i>
+                    <span className="sidebar-chat-notify__count">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                </>
+            )}
+        </span>
+    );
+}
+
+function CountBadge({ count }) {
+    if (!count || count < 1) {
+        return null;
+    }
+
+    return (
+        <span className="shake text--warning ms-1">
+            <i className="las la-bell"></i>
+            <span className="sidebar-chat-notify__count">
+                {count > 9 ? '9+' : count}
+            </span>
+        </span>
+    );
+}
+
 export default function MasterLayout({ children, pageTitle, backUrl }) {
     const { url, props } = usePage();
     const { auth, site, template, routes, monetisation } = props;
@@ -93,29 +126,37 @@ export default function MasterLayout({ children, pageTitle, backUrl }) {
                                     <img src={site.logoDark || site.logo} alt={site.name} />
                                 </Link>
                             </div>
-                            <div className="sidebar-menu__top">
-                                <div className="shape">
-                                    <img src={`${template.assetPath}shape/d-shape.png`} alt="" />
+                            {!isSimple && (
+                                <div className="sidebar-menu__top">
+                                    <div className="shape">
+                                        <img src={`${template.assetPath}shape/d-shape.png`} alt="" />
+                                    </div>
+                                    <span className="icon"><i className="las la-wallet"></i></span>
+                                    <div className="content">
+                                        <span className="title">Wallet Balance</span>
+                                        <h6 className="number">{user?.balance_formatted || user?.balance}</h6>
+                                        {monetisation?.enabled && (
+                                            <span className="title d-block mt-1">Quote tokens: {user?.lead_credits ?? 0}</span>
+                                        )}
+                                    </div>
                                 </div>
-                                <span className="icon"><i className="las la-wallet"></i></span>
-                                <div className="content">
-                                    <span className="title">Wallet Balance</span>
-                                    <h6 className="number">{user?.balance_formatted || user?.balance}</h6>
-                                    {monetisation?.enabled && (
-                                        <span className="title d-block mt-1">Quote tokens: {user?.lead_credits ?? 0}</span>
-                                    )}
-                                </div>
-                            </div>
+                            )}
                             <ul className="sidebar-menu-list">
                                 <li className="sidebar-menu-list__item px-3 py-2">
-                                    <button type="button" className="btn btn-sm btn-outline--secondary w-100" onClick={toggleNavMode}>
-                                        {isSimple ? 'Show all menu items' : 'Simple menu'}
+                                    <button
+                                        type="button"
+                                        className="btn btn-sm btn-outline--secondary w-100"
+                                        onClick={toggleNavMode}
+                                    >
+                                        {isSimple ? 'More options' : 'Easy menu'}
                                     </button>
                                 </li>
+
+                                {/* Daily work — always visible */}
                                 <SidebarLink
                                     href={homeHref}
                                     icon="las la-home"
-                                    label="Dashboard"
+                                    label="Home"
                                     active={isNavActive(url, homeHref, { exact: true })}
                                 />
                                 <SidebarLink
@@ -134,95 +175,77 @@ export default function MasterLayout({ children, pageTitle, backUrl }) {
                                 <SidebarLink
                                     href={projectsHref}
                                     icon="las la-briefcase"
-                                    label="My Projects"
+                                    label="My Jobs"
                                     active={isNavActive(url, projectsHref)}
                                 />
                                 <SidebarLink
-                                    href={servicesHref}
-                                    icon="las la-box"
-                                    label="Service Packages"
-                                    active={isNavActive(url, servicesHref)}
-                                />
-                                {!isSimple && (
-                                    <>
-                                <SidebarLink
-                                    href={disputesHref}
-                                    icon="las la-exclamation-triangle"
-                                    label="Disputes"
-                                    active={isNavActive(url, disputesHref)}
-                                    badge={(user?.active_disputes ?? 0) > 0 ? (
-                                        <span className="shake text--warning"><i className="las la-bell"></i></span>
-                                    ) : null}
+                                    href={conversationHref}
+                                    icon="lab la-rocketchat"
+                                    label="Messages"
+                                    active={isNavActive(url, conversationHref)}
+                                    badge={<ChatBadge unreadCount={unreadCount} />}
                                 />
                                 <SidebarLink
                                     href={notificationsHref}
                                     icon="las la-bell"
-                                    label="Notifications"
+                                    label="Alerts"
                                     active={isNavActive(url, notificationsHref)}
-                                    badge={notificationUnreadCount > 0 ? (
-                                        <span className="shake text--warning ms-1">
-                                            <i className="las la-bell"></i>
-                                            <span className="sidebar-chat-notify__count">
-                                                {notificationUnreadCount > 9 ? '9+' : notificationUnreadCount}
-                                            </span>
-                                        </span>
-                                    ) : null}
+                                    badge={<CountBadge count={notificationUnreadCount} />}
                                 />
-                                <SidebarLink
-                                    href={withdrawHref}
-                                    icon="las la-money-check-alt"
-                                    label="Withdraw"
-                                    active={isNavActive(url, withdrawHref)}
-                                />
-                                <SidebarLink
-                                    href={transactionsHref}
-                                    icon="las la-exchange-alt"
-                                    label="Transactions"
-                                    active={isNavActive(url, transactionsHref)}
-                                />
-                                <SidebarLink
-                                    href={invoicesHref}
-                                    icon="las la-file-invoice"
-                                    label="Invoices"
-                                    active={isNavActive(url, invoicesHref)}
-                                />
-                                {monetisation?.enabled && (
-                                    <SidebarLink
-                                        href={leadCreditsHref}
-                                        icon="las la-coins"
-                                        label="Quote Tokens"
-                                        active={isNavActive(url, leadCreditsHref)}
-                                    />
-                                )}
-                                <SidebarLink
-                                    href={verificationHref}
-                                    icon="las la-certificate"
-                                    label="Verification"
-                                    active={isNavActive(url, verificationHref)}
-                                />
+
+                                {/* Extra tools — advanced only */}
+                                {!isSimple && (
+                                    <>
+                                        <SidebarLink
+                                            href={servicesHref}
+                                            icon="las la-box"
+                                            label="Service Packages"
+                                            active={isNavActive(url, servicesHref)}
+                                        />
+                                        <SidebarLink
+                                            href={disputesHref}
+                                            icon="las la-exclamation-triangle"
+                                            label="Disputes"
+                                            active={isNavActive(url, disputesHref)}
+                                            badge={(user?.active_disputes ?? 0) > 0 ? (
+                                                <span className="shake text--warning"><i className="las la-bell"></i></span>
+                                            ) : null}
+                                        />
+                                        <SidebarLink
+                                            href={withdrawHref}
+                                            icon="las la-money-check-alt"
+                                            label="Withdraw"
+                                            active={isNavActive(url, withdrawHref)}
+                                        />
+                                        <SidebarLink
+                                            href={transactionsHref}
+                                            icon="las la-exchange-alt"
+                                            label="Transactions"
+                                            active={isNavActive(url, transactionsHref)}
+                                        />
+                                        <SidebarLink
+                                            href={invoicesHref}
+                                            icon="las la-file-invoice"
+                                            label="Invoices"
+                                            active={isNavActive(url, invoicesHref)}
+                                        />
+                                        {monetisation?.enabled && (
+                                            <SidebarLink
+                                                href={leadCreditsHref}
+                                                icon="las la-coins"
+                                                label="Quote Tokens"
+                                                active={isNavActive(url, leadCreditsHref)}
+                                            />
+                                        )}
+                                        <SidebarLink
+                                            href={verificationHref}
+                                            icon="las la-certificate"
+                                            label="Verification"
+                                            active={isNavActive(url, verificationHref)}
+                                        />
                                     </>
                                 )}
-                                <SidebarLink
-                                    href={conversationHref}
-                                    icon="lab la-rocketchat"
-                                    label="Chat"
-                                    active={isNavActive(url, conversationHref)}
-                                    badge={(
-                                        <span
-                                            className={`sidebar-chat-notify ${unreadCount > 0 ? 'shake text--warning' : 'd-none'}`}
-                                            data-sidebar-chat-notify
-                                        >
-                                            {unreadCount > 0 && (
-                                                <>
-                                                    <i className="las la-bell"></i>
-                                                    <span className="sidebar-chat-notify__count">
-                                                        {unreadCount > 9 ? '9+' : unreadCount}
-                                                    </span>
-                                                </>
-                                            )}
-                                        </span>
-                                    )}
-                                />
+
                                 <SidebarLink
                                     href={settingsHref}
                                     icon="las la-cog"
