@@ -1,9 +1,11 @@
 import { Link, usePage } from '@inertiajs/react';
 import { quotePostUrl } from '@/utils/quotePostUrl';
+import { useT } from '@/hooks/useT';
 
 export default function Footer() {
     const { site, navigation, routes, auth, footerData: data = {} } = usePage().props;
     const postJobUrl = quotePostUrl(routes, auth);
+    const t = useT();
 
     return (
         <footer className="footer-area">
@@ -33,20 +35,20 @@ export default function Footer() {
 
                 <div className="footer-wrapper py-60">
                     <div className="footer-item">
-                        <h5 className="footer-item__title">Navigation</h5>
+                        <h5 className="footer-item__title">{t('Navigation')}</h5>
                         <ul className="footer-menu">
-                            <li className="footer-menu__item"><Link href={routes.home} className="footer-menu__link">Home</Link></li>
+                            <li className="footer-menu__item"><Link href={routes.home} className="footer-menu__link">{t('Home')}</Link></li>
                             <li className="footer-menu__item">
                                 <Link
                                     href={navigation?.aboutPage ? `/${navigation.aboutPage.slug}` : `${routes.home}#about`}
                                     className="footer-menu__link"
                                 >
-                                    {navigation?.aboutPage?.name || 'About'}
+                                    {t(navigation?.aboutPage?.name || 'About')}
                                 </Link>
                             </li>
-                            <li className="footer-menu__item"><Link href={routes.categories} className="footer-menu__link">Category</Link></li>
-                            <li className="footer-menu__item"><Link href={routes.blogs} className="footer-menu__link">Blogs</Link></li>
-                            <li className="footer-menu__item"><Link href={routes.contact} className="footer-menu__link">Contact</Link></li>
+                            <li className="footer-menu__item"><Link href={routes.categories} className="footer-menu__link">{t('Category')}</Link></li>
+                            <li className="footer-menu__item"><Link href={routes.blogs} className="footer-menu__link">{t('Blogs')}</Link></li>
+                            <li className="footer-menu__item"><Link href={routes.contact} className="footer-menu__link">{t('Contact')}</Link></li>
                             {(navigation?.extraLinks || []).map((item) => (
                                 <li key={item.href} className="footer-menu__item">
                                     <Link href={item.href} className="footer-menu__link">{item.label}</Link>
@@ -61,24 +63,24 @@ export default function Footer() {
                     </div>
 
                     <div className="footer-item">
-                        <h5 className="footer-item__title">Get Started</h5>
+                        <h5 className="footer-item__title">{t('Get Started')}</h5>
                         <ul className="footer-menu">
                             {auth?.user ? (
-                                <li className="footer-menu__item"><Link href={routes.userHome} className="footer-menu__link">Provider Dashboard</Link></li>
+                                <li className="footer-menu__item"><Link href={routes.userHome} className="footer-menu__link">{t('Provider Dashboard')}</Link></li>
                             ) : auth?.buyer ? (
-                                <li className="footer-menu__item"><Link href={routes.buyerHome} className="footer-menu__link">Customer Dashboard</Link></li>
+                                <li className="footer-menu__item"><Link href={routes.buyerHome} className="footer-menu__link">{t('Customer Dashboard')}</Link></li>
                             ) : (
                                 <>
-                                    <li className="footer-menu__item"><Link href={routes.buyerLogin} className="footer-menu__link">Customer Login</Link></li>
-                                    <li className="footer-menu__item"><Link href={routes.userLogin} className="footer-menu__link">Provider Login</Link></li>
+                                    <li className="footer-menu__item"><Link href={routes.buyerLogin} className="footer-menu__link">{t('Customer Login')}</Link></li>
+                                    <li className="footer-menu__item"><Link href={routes.userLogin} className="footer-menu__link">{t('Provider Login')}</Link></li>
                                 </>
                             )}
-                            <li className="footer-menu__item"><Link href={postJobUrl} className="footer-menu__link">Post a Requirement</Link></li>
+                            <li className="footer-menu__item"><Link href={postJobUrl} className="footer-menu__link">{t('Post a Requirement')}</Link></li>
                         </ul>
                     </div>
 
                     <div className="footer-item">
-                        <h5 className="footer-item__title">Terms</h5>
+                        <h5 className="footer-item__title">{t('Terms')}</h5>
                         <ul className="footer-menu">
                             {(data.policies || []).map((policy) => (
                                 <li key={policy.slug} className="footer-menu__item">
@@ -86,13 +88,13 @@ export default function Footer() {
                                 </li>
                             ))}
                             <li className="footer-menu__item">
-                                <Link href={routes.cookiePolicy} className="footer-menu__link">Cookie Policy</Link>
+                                <Link href={routes.cookiePolicy} className="footer-menu__link">{t('Cookie Policy')}</Link>
                             </li>
                         </ul>
                     </div>
 
                     <div className="footer-item">
-                        <h5 className="footer-item__title">Contact Us</h5>
+                        <h5 className="footer-item__title">{t('Contact Us')}</h5>
                         <ul className="footer-contact-menu">
                             <li className="footer-contact-menu__item">
                                 <div className="footer-contact-menu__item-icon"><i className="fas fa-map-marker-alt"></i></div>
@@ -113,7 +115,7 @@ export default function Footer() {
                         </ul>
 
                         <div className="social-list-wrapper">
-                            <p className="title">Follow Us</p>
+                            <p className="title">{t('Follow Us')}</p>
                             <ul className="social-list">
                                 {(data.socialIcons || []).map((social, index) => (
                                     <li key={index} className="social-list__item">
@@ -132,8 +134,8 @@ export default function Footer() {
                     <div className="row gy-3">
                         <div className="col-md-12 text-center">
                             <div className="bottom-footer-text">
-                                Copyright &copy;{new Date().getFullYear()}{' '}
-                                <Link href={routes.home}>{site.name}</Link> All rights reserved.
+                                {t('Copyright')} &copy;{new Date().getFullYear()}{' '}
+                                <Link href={routes.home}>{site.name}</Link> {t('All rights reserved.')}
                             </div>
                         </div>
                     </div>

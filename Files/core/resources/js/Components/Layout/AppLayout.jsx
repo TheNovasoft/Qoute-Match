@@ -7,6 +7,7 @@ import { initTemplateSliders } from '@/utils/sliders';
 import { initTemplateInteractions, patchBootstrapModalBridge } from '@/utils/templateInteractions';
 import NotifyScripts from '@/Components/Shared/NotifyScripts';
 import CookieBanner from '@/Components/Shared/CookieBanner';
+import SiteLocaleTranslator from '@/Components/Shared/SiteLocaleTranslator';
 
 export default function AppLayout({ children, pageTitle, seo, showPreloader = true }) {
     const { site, template, seoDefaults, canonicalUrl, flash, errors, routes } = usePage().props;
@@ -125,6 +126,7 @@ export default function AppLayout({ children, pageTitle, seo, showPreloader = tr
 
             {children}
 
+            <SiteLocaleTranslator />
             <NotifyScripts />
             <CookieBanner />
         </>

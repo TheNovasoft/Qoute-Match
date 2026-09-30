@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import FrontendLayout from '@/Components/Layout/FrontendLayout';
 import JobCard from '@/Components/Jobs/JobCard';
 import Pagination, { EmptyState } from '@/Components/Shared/Pagination';
+import { useT } from '@/hooks/useT';
 
 export default function Jobs({
     pageTitle,
@@ -15,6 +16,7 @@ export default function Jobs({
     invitedBy,
     totalJobs = 0,
 }) {
+    const t = useT();
     const [localFilters, setLocalFilters] = useState({
         min_budget: filters.min_budget || '',
         max_budget: filters.max_budget || '',
@@ -70,17 +72,17 @@ export default function Jobs({
                                     <div className="accordion-item">
                                         <h2 className="accordion-header">
                                             <button className="accordion-button" data-bs-toggle="collapse" data-bs-target="#budget" type="button">
-                                                Budget
+                                                {t('Budget')}
                                             </button>
                                         </h2>
                                         <div className="accordion-collapse show collapse" id="budget">
                                             <div className="accordion-body">
                                                 <div className="project-value">
-                                                    <input className="form--control" type="number" placeholder="Min"
+                                                    <input className="form--control" type="number" placeholder={t('Min')}
                                                         value={localFilters.min_budget}
                                                         onChange={(e) => setLocalFilters({ ...localFilters, min_budget: e.target.value })} />
-                                                    <span className="project-value__text">to</span>
-                                                    <input className="form--control" type="number" placeholder="Max"
+                                                    <span className="project-value__text">{t('to')}</span>
+                                                    <input className="form--control" type="number" placeholder={t('Max')}
                                                         value={localFilters.max_budget}
                                                         onChange={(e) => setLocalFilters({ ...localFilters, max_budget: e.target.value })} />
                                                 </div>
@@ -92,7 +94,7 @@ export default function Jobs({
                                 <div className="filter-block">
                                     <h2 className="accordion-header">
                                         <button className="accordion-button" data-bs-toggle="collapse" data-bs-target="#category" type="button">
-                                            Categories
+                                            {t('Categories')}
                                         </button>
                                     </h2>
                                     <div className="accordion-collapse show collapse" id="category">
@@ -104,7 +106,7 @@ export default function Jobs({
                                                             checked={!localFilters.category_id}
                                                             onChange={() => setLocalFilters({ ...localFilters, category_id: '' })} />
                                                         <label className="form-check-label" htmlFor="subcat_all">
-                                                            <span className="label-text">All</span>
+                                                            <span className="label-text">{t('All')}</span>
                                                             <span className="label-text"> ({totalCategoryJobs})</span>
                                                         </label>
                                                     </div>
@@ -131,7 +133,7 @@ export default function Jobs({
                                     <div className="accordion-item">
                                         <h2 className="accordion-header">
                                             <button className="accordion-button" data-bs-toggle="collapse" data-bs-target="#subcategory" type="button">
-                                                Specialities
+                                                {t('Specialities')}
                                             </button>
                                         </h2>
                                         <div className="accordion-collapse show collapse" id="subcategory">
@@ -160,16 +162,16 @@ export default function Jobs({
                                     <div className="accordion-item">
                                         <h2 className="accordion-header">
                                             <button className="accordion-button" data-bs-toggle="collapse" data-bs-target="#scope" type="button">
-                                                Project Scope
+                                                {t('Project Scope')}
                                             </button>
                                         </h2>
                                         <div className="accordion-collapse show collapse" id="scope">
                                             <div className="accordion-body">
                                                 <ul className="filter-block__list">
                                                     {[
-                                                        { id: 'large', value: '1', label: 'Large', count: counting.large },
-                                                        { id: 'medium', value: '2', label: 'Medium', count: counting.medium },
-                                                        { id: 'small', value: '3', label: 'Small', count: counting.small },
+                                                        { id: 'large', value: '1', label: t('Large'), count: counting.large },
+                                                        { id: 'medium', value: '2', label: t('Medium'), count: counting.medium },
+                                                        { id: 'small', value: '3', label: t('Small'), count: counting.small },
                                                     ].map((scope) => (
                                                         <li key={scope.id} className="filter-block__item">
                                                             <div className="form--check">
@@ -193,17 +195,17 @@ export default function Jobs({
                                     <div className="accordion-item">
                                         <h2 className="accordion-header">
                                             <button className="accordion-button" data-bs-toggle="collapse" data-bs-target="#level" type="button">
-                                                Experience Level
+                                                {t('Experience Level')}
                                             </button>
                                         </h2>
                                         <div className="accordion-collapse show collapse" id="level">
                                             <div className="accordion-body">
                                                 <ul className="filter-block__list">
                                                     {[
-                                                        { id: 'pro-level', value: '1', label: 'Pro Level', count: counting.pro },
-                                                        { id: 'expert', value: '2', label: 'Expert', count: counting.expert },
-                                                        { id: 'intermediate', value: '3', label: 'Intermediate', count: counting.intermediate },
-                                                        { id: 'entry', value: '4', label: 'Entry', count: counting.entry },
+                                                        { id: 'pro-level', value: '1', label: t('Pro Level'), count: counting.pro },
+                                                        { id: 'expert', value: '2', label: t('Expert'), count: counting.expert },
+                                                        { id: 'intermediate', value: '3', label: t('Intermediate'), count: counting.intermediate },
+                                                        { id: 'entry', value: '4', label: t('Entry'), count: counting.entry },
                                                     ].map((level) => (
                                                         <li key={level.id} className="filter-block__item">
                                                             <div className="form--check">
@@ -231,7 +233,7 @@ export default function Jobs({
                             </div>
                             <div className="job-category-body__top">
                                 <div className="search-container">
-                                    <input className="form--control" type="search" placeholder="Type job keyword"
+                                    <input className="form--control" type="search" placeholder={t('Type job keyword')}
                                         value={localFilters.search}
                                         onChange={(e) => setLocalFilters({ ...localFilters, search: e.target.value })} />
                                     <span className="search-container__icon"><i className="las la-search"></i></span>
@@ -246,7 +248,7 @@ export default function Jobs({
                                 {jobs.data?.length ? jobs.data.map((job) => (
                                     <JobCard key={job.id} job={job} />
                                 )) : (
-                                    <EmptyState message="No job found!" />
+                                    <EmptyState message={t('No job found!')} />
                                 )}
                                 {jobs.links?.length > 3 && <Pagination links={jobs.links} />}
                             </div>

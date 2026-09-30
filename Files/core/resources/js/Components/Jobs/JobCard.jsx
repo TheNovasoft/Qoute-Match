@@ -1,7 +1,10 @@
 import { Link } from '@inertiajs/react';
 import VerificationBadges from '@/Components/Shared/VerificationBadges';
+import { useT } from '@/hooks/useT';
 
 export default function JobCard({ job }) {
+    const t = useT();
+
     return (
         <div className={`expert-developer${job.isExpired ? ' expert-developer--expired' : ''}`}>
             {job.isExpired && job.expiredLabel && (
@@ -20,20 +23,20 @@ export default function JobCard({ job }) {
                     <div className="job-information-area">
                         <div>
                             <span className="title">
-                                Budget <sup>[{job.customBudget ? 'Customized' : 'Fixed'}]</sup>
+                                {t('Budget')} <sup>[{job.customBudget ? t('Customized') : t('Fixed')}]</sup>
                             </span>
                             <p className="text">{job.budget}</p>
                         </div>
                         <div>
-                            <span className="title">Experience level</span>
+                            <span className="title">{t('Experience level')}</span>
                             <p className="text">{job.skillLevel}</p>
                         </div>
                     </div>
                 </div>
                 <div className="right">
-                    <Link href={job.url} target="_blank" className="btn btn--base btn--xsm">Bid Now</Link>
+                    <Link href={job.url} target="_blank" className="btn btn--base btn--xsm">{t('Bid Now')}</Link>
                     <p className="total-bid mt-1">
-                        <span className="text">Bids: {job.bidsCount}</span>
+                        <span className="text">{t('Bids')}: {job.bidsCount}</span>
                     </p>
                 </div>
             </div>
@@ -47,7 +50,7 @@ export default function JobCard({ job }) {
             </ul>
             {job.skillMatch !== null && job.skillMatch !== undefined && (
                 <div className="skill-match mt-2">
-                    <small className="d-block mb-1">Skill Match</small>
+                    <small className="d-block mb-1">{t('Skill Match')}</small>
                     <div className="progress">
                         <div className={`progress-bar ${job.skillMatchBar}`} style={{ width: `${job.skillMatch}%`, minWidth: '25px' }}>
                             {job.skillMatch}%
@@ -56,11 +59,11 @@ export default function JobCard({ job }) {
                 </div>
             )}
             {job.postcodeMatch && (
-                <span className="badge badge--success badge--sm mt-2">Postcode area match</span>
+                <span className="badge badge--success badge--sm mt-2">{t('Postcode area match')}</span>
             )}
             {job.matchScore !== null && job.matchScore !== undefined && (
                 <div className="skill-match mt-2">
-                    <small className="d-block mb-1">Location & Service Match</small>
+                    <small className="d-block mb-1">{t('Location & Service Match')}</small>
                     <div className="progress">
                         <div className={`progress-bar ${job.matchScoreBar}`} style={{ width: `${job.matchScore}%`, minWidth: '25px' }}>
                             {job.matchScore}%
@@ -73,6 +76,8 @@ export default function JobCard({ job }) {
 }
 
 export function BidFreelancerCard({ freelancer }) {
+    const t = useT();
+
     return (
         <div className="bid-item">
             <Link href={freelancer.profileUrl} className="bid-item__thumb">
@@ -86,14 +91,14 @@ export function BidFreelancerCard({ freelancer }) {
                                 {freelancer.fullname}
                                 <VerificationBadges badges={freelancer.verificationBadges} compact />
                             </p>
-                            <Link href={freelancer.profileUrl} className="btn btn--base btn--xsm">View Profile</Link>
+                            <Link href={freelancer.profileUrl} className="btn btn--base btn--xsm">{t('View Profile')}</Link>
                         </div>
                         <div className="d-flex aligns-items-center gap-2 justify-content-start flex-wrap my-2">
                             <div className="location">
                                 <p className="text"><i className="las la-globe"></i>{freelancer.country}</p>
                             </div>
-                            <span className="text">{freelancer.successPercent}% Job Success</span>
-                            <span className="text">Total Earned {freelancer.totalEarned}</span>
+                            <span className="text">{freelancer.successPercent}% {t('Job Success')}</span>
+                            <span className="text">{t('Total Earned')} {freelancer.totalEarned}</span>
                             {freelancer.badge && <span className="text">{freelancer.badge.name}</span>}
                         </div>
                         <div className="freelancer-title">{freelancer.tagline}</div>
@@ -101,7 +106,7 @@ export function BidFreelancerCard({ freelancer }) {
                             {[...Array(Math.min(Math.floor(freelancer.avgRating), 5))].map((_, i) => (
                                 <li key={i} className="review-rating-list__item"><i className="las la-star"></i></li>
                             ))}
-                            <li className="rating-list__number">({freelancer.reviewsCount} reviews)</li>
+                            <li className="rating-list__number">({freelancer.reviewsCount} {t('reviews')})</li>
                         </ul>
                     </div>
                 </div>
@@ -112,12 +117,14 @@ export function BidFreelancerCard({ freelancer }) {
 }
 
 export function SimilarJobItem({ job }) {
+    const t = useT();
+
     return (
         <li className="job-list__item">
             <Link href={job.url} className="job-list__link">{job.title}</Link>
             <div className="d-flex align-items-center gap-3">
                 <span className="text">{job.timeLabel}</span>
-                <span className="text">Deadline {job.deadline}</span>
+                <span className="text">{t('Deadline')} {job.deadline}</span>
             </div>
         </li>
     );

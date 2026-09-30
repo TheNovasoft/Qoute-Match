@@ -20,7 +20,12 @@ class FrontendNavigation
         $pages = Page::where('is_default', Status::NO)
             ->where('tempname', activeTemplate())
             ->orderBy('id', 'DESC')
-            ->get(['id', 'name', 'slug']);
+            ->get(['id', 'name', 'slug'])
+            ->map(function (Page $page) {
+                $page->name = __($page->name);
+
+                return $page;
+            });
 
         $aboutPage = $pages->first(function (Page $page) {
             $slug = strtolower($page->slug);
@@ -38,10 +43,10 @@ class FrontendNavigation
             'aboutPage' => $aboutPage,
             'extraPages' => $extraPages,
             'extraLinks' => [
-                ['label' => 'Browse Requests', 'href' => route('freelance.jobs')],
-                ['label' => 'Find Providers', 'href' => route('all.freelancers')],
-                ['label' => 'Locations', 'href' => route('locations')],
-                ['label' => 'FAQ', 'href' => route('faq')],
+                ['label' => __('Browse Requests'), 'href' => route('freelance.jobs')],
+                ['label' => __('Find Providers'), 'href' => route('all.freelancers')],
+                ['label' => __('Locations'), 'href' => route('locations')],
+                ['label' => __('FAQ'), 'href' => route('faq')],
             ],
         ];
     }

@@ -1,7 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
 import FrontendLayout from '@/Components/Layout/FrontendLayout';
+import { useT } from '@/hooks/useT';
 
 export default function Categories({ pageTitle, seo, categories }) {
+    const t = useT();
+
     return (
         <FrontendLayout pageTitle={pageTitle} seo={seo}>
             <section className="pb-120">
@@ -9,7 +12,7 @@ export default function Categories({ pageTitle, seo, categories }) {
                     <div className="row justify-content-center mb-5">
                         <div className="col-lg-8 text-center">
                             <p className="section-heading__desc mb-0">
-                                Choose a category to post your requirement or browse open requests from verified providers.
+                                {t('Choose a category to post your requirement or browse open requests from verified providers.')}
                             </p>
                         </div>
                     </div>
@@ -35,8 +38,8 @@ export default function Categories({ pageTitle, seo, categories }) {
                                     </div>
                                     <div className="category-browse-card__body">
                                         <p className="category-browse-card__meta">
-                                            {category.subcategories.length} subcategories
-                                            {category.jobsCount > 0 && ` · ${category.jobsCount} open requests`}
+                                            {category.subcategories.length} {t('subcategories')}
+                                            {category.jobsCount > 0 && ` · ${category.jobsCount} ${t('open requests')}`}
                                         </p>
                                         <div className="category-browse-card__tags">
                                             {category.subcategories.slice(0, 6).map((sub) => (
@@ -46,13 +49,13 @@ export default function Categories({ pageTitle, seo, categories }) {
                                             ))}
                                             {category.subcategories.length > 6 && (
                                                 <Link href={category.url} className="category-tag category-tag--more">
-                                                    +{category.subcategories.length - 6} more
+                                                    +{category.subcategories.length - 6} {t('more')}
                                                 </Link>
                                             )}
                                         </div>
                                         <div className="d-flex flex-wrap gap-2 mt-3">
                                             <Link href={category.url} className="btn btn--base btn--sm">
-                                                View Subcategories
+                                                {t('View Subcategories')}
                                             </Link>
                                         </div>
                                     </div>

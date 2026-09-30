@@ -76,6 +76,24 @@ function SuccessContent({ job, buyerLoggedIn }) {
                                                     : 'Thanks — your request is in review. You will get an email as soon as it is approved and appears on Find Jobs. Manage it anytime from your customer account.',
                                         )}
                                     </p>
+                                    {(job.email || job.temp_password) && (
+                                        <div className="text-start border rounded-3 p-3 mb-4 bg-light">
+                                            <p className="mb-2 fw-semibold">{tx('Your login details')}</p>
+                                            {job.email && (
+                                                <p className="mb-1 small">
+                                                    {tx('Email')}: <strong>{job.email}</strong>
+                                                </p>
+                                            )}
+                                            {job.temp_password && (
+                                                <p className="mb-0 small">
+                                                    {tx('Temporary password')}: <strong>{job.temp_password}</strong>
+                                                </p>
+                                            )}
+                                            <p className="mb-0 mt-2 small text-muted">
+                                                {tx('We also emailed these details. If the inbox is empty, check spam or use the password above to sign in.')}
+                                            </p>
+                                        </div>
+                                    )}
                                 </>
                             )}
 

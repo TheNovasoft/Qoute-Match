@@ -1,4 +1,5 @@
 ﻿import FrontendLayout from '@/Components/Layout/FrontendLayout';
+import { useT } from '@/hooks/useT';
 
 const customerFaq = [
     { q: 'How do I post a job?', a: 'Register or use guest post, describe your job in the step-by-step wizard, then publish. Providers will send you free quotes.' },
@@ -17,27 +18,29 @@ const providerFaq = [
 ];
 
 export default function Faq({ pageTitle, seo }) {
+    const t = useT();
+
     return (
         <FrontendLayout pageTitle={pageTitle} seo={seo}>
             <section className="py-5">
                 <div className="container">
                     <div className="row justify-content-center">
                         <div className="col-lg-10">
-                            <h1 className="mb-2">Help & FAQ</h1>
-                            <p className="text-muted mb-5">Quick answers for customers and providers.</p>
+                            <h1 className="mb-2">{t('Help & FAQ')}</h1>
+                            <p className="text-muted mb-5">{t('Quick answers for customers and providers.')}</p>
 
                             <div className="faq-section faq-section--customer mb-5">
-                                <h4 className="faq-section__title mb-3">For Customers</h4>
+                                <h4 className="faq-section__title mb-3">{t('For Customers')}</h4>
                                 <div className="accordion faq-section__accordion" id="customerFaq">
                                 {customerFaq.map((item, index) => (
                                     <div className="accordion-item" key={item.q}>
                                         <h2 className="accordion-header">
                                             <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#customer-faq-${index}`}>
-                                                {item.q}
+                                                {t(item.q)}
                                             </button>
                                         </h2>
                                         <div id={`customer-faq-${index}`} className="accordion-collapse collapse" data-bs-parent="#customerFaq">
-                                            <div className="accordion-body">{item.a}</div>
+                                            <div className="accordion-body">{t(item.a)}</div>
                                         </div>
                                     </div>
                                 ))}
@@ -45,17 +48,17 @@ export default function Faq({ pageTitle, seo }) {
                             </div>
 
                             <div className="faq-section faq-section--provider">
-                                <h4 className="faq-section__title mb-3">For Providers</h4>
+                                <h4 className="faq-section__title mb-3">{t('For Providers')}</h4>
                                 <div className="accordion faq-section__accordion" id="providerFaq">
                                 {providerFaq.map((item, index) => (
                                     <div className="accordion-item" key={item.q}>
                                         <h2 className="accordion-header">
                                             <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#provider-faq-${index}`}>
-                                                {item.q}
+                                                {t(item.q)}
                                             </button>
                                         </h2>
                                         <div id={`provider-faq-${index}`} className="accordion-collapse collapse" data-bs-parent="#providerFaq">
-                                            <div className="accordion-body">{item.a}</div>
+                                            <div className="accordion-body">{t(item.a)}</div>
                                         </div>
                                     </div>
                                 ))}

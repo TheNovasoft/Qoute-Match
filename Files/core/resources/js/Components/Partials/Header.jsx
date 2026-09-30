@@ -4,15 +4,17 @@ import LanguageSwitcher from '@/Components/Partials/LanguageSwitcher';
 import { isNavActive } from '@/utils/helpers';
 
 export default function Header() {
-    const { site, navigation, routes, auth, url } = usePage().props;
+    const { site, navigation, routes, auth, url, locale } = usePage().props;
     const currentUrl = usePage().url || url || '';
     const aboutPage = navigation?.aboutPage;
     const extraPages = navigation?.extraPages || [];
     const extraLinks = navigation?.extraLinks || [];
     const postJobUrl = auth?.buyer ? routes.buyerJobPost : routes.postJob;
+    const t = locale?.strings ?? {};
+    const tr = (key, fallback = key) => t[key] || fallback;
 
     const aboutHref = aboutPage ? `/${aboutPage.slug}` : `${routes.home}#about`;
-    const aboutLabel = aboutPage?.name || 'About';
+    const aboutLabel = tr(aboutPage?.name || 'About', aboutPage?.name || 'About');
     const hasExtraMenu = extraPages.length > 0 || extraLinks.length > 0;
 
     const navClass = (href, exact = false) =>
@@ -31,7 +33,7 @@ export default function Header() {
 
                     <div className="d-xl-none d-block job-link">
                         <Link href={postJobUrl} className="btn btn--base btn--sm header-post-job-btn">
-                            Post Job
+                            {tr('Post Job')}
                         </Link>
                     </div>
 
@@ -52,19 +54,19 @@ export default function Header() {
                     <div className="collapse navbar-collapse justify-content-xl-center" id="navbarSupportedContent">
                         <ul className="navbar-nav nav-menu mx-xl-auto align-items-xl-center justify-content-xl-center">
                             <li className={`nav-item${isNavActive(currentUrl, routes.home, { exact: true }) ? ' active' : ''}`}>
-                                <Link className={navClass(routes.home, true)} href={routes.home}>Home</Link>
+                                <Link className={navClass(routes.home, true)} href={routes.home}>{tr('Home')}</Link>
                             </li>
                             <li className={`nav-item${isNavActive(currentUrl, aboutHref, { exact: !aboutPage }) ? ' active' : ''}`}>
                                 <Link className={navClass(aboutHref, !aboutPage)} href={aboutHref}>{aboutLabel}</Link>
                             </li>
                             <li className={`nav-item${isNavActive(currentUrl, routes.categories) ? ' active' : ''}`}>
-                                <Link className={navClass(routes.categories)} href={routes.categories}>Category</Link>
+                                <Link className={navClass(routes.categories)} href={routes.categories}>{tr('Category')}</Link>
                             </li>
                             <li className={`nav-item${isNavActive(currentUrl, routes.blogs) ? ' active' : ''}`}>
-                                <Link className={navClass(routes.blogs)} href={routes.blogs}>Blogs</Link>
+                                <Link className={navClass(routes.blogs)} href={routes.blogs}>{tr('Blogs')}</Link>
                             </li>
                             <li className={`nav-item${isNavActive(currentUrl, routes.contact, { exact: true }) ? ' active' : ''}`}>
-                                <Link className={navClass(routes.contact, true)} href={routes.contact}>Contact</Link>
+                                <Link className={navClass(routes.contact, true)} href={routes.contact}>{tr('Contact')}</Link>
                             </li>
 
                             {hasExtraMenu && (
@@ -76,7 +78,7 @@ export default function Header() {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                     >
-                                        Explore <span className="nav-item__icon"><i className="las la-angle-down"></i></span>
+                                        {tr('Explore')} <span className="nav-item__icon"><i className="las la-angle-down"></i></span>
                                     </a>
                                     <ul className="dropdown-menu">
                                         {extraLinks.map((item) => (
@@ -104,11 +106,11 @@ export default function Header() {
                             )}
 
                             <li className="nav-item d-xl-none">
-                                <Link className="nav-link fw-semibold text--base" href={postJobUrl}>Post Job</Link>
+                                <Link className="nav-link fw-semibold text--base" href={postJobUrl}>{tr('Post Job')}</Link>
                             </li>
                             <li className="nav-item d-xl-none w-100">
                                 <LanguageSwitcher className="mb-3" />
-                                <HeaderAuthLinks routes={routes} auth={auth} compact />
+                                <HeaderAuthLinks routes={routes} auth={auth} compact labels={{ dashboard: tr('Dashboard'), join: tr('Join') }} />
                             </li>
                         </ul>
                     </div>
@@ -116,8 +118,8 @@ export default function Header() {
                     <div className="d-xl-block d-none header-actions">
                         <div className="top-button d-flex align-items-center gap-3">
                             <LanguageSwitcher />
-                            <HeaderAuthLinks routes={routes} auth={auth} />
-                            <Link href={postJobUrl} className="btn btn--base header-post-job-btn">Post Job</Link>
+                            <HeaderAuthLinks routes={routes} auth={auth} labels={{ dashboard: tr('Dashboard'), join: tr('Join') }} />
+                            <Link href={postJobUrl} className="btn btn--base header-post-job-btn">{tr('Post Job')}</Link>
                         </div>
                     </div>
                 </nav>

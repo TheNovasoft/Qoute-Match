@@ -467,10 +467,11 @@ function collectKeywords(data, categories, categoryForms) {
     return parts.filter(Boolean).join(' ').toLowerCase();
 }
 
-export function generateTitle(data, categories, categoryForms = {}) {
+export function generateTitle(data, categories, categoryForms = {}, locale = 'en') {
+    const isUr = String(locale || 'en').toLowerCase().startsWith('ur');
     const category = categories.find((c) => String(c.id) === String(data.category_id));
     const sub = category?.subcategories?.find((s) => String(s.id) === String(data.subcategory_id));
-    const serviceName = sub?.name || category?.name || 'Project';
+    const serviceName = sub?.name || category?.name || (isUr ? 'پروجیکٹ' : 'Project');
     const context = getDynamicContext(data, categoryForms, data.category_id);
 
     if (data.container_type) {
@@ -491,29 +492,34 @@ export function generateTitle(data, categories, categoryForms = {}) {
         return `${serviceName} — ${context.postcode}`.slice(0, 70);
     }
 
-    return `${serviceName} Specialist Needed`.slice(0, 70);
+    return (isUr ? `${serviceName} ماہر درکار` : `${serviceName} Specialist Needed`).slice(0, 70);
 }
 
-function naturalFieldSentence(name, value) {
+function naturalFieldSentence(name, value, isUr = false) {
     const label = String(name || '').toLowerCase();
     const text = displayValue(value);
 
     if (label.includes('postcode') || label.includes('post code')) {
-        return `The job site is in postcode ${text}.`;
+        return isUr ? `نوکری کی سائٹ کا پوسٹ کوڈ ${text} ہے۔` : `The job site is in postcode ${text}.`;
     }
     if (label.includes('property type')) {
-        return `The property type is a ${text.toLowerCase()}.`;
+        return isUr
+            ? `پراپرٹی کی قسم ${text} ہے۔`
+            : `The property type is a ${text.toLowerCase()}.`;
     }
     if (label.includes('timeline') || label.includes('urgency')) {
-        return `My preferred start/completion window is ${timelinePhrase(text) || text.toLowerCase()}.`;
+        const window = timelinePhrase(text) || text.toLowerCase();
+        return isUr
+            ? `میری پسندیدہ شروع/تکمیل ونڈو ${window} ہے۔`
+            : `My preferred start/completion window is ${window}.`;
     }
     if (label.includes('access') || label.includes('parking')) {
-        return `Please note regarding access: ${text}.`;
+        return isUr ? `رسائی کے بارے میں نوٹ کریں: ${text}۔` : `Please note regarding access: ${text}.`;
     }
     if (label.includes('material')) {
-        return `Materials preference: ${text}.`;
+        return isUr ? `مواد کی ترجیح: ${text}۔` : `Materials preference: ${text}.`;
     }
-    return `${sentenceCase(name)} is ${text}.`;
+    return isUr ? `${sentenceCase(name)}: ${text}۔` : `${sentenceCase(name)} is ${text}.`;
 }
 
 function experienceLabel(level) {
@@ -533,51 +539,73 @@ function longevityLabel(longevity) {
     }[String(longevity)] || 'flexible');
 }
 
-export function generateDescription(data, categories, categoryForms) {
+export function generateDescription(data, categories, categoryForms, locale = 'en') {
+    const isUr = String(locale || 'en').toLowerCase().startsWith('ur');
     const category = categories.find((c) => String(c.id) === String(data.category_id));
     const sub = category?.subcategories?.find((s) => String(s.id) === String(data.subcategory_id));
-    const serviceLabel = sub?.name || category?.name || 'this project';
+    const serviceLabel = sub?.name || category?.name || (isUr ? 'اس پروجیکٹ' : 'this project');
     const categoryPath = [category?.name, sub?.name].filter(Boolean).join(' › ');
     const context = getDynamicContext(data, categoryForms, data.category_id);
     const paragraphs = [];
+    const path = categoryPath || serviceLabel;
 
     paragraphs.push(
-        `I'm looking to hire a qualified professional for ${serviceLabel.toLowerCase()} `
-        + `(category: ${categoryPath || serviceLabel}). `
-        + 'Please review the details below and send a competitive quote.',
+        isUr
+            ? `میں ${serviceLabel} کے لیے ایک اہل پیشہ ور کو ہائر کرنا چاہتا ہوں (زمرہ: ${path})۔ براہ کرم نیچے دی گئی تفصیلات دیکھیں اور مسابقتی کوٹ بھیجیں۔`
+            : `I'm looking to hire a qualified professional for ${String(serviceLabel).toLowerCase()} `
+                + `(category: ${path}). `
+                + 'Please review the details below and send a competitive quote.',
     );
 
     const scopeParts = [];
 
     if (context.origin && context.destination) {
-        scopeParts.push(`The shipment route is from ${context.origin} to ${context.destination}.`);
+        scopeParts.push(
+            isUr
+                ? `شپمنٹ کا راستہ ${context.origin} سے ${context.destination} تک ہے۔`
+                : `The shipment route is from ${context.origin} to ${context.destination}.`,
+        );
     } else if (context.origin) {
-        scopeParts.push(`Origin: ${context.origin}.`);
+        scopeParts.push(isUr ? `آغاز: ${context.origin}۔` : `Origin: ${context.origin}.`);
     } else if (context.destination) {
-        scopeParts.push(`Destination: ${context.destination}.`);
+        scopeParts.push(isUr ? `منزل: ${context.destination}۔` : `Destination: ${context.destination}.`);
     }
 
     if (context.postcode) {
-        scopeParts.push(`The job location postcode is ${context.postcode}.`);
+        scopeParts.push(
+            isUr
+                ? `نوکری کے مقام کا پوسٹ کوڈ ${context.postcode} ہے۔`
+                : `The job location postcode is ${context.postcode}.`,
+        );
     }
 
     if (context.location) {
-        scopeParts.push(`Additional location details: ${context.location}.`);
+        scopeParts.push(
+            isUr
+                ? `اضافی مقام کی تفصیلات: ${context.location}۔`
+                : `Additional location details: ${context.location}.`,
+        );
     }
 
     if (context.platform) {
-        scopeParts.push(`Preferred platform/technology: ${context.platform}.`);
+        scopeParts.push(
+            isUr
+                ? `پسندیدہ پلیٹ فارم/ٹیکنالوجی: ${context.platform}۔`
+                : `Preferred platform/technology: ${context.platform}.`,
+        );
     }
 
     if (data.container_type) {
         scopeParts.push(
-            `Container requirement: ${data.container_type}. `
-            + 'Please factor in loading, documentation, and any applicable freight charges.',
+            isUr
+                ? `کنٹینر کی ضرورت: ${data.container_type}۔ براہ کرم لوڈنگ، دستاویزات اور قابل اطلاق فریٹ چارجز شامل کریں۔`
+                : `Container requirement: ${data.container_type}. `
+                    + 'Please factor in loading, documentation, and any applicable freight charges.',
         );
     }
 
     context.extras.forEach((item) => {
-        scopeParts.push(naturalFieldSentence(item.name, item.value));
+        scopeParts.push(naturalFieldSentence(item.name, item.value, isUr));
     });
 
     if (scopeParts.length) {
@@ -585,14 +613,24 @@ export function generateDescription(data, categories, categoryForms) {
     }
 
     paragraphs.push(
-        'When you respond, please include:\n'
-        + '• Your estimated price and what is included\n'
-        + '• How soon you can start and expected completion time\n'
-        + '• Relevant experience with similar jobs\n'
-        + '• Any questions about access, materials, cargo details, or site conditions',
+        isUr
+            ? 'جواب دیتے وقت براہ کرم شامل کریں:\n'
+                + '• آپ کی تخمینی قیمت اور اس میں کیا شامل ہے\n'
+                + '• آپ کتنی جلدی شروع کر سکتے ہیں اور متوقع تکمیل کا وقت\n'
+                + '• ملتے جلتے کاموں کا متعلقہ تجربہ\n'
+                + '• رسائی، مواد، کارگو تفصیلات، یا سائٹ کے حالات کے بارے میں کوئی سوالات'
+            : 'When you respond, please include:\n'
+                + '• Your estimated price and what is included\n'
+                + '• How soon you can start and expected completion time\n'
+                + '• Relevant experience with similar jobs\n'
+                + '• Any questions about access, materials, cargo details, or site conditions',
     );
 
-    paragraphs.push('Thank you — I look forward to reviewing your quote.');
+    paragraphs.push(
+        isUr
+            ? 'شکریہ — میں آپ کا کوٹ دیکھنے کا منتظر ہوں۔'
+            : 'Thank you — I look forward to reviewing your quote.',
+    );
 
     return paragraphs.join('\n\n').trim();
 }

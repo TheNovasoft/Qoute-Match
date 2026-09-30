@@ -31,7 +31,7 @@ class SiteController extends Controller
 {
     public function index()
     {
-        $pageTitle   = 'Home';
+        $pageTitle   = __('Home');
         $sections    = Page::where('tempname', activeTemplate())->where('slug', '/')->first();
         $seoContents = $sections->seo_content;
         $seoImage    = @$seoContents->image ? getImage(getFilePath('seo') . '/' . @$seoContents->image, getFileSize('seo')) : null;
@@ -54,10 +54,10 @@ class SiteController extends Controller
             ->get();
 
         return Inertia::render('Public/Categories', [
-            'pageTitle' => 'Browse Categories',
+            'pageTitle' => __('Browse Categories'),
             'seo' => [
-                'title' => 'Browse Categories | QuoteMatch',
-                'description' => 'Browse builders, home improvement, freight forwarding, and logistics categories. Post a requirement and compare quotes.',
+                'title' => __('Browse Categories') . ' | QuoteMatch',
+                'description' => __('Browse builders, home improvement, freight forwarding, and logistics categories. Post a requirement and compare quotes.'),
                 'canonical' => route('categories'),
             ],
             'categories' => InertiaResource::categoryTree($categories),
@@ -100,10 +100,10 @@ class SiteController extends Controller
             ->all();
 
         return Inertia::render('Public/Locations', [
-            'pageTitle' => 'Service Locations',
+            'pageTitle' => __('Service Locations'),
             'seo' => [
-                'title' => 'Service Locations | QuoteMatch',
-                'description' => 'Browse UK locations and compare quotes from verified builders, tradespeople, and freight providers near you.',
+                'title' => __('Service Locations') . ' | QuoteMatch',
+                'description' => __('Browse UK locations and compare quotes from verified builders, tradespeople, and freight providers.'),
                 'canonical' => route('locations'),
             ],
             'locations' => $locations,
@@ -208,7 +208,7 @@ class SiteController extends Controller
 
     public function allFreelancers(Request $request)
     {
-        $pageTitle = "Talent Freelancers";
+        $pageTitle = __("Talent Freelancers");
         $sort = $request->get('sort', 'recommended');
         $mainQuery = User::active();
         if ($request->rating && in_array($request->rating, [1, 2, 3, 4, 5])) {
@@ -270,7 +270,7 @@ class SiteController extends Controller
     public function pages($slug)
     {
         $page        = Page::where('tempname', activeTemplate())->where('slug', $slug)->firstOrFail();
-        $pageTitle   = $page->name;
+        $pageTitle   = __($page->name);
         $sections    = $page->secs;
         $seoContents = $page->seo_content;
         $seoImage    = @$seoContents->image ? getImage(getFilePath('seo') . '/' . @$seoContents->image, getFileSize('seo')) : null;
@@ -285,10 +285,10 @@ class SiteController extends Controller
     public function faq()
     {
         return Inertia::render('Public/Faq', [
-            'pageTitle' => 'Help & FAQ',
+            'pageTitle' => __('Help & FAQ'),
             'seo' => [
-                'title' => 'Help & FAQ | ' . gs('site_name'),
-                'description' => 'Answers for customers and providers using the marketplace.',
+                'title' => __('Help & FAQ') . ' | ' . gs('site_name'),
+                'description' => __('Answers for customers and providers using the marketplace.'),
                 'canonical' => route('faq'),
             ],
         ]);
@@ -296,7 +296,7 @@ class SiteController extends Controller
 
     public function contact()
     {
-        $pageTitle   = "Contact Us";
+        $pageTitle   = __("Contact Us");
         $user        = auth()->user();
         $sections    = Page::where('tempname', activeTemplate())->where('slug', 'contact')->first();
         $seoContents = $sections->seo_content;
@@ -378,7 +378,7 @@ class SiteController extends Controller
     public function policyPages($slug)
     {
         $policy = Frontend::where('tempname', activeTemplateName())->where('slug', $slug)->where('data_keys', 'policy_pages.element')->firstOrFail();
-        $pageTitle = $policy->data_values->title;
+        $pageTitle = __($policy->data_values->title);
         $seoContents = $policy->seo_content;
         $seoImage = $seoContents?->image ? frontendImage('policy_pages', $seoContents?->image, getFileSize('seo'), true) : null;
         return Inertia::render('Public/Policy', [
@@ -401,7 +401,7 @@ class SiteController extends Controller
 
     public function blogs()
     {
-        $pageTitle   = 'Blogs';
+        $pageTitle   = __('Blogs');
         $blogs       = Frontend::where('data_keys', 'blog.element')->latest()->orderByDesc('id')->orderByDesc('created_at')->paginate(getPaginate(18));
         $sections    = Page::where('tempname', activeTemplate())->where('slug', 'blog')->first();
         $seoContents = $sections->seo_content;
@@ -483,7 +483,7 @@ class SiteController extends Controller
     {
         $cookieContent = Frontend::where('data_keys', 'cookie.data')->first();
         abort_if($cookieContent->data_values->status != Status::ENABLE, 404);
-        $pageTitle = 'Cookie Policy';
+        $pageTitle = __('Cookie Policy');
         $cookie    = Frontend::where('data_keys', 'cookie.data')->first();
         return Inertia::render('Public/Cookie', [
             'pageTitle' => $pageTitle,
@@ -522,7 +522,7 @@ class SiteController extends Controller
 
     public function maintenance()
     {
-        $pageTitle = 'Maintenance Mode';
+        $pageTitle = __('Maintenance Mode');
         if (gs('maintenance_mode') == Status::DISABLE) {
             return to_route('home');
         }

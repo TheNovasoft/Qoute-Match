@@ -1,8 +1,10 @@
 import { Link } from '@inertiajs/react';
 import FrontendLayout from '@/Components/Layout/FrontendLayout';
+import { useT } from '@/hooks/useT';
 
 export default function BlogDetails({ pageTitle, seo, blog, latestBlogs, customPageTitle, customSubPageTitle, toRoute }) {
     const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const t = useT();
 
     return (
         <FrontendLayout pageTitle={pageTitle} seo={seo} customPageTitle={customPageTitle}
@@ -23,7 +25,7 @@ export default function BlogDetails({ pageTitle, seo, blog, latestBlogs, customP
                                     <h4 className="blog-details__title">{blog.title}</h4>
                                     <div className="blog-details__desc" dangerouslySetInnerHTML={{ __html: blog.description }} />
                                     <div className="blog-details__share mt-4 d-flex align-items-center flex-wrap justify-content-start">
-                                        <h6 className="social-share__title mb-0 me-sm-3 me-1 d-inline-block">Share :</h6>
+                                        <h6 className="social-share__title mb-0 me-sm-3 me-1 d-inline-block">{t('Share')} :</h6>
                                         <ul className="social-list">
                                             <li className="social-list__item">
                                                 <a href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} className="social-list__link flex-center" target="_blank" rel="noreferrer">
@@ -43,7 +45,7 @@ export default function BlogDetails({ pageTitle, seo, blog, latestBlogs, customP
                         <div className="col-xl-3 col-lg-4">
                             <div className="blog-sidebar-wrapper">
                                 <div className="blog-sidebar">
-                                    <h5 className="blog-sidebar__title">Latest Blogs</h5>
+                                    <h5 className="blog-sidebar__title">{t('Latest Blogs')}</h5>
                                 </div>
                                 <div className="blog-sidebar">
                                     {latestBlogs?.length ? latestBlogs.map((item) => (

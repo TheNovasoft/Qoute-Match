@@ -146,13 +146,29 @@ class TranslateController extends Controller
             return $translations;
         }
 
-        $responses = Http::pool(function ($pool) use ($pending, $from, $to) {
-            foreach ($pending as $index => $text) {
+        // Curated dictionary first — instant, no API quota.
+        $apiPending = [];
+        foreach ($pending as $text) {
+            $static = FormStaticTranslations::get($to, $text);
+            if ($static !== null && $static !== $text) {
+                $translations[$text] = $static;
+                FormTranslationCache::put($from, $to, $text, $static);
+                continue;
+            }
+            $apiPending[] = $text;
+        }
+
+        if ($apiPending === []) {
+            return $translations;
+        }
+
+        $responses = Http::pool(function ($pool) use ($apiPending, $from, $to) {
+            foreach ($apiPending as $index => $text) {
                 $pool->as((string) $index)->timeout(12)->get('https://api.mymemory.translated.net/get', $this->myMemoryQuery($text, $from, $to));
             }
         });
 
-        foreach ($pending as $index => $text) {
+        foreach ($apiPending as $index => $text) {
             $translation = $this->extractTranslation($responses[(string) $index] ?? null);
 
             if ($translation === null || $translation === $text) {
