@@ -12,8 +12,12 @@
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/slick.css') }}">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/main.css') }}">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/custom.css') }}">
+        <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/qm-marketplace.css') }}?v={{ @filemtime(base_path('../assets/templates/basic/css/qm-marketplace.css')) ?: time() }}">
+        <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/qm-for-providers.css') }}?v={{ @filemtime(base_path('../assets/templates/basic/css/qm-for-providers.css')) ?: time() }}">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/color.php') }}?color={{ gs('base_color') }}&secondColor={{ gs('secondary_color') }}">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/apple.css') }}?v={{ @filemtime(base_path('../assets/templates/basic/css/apple.css')) ?: time() }}">
+        <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/qm-theme.css') }}?v={{ @filemtime(base_path('../assets/templates/basic/css/qm-theme.css')) ?: time() }}">
+        <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/qm-home-fiverr.css') }}?v={{ @filemtime(base_path('../assets/templates/basic/css/qm-home-fiverr.css')) ?: time() }}">
     @else
         <link rel="stylesheet" href="{{ asset('assets/admin/css/app.css') }}">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/custom.css') }}">

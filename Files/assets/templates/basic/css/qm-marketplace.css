@@ -1,0 +1,945 @@
+/* Public marketplace UI (Fiverr-inspired) — site chrome only.
+   Do not style .dashboard / admin panels here. */
+
+/* ── Header: kill pill bg + main.css ::before underline ── */
+.qm-site-header.header {
+  position: sticky;
+  top: 0;
+  z-index: 1040;
+  background: #fff;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: none;
+}
+
+.qm-site-header .header-navbar {
+  min-height: 72px;
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+.qm-site-header .nav-menu .nav-item .nav-link,
+.qm-site-header .nav-menu .nav-link {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #222325 !important;
+  padding: 0.55rem 0.75rem !important;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: 0 !important;
+  position: relative;
+}
+
+.qm-site-header .nav-menu .nav-item .nav-link::before,
+.qm-site-header .nav-menu .nav-link::before,
+.qm-site-header .nav-menu .nav-item.active .nav-link::before,
+.qm-site-header .nav-menu .nav-item:hover .nav-link::before,
+.qm-site-header .nav-menu .nav-item .nav-link:hover::before {
+  content: none !important;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: none !important;
+}
+
+.qm-site-header .nav-menu .nav-link:hover,
+.qm-site-header .nav-menu .nav-item:hover > .nav-link,
+.qm-site-header .nav-menu .nav-item.active > .nav-link,
+.qm-site-header .nav-menu .nav-link.active {
+  color: hsl(var(--base)) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.qm-site-header .nav-menu .nav-item.active > .nav-link,
+.qm-site-header .nav-menu .nav-link.active {
+  font-weight: 700;
+}
+
+.qm-site-header .header-post-job-btn {
+  border-radius: 8px;
+  font-weight: 700;
+  padding-inline: 1.15rem;
+}
+
+.header-auth-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.header-auth-links--compact {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.header-signin-link {
+  font-weight: 700;
+  color: #222325;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.header-signin-link:hover {
+  color: hsl(var(--base));
+}
+
+.qm-site-header .header-join-btn {
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.qm-site-header .btn-outline--base,
+.qm-site-header .btn.btn-outline--base {
+  border-radius: 8px;
+  outline: none;
+  box-shadow: none;
+}
+
+/* ── Home banner ── */
+.qm-home-banner.banner-section {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+  background: linear-gradient(180deg, #fafafa 0%, #fff 70%);
+}
+
+.qm-home-banner .banner-content__title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: #222325;
+}
+
+.qm-home-banner .banner-content__desc {
+  font-size: 1.1rem;
+  color: #74767e;
+  max-width: 32rem;
+  margin-top: 0.85rem;
+}
+
+.qm-home-search {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  max-width: 520px;
+  margin: 1.35rem 0 1.25rem;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.qm-home-search__input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  background: transparent;
+  padding: 0.95rem 1.1rem;
+  font-size: 1rem;
+  color: #222325;
+  min-width: 0;
+}
+
+.qm-home-search__input::placeholder {
+  color: #95979d;
+}
+
+.qm-home-search__btn {
+  border-radius: 0 !important;
+  padding-inline: 1.35rem !important;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.qm-home-banner .btn--lg {
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+/* Hero badge links — keep original look, make clickable */
+body .banner-section a.banner-thumb-wrapper__item {
+  text-decoration: none !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  color: inherit !important;
+  -webkit-text-fill-color: inherit;
+}
+
+body .banner-section a.banner-thumb-wrapper__item:hover {
+  text-decoration: none !important;
+}
+
+body .banner-section .banner-thumb video {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  object-fit: cover;
+  display: block;
+  border-radius: inherit;
+}
+
+body .banner-section .banner-thumb .qm-banner-video,
+.banner-section .banner-thumb video.qm-banner-video {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  object-fit: cover;
+  display: block;
+  border-radius: inherit;
+}
+
+.qm-section-eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: hsl(var(--base));
+}
+
+/* ── Categories grid ── */
+.qm-categories .section-heading__title {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #222325;
+}
+
+.qm-category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.qm-category-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.qm-category-card:hover {
+  transform: translateY(-3px);
+  border-color: hsl(var(--base) / 0.35);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+  text-decoration: none;
+}
+
+.qm-category-card__thumb {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.qm-category-card__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.qm-category-card__body {
+  padding: 0.9rem 1rem 1.05rem;
+}
+
+.qm-category-card__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #222325;
+  line-height: 1.3;
+}
+
+.qm-category-card__meta {
+  margin: 0.3rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #74767e;
+}
+
+/* ── How it works ── */
+.qm-how-work {
+  background: #fafafa;
+  border-radius: 0;
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+}
+
+.qm-how-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.qm-how-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem 1.35rem 1.4rem;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.qm-how-card__step {
+  position: absolute;
+  top: 1rem;
+  right: 1.1rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: hsl(var(--base));
+  opacity: 0.85;
+}
+
+.qm-how-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: hsl(var(--base) / 0.1);
+  color: hsl(var(--base));
+  font-size: 1.35rem;
+  margin-bottom: 0.85rem;
+}
+
+.qm-how-card__icon svg,
+.qm-how-card__icon img {
+  max-width: 28px;
+  max-height: 28px;
+}
+
+.qm-how-card__title {
+  margin: 0 0 0.45rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #222325;
+}
+
+.qm-how-card__desc {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #74767e;
+}
+
+/* Hide old arrow shape inside redesigned how-work */
+.qm-how-work .how-work-item__shape {
+  display: none;
+}
+
+/* ── Jobs browse (existing) ── */
+.qm-jobs-page {
+  background: linear-gradient(180deg, #fafafa 0%, #fff 280px);
+}
+
+.qm-jobs-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+  padding: 1.25rem 0 0.25rem;
+}
+
+.qm-jobs-hero__eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: hsl(var(--base));
+}
+
+.qm-jobs-hero__title {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.5vw, 2.15rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #222325;
+  line-height: 1.2;
+}
+
+.qm-jobs-hero__sub {
+  margin: 0.45rem 0 0;
+  max-width: 36rem;
+  color: #74767e;
+  font-size: 1rem;
+}
+
+.qm-jobs-hero__count {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.1;
+}
+
+.qm-jobs-hero__count strong {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #222325;
+}
+
+.qm-jobs-hero__count span {
+  font-size: 0.85rem;
+  color: #74767e;
+  font-weight: 600;
+}
+
+.qm-jobs-layout {
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.qm-jobs-filters {
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 1rem 1rem 0.5rem;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.qm-jobs-filters__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding: 0 0.25rem;
+}
+
+.qm-jobs-filters__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #222325;
+}
+
+.qm-jobs-filters__clear {
+  border: 0;
+  background: transparent;
+  color: hsl(var(--base));
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0;
+}
+
+.qm-jobs-filters__clear:hover {
+  text-decoration: underline;
+}
+
+.qm-jobs-filters .filter-block {
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  padding-top: 0.35rem;
+}
+
+.qm-jobs-filters .accordion-button {
+  font-weight: 700;
+  color: #222325;
+  box-shadow: none !important;
+}
+
+.qm-jobs-toolbar {
+  margin-bottom: 1rem;
+}
+
+.qm-jobs-search.search-container {
+  width: 100%;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+}
+
+.qm-jobs-search.search-container .form--control {
+  border: 0;
+  background: transparent;
+  height: 52px;
+  padding-left: 1.15rem;
+  font-size: 1rem;
+}
+
+.qm-jobs-search .search-container__icon {
+  color: #74767e;
+}
+
+.qm-jobs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.qm-job-card.expert-developer {
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem 1.35rem;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.045);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.qm-job-card.expert-developer:hover {
+  transform: translateY(-2px);
+  border-color: hsl(var(--base) / 0.35);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+}
+
+.qm-job-card--expired {
+  opacity: 0.78;
+}
+
+.qm-job-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.qm-job-card__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+}
+
+.qm-job-card__title a {
+  color: #222325;
+  text-decoration: none;
+}
+
+.qm-job-card__title a:hover {
+  color: hsl(var(--base));
+}
+
+.qm-job-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  margin-top: 0.45rem;
+  color: #74767e;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.qm-job-card__meta-item i {
+  margin-right: 0.25rem;
+}
+
+.qm-job-card__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.qm-job-card__chip--success {
+  background: rgba(26, 188, 108, 0.12);
+  color: #0f8a4d;
+}
+
+.qm-job-card__cta {
+  border-radius: 999px;
+  font-weight: 700;
+  white-space: nowrap;
+  padding-inline: 1.1rem;
+}
+
+.qm-job-card__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.qm-job-card__stat {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 0.7rem 0.85rem;
+}
+
+.qm-job-card__stat-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #74767e;
+  margin-bottom: 0.2rem;
+}
+
+.qm-job-card__stat-value {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #222325;
+}
+
+.qm-job-card__desc {
+  margin: 0 0 0.85rem;
+  color: #404145;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.qm-job-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.qm-job-card__tag .skill-list__link,
+.qm-job-card .skill-list__link {
+  display: inline-flex;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  background: #efeff0;
+  color: #404145;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 0;
+}
+
+.qm-job-card__matches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.95rem;
+}
+
+.qm-job-card__match-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #74767e;
+}
+
+.qm-job-card__match .progress {
+  height: 8px;
+  border-radius: 999px;
+  background: #efeff0;
+}
+
+.talent-filter-panel {
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.045);
+  background: #fff;
+  padding: 1.25rem;
+}
+
+.talent-filter-panel__title {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.qm-talent-row.bid-item {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 1rem 1.15rem;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
+}
+
+body:not(.dashboard):not(.admin-panel) .breadcrumb-section {
+  background: #fafafa !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+@media (max-width: 991px) {
+  .qm-how-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .qm-jobs-hero__count {
+    align-items: flex-start;
+  }
+
+  .qm-job-card__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .qm-job-card__cta {
+    width: 100%;
+    text-align: center;
+  }
+
+  .qm-category-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .qm-home-search {
+    flex-direction: column;
+  }
+
+  .qm-home-search__btn {
+    width: 100%;
+    border-radius: 0 0 11px 11px !important;
+  }
+}
+
+/* ── Fiverr-style video promo: full-bleed BG video + centered CTA ── */
+.qm-video-promo {
+  position: relative;
+  isolation: isolate;
+  min-height: clamp(520px, 72vh, 760px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #1a1a1a;
+  color: #fff;
+  padding: 5.5rem 0;
+}
+
+.qm-video-promo__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.qm-video-promo__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.qm-video-promo__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.5) 0%,
+    rgba(15, 23, 42, 0.68) 100%
+  );
+  pointer-events: none;
+}
+
+.qm-video-promo__content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 760px;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+body .qm-video-promo .qm-video-promo__eyebrow,
+.qm-video-promo__eyebrow {
+  margin: 0 0 0.85rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.9) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body .qm-video-promo h2.qm-video-promo__title,
+body .qm-video-promo .qm-video-promo__title,
+.qm-video-promo__title {
+  margin: 0 0 1.1rem;
+  font-size: clamp(2rem, 4.5vw, 3.15rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  line-height: 1.15 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: none !important;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
+}
+
+body .qm-video-promo .qm-video-promo__desc,
+.qm-video-promo__desc {
+  margin: 0 auto 2rem;
+  max-width: 36rem;
+  font-size: 1.1rem !important;
+  line-height: 1.55 !important;
+  color: rgba(255, 255, 255, 0.88) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.qm-video-promo__cta {
+  border-radius: 8px !important;
+  font-weight: 700;
+  padding-inline: 1.75rem !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+.qm-video-promo__cta:hover {
+  filter: brightness(1.05);
+}
+
+@media (max-width: 991px) {
+  .qm-video-promo {
+    min-height: 480px;
+    padding: 4rem 0;
+  }
+}
+
+.qm-video-promo--hero {
+  min-height: clamp(560px, 78vh, 820px);
+  padding: 6rem 0;
+}
+
+
+/* ── Trust cards: stable hover (icon + title + text stay put) ── */
+.qm-trust {
+  background: #f5f5f5;
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+}
+
+.qm-trust-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.qm-trust-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+  background: #fff !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  border-radius: 16px !important;
+  padding: 1.5rem 1.35rem !important;
+  box-shadow: none !important;
+  transform: none !important;
+  height: 100%;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.qm-trust-card:hover,
+body .qm-trust-card:hover,
+body .trust-card.qm-trust-card:hover {
+  transform: none !important;
+  background: #fff !important;
+  border-color: hsl(var(--base) / 0.35) !important;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08) !important;
+}
+
+.qm-trust-card__icon {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: hsl(var(--base) / 0.1) !important;
+  color: hsl(var(--base)) !important;
+  font-size: 1.45rem;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.qm-trust-card__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #222325 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: static !important;
+  transform: none !important;
+}
+
+.qm-trust-card__desc {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #74767e !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: static !important;
+  transform: none !important;
+  text-align: left !important;
+}
+
+@media (max-width: 991px) {
+  .qm-trust-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Compact public footer ── */
+.qm-footer .footer-area__top,
+.qm-footer .sign-up-wrapper {
+  display: none !important;
+}
+
+.qm-footer .qm-footer__grid.footer-wrapper,
+.qm-footer .footer-wrapper.qm-footer__grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem 2rem;
+  padding-top: 2rem !important;
+  padding-bottom: 1.5rem !important;
+}
+
+.qm-footer .footer-item__title {
+  margin-bottom: 0.75rem !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+}
+
+.qm-footer .footer-menu__item {
+  margin-bottom: 0.35rem !important;
+}
+
+.qm-footer .footer-menu__link {
+  font-size: 0.9rem !important;
+}
+
+.qm-footer .qm-footer__contact .footer-contact-menu__item {
+  margin-bottom: 0.45rem !important;
+}
+
+.qm-footer .qm-footer__contact .footer-contact-menu__item-content,
+.qm-footer .qm-footer__contact .footer-contact-menu__item-content a,
+.qm-footer .qm-footer__contact .footer-contact-menu__item-content p {
+  color: inherit !important;
+  opacity: 0.85;
+  font-size: 0.9rem;
+}
+
+.qm-footer .bottom-footer {
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+@media (max-width: 767px) {
+  .qm-footer .qm-footer__grid.footer-wrapper,
+  .qm-footer .footer-wrapper.qm-footer__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+}

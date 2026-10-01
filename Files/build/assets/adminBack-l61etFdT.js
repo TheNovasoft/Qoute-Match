@@ -1,0 +1,1 @@
+import{r as n}from"./app-DbrXguAt.js";function d(i,o){var t;if((t=i==null?void 0:i.preventDefault)==null||t.call(i),o){n.visit(o);return}typeof window<"u"&&window.history.length>1&&window.history.back()}export{d as a};

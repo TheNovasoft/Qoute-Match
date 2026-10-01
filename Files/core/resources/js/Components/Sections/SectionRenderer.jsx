@@ -52,6 +52,9 @@ export default function SectionRenderer({ sections = [] }) {
 export function Banner({ data }) {
     const { routes, auth } = usePage().props;
     const postJobUrl = auth?.buyer ? routes.buyerJobPost : routes.postJob;
+    const forProvidersUrl = routes.forProviders || '/for-providers';
+    const customerUrl = auth?.buyer ? (routes.buyerHome || postJobUrl) : routes.buyerRegister;
+    const heroVideo = '/assets/templates/basic/videos/qm-promo-bg.mp4';
 
     if (!data) return null;
 
@@ -61,7 +64,7 @@ export function Banner({ data }) {
                 <img src={data.shape} alt="" />
             </div>
             <div className="container">
-                <div className="row gy-5 align-items-start">
+                <div className="row gy-5 align-items-center">
                     <div className="col-lg-6">
                         <div className="banner-content highlight">
                             <h1 className="banner-content__title s-highlight" data-s-break="-1" data-s-length="1">
@@ -73,7 +76,7 @@ export function Banner({ data }) {
                             <Link href={postJobUrl} className="btn btn--base btn--lg">
                                 Get Quotes
                             </Link>
-                            <Link href={routes.forProviders} className="btn btn-outline--base btn--lg">
+                            <Link href={forProvidersUrl} className="btn btn-outline--base btn--lg">
                                 Join as Provider
                             </Link>
                         </div>
@@ -85,12 +88,26 @@ export function Banner({ data }) {
                     <div className="col-12 col-lg-6 banner-thumb-column">
                         <div className="banner-thumb-wrapper">
                             <div className="banner-thumb">
-                                <img src={data.image} alt="" />
+                                <video
+                                    autoPlay
+                                    muted
+                                    loop
+                                    playsInline
+                                    preload="metadata"
+                                    poster={data.image || undefined}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: 'inherit' }}
+                                >
+                                    <source src={heroVideo} type="video/mp4" />
+                                </video>
                             </div>
                             <div className="banner-thumb-wrapper__content">
-                                <div className="banner-thumb-wrapper__item one">{data.featureOne}</div>
-                                <div className="banner-thumb-wrapper__item two">{data.featureTwo}</div>
-                                <div className="banner-thumb-wrapper__item three">
+                                <Link href={forProvidersUrl} className="banner-thumb-wrapper__item one">
+                                    {data.featureOne}
+                                </Link>
+                                <Link href={postJobUrl} className="banner-thumb-wrapper__item two">
+                                    {data.featureTwo}
+                                </Link>
+                                <Link href={customerUrl} className="banner-thumb-wrapper__item three">
                                     <span className="icon"><img src={data.heartShape} alt="" /></span>
                                     <div className="content">
                                         <span className="text">{data.featureThree}</span>
@@ -100,7 +117,7 @@ export function Banner({ data }) {
                                             ))}
                                         </ul>
                                     </div>
-                                </div>
+                                </Link>
                             </div>
                         </div>
                     </div>

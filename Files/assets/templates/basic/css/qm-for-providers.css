@@ -1,0 +1,179 @@
+/* For Providers — final Timeline design (option 5) */
+
+.qm-fp-eyebrow {
+  margin: 0 0 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: hsl(var(--base));
+}
+
+body .qm-fp h1,
+.qm-fp h1 {
+  margin: 0 0 0.85rem;
+  font-size: clamp(2rem, 4vw, 3rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  line-height: 1.12 !important;
+  color: inherit !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+.qm-fp-lead {
+  margin: 0 0 1.35rem;
+  max-width: 34rem;
+  font-size: 1.08rem;
+  line-height: 1.55;
+  color: #74767e;
+}
+
+.qm-fp-lead--center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.qm-fp-h2 {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #222325 !important;
+  -webkit-text-fill-color: #222325 !important;
+}
+
+.qm-fp-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.qm-fp-section {
+  padding: 3.5rem 0 4rem;
+}
+
+.qm-fp5-hero {
+  padding: 3.75rem 0 2rem;
+  background: linear-gradient(180deg, #ecfdf5 0%, #fff 70%);
+}
+
+.qm-fp5-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid rgba(29, 191, 115, 0.28);
+  color: #1dbf73;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+body .qm-fp--5 h1 {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+
+.qm-fp5-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.qm-fp5-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid rgba(29, 191, 115, 0.28);
+}
+
+.qm-fp5-timeline li {
+  display: flex;
+  gap: 0.9rem;
+  padding: 0 0 1.35rem 1.15rem;
+  position: relative;
+}
+
+.qm-fp5-timeline li::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 0.35rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: hsl(var(--base));
+}
+
+.qm-fp5-timeline i {
+  color: hsl(var(--base));
+  font-size: 1.2rem;
+  margin-top: 0.1rem;
+}
+
+.qm-fp5-timeline h3 {
+  margin: 0 0 0.3rem;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #222325 !important;
+  -webkit-text-fill-color: #222325 !important;
+}
+
+.qm-fp5-timeline p {
+  margin: 0;
+  color: #74767e;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.qm-fp5-aside {
+  background: linear-gradient(165deg, #116b45 0%, #0f3d2e 48%, #1a2e24 100%);
+  color: #ffffff;
+  border-radius: 18px;
+  padding: 1.6rem 1.5rem 1.5rem;
+  border: 1px solid rgba(29, 191, 115, 0.45);
+  box-shadow: 0 18px 42px rgba(15, 61, 46, 0.28);
+}
+
+.qm-fp5-aside h2 {
+  margin: 0 0 0.7rem;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.qm-fp5-aside p {
+  margin: 0 0 1rem;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+.qm-fp5-aside ul {
+  margin: 0 0 1.35rem;
+  padding-left: 1.15rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.9rem;
+}
+
+.qm-fp5-aside li {
+  margin-bottom: 0.45rem;
+}
+
+.qm-fp5-aside li::marker {
+  color: #1dbf73;
+}
+
+.qm-fp5-aside .btn--base {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22) !important;
+}
+
+@media (max-width: 991px) {
+  .qm-fp5-layout {
+    grid-template-columns: 1fr;
+  }
+}

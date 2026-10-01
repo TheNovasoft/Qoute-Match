@@ -24,11 +24,19 @@ export default function HeaderAuthLinks({ routes, auth, compact = false }) {
     }
 
     return (
-        <Link
-            href={routes.buyerRegister}
-            className={`btn btn-outline--base header-join-btn${compact ? ' btn--sm w-100' : ''}`}
-        >
-            Join
-        </Link>
+        <div className={`header-auth-links${compact ? ' header-auth-links--compact' : ''}`}>
+            <Link
+                href={routes.userLogin || routes.buyerLogin}
+                className={`header-signin-link${compact ? ' d-block mb-2' : ''}`}
+            >
+                Sign in
+            </Link>
+            <Link
+                href={routes.buyerRegister}
+                className={`btn btn-outline--base header-join-btn${compact ? ' btn--sm w-100' : ''}`}
+            >
+                Join
+            </Link>
+        </div>
     );
 }
