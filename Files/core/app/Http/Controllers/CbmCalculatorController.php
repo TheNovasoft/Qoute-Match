@@ -15,7 +15,7 @@ class CbmCalculatorController extends Controller
             'bv' => 'required|numeric|min:0',
             'hv' => 'required|numeric|min:0',
             'qv' => 'nullable|integer|min:1',
-            'uom' => 'nullable|in:mm,cm,meter',
+            'uom' => 'nullable|in:mm,cm,meter,inch,in',
             'wv' => 'nullable|numeric|min:0',
             'wu' => 'nullable|in:kg,gm,lb',
         ]);

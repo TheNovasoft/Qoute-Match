@@ -5,7 +5,9 @@ import {
     calculateCbmResults,
     formatStoredCbmValue,
     mapCbmApiResponse,
+    MODE_OPTIONS,
     parseStoredCbmValue,
+    resolveMode,
     UOM_OPTIONS,
     WEIGHT_UNIT_OPTIONS,
 } from '@/utils/cbmCalculations';
@@ -40,6 +42,7 @@ export default function CbmCalculator({
     hideWeightInput = false,
     hideResults = false,
     compact = false,
+    showHsCode = false,
 }) {
     const { tx } = useJobPostFormTranslation();
     const initial = parseStoredCbmValue(value);
@@ -54,6 +57,8 @@ export default function CbmCalculator({
     ));
     const [weightUnit, setWeightUnit] = useState(initial.weightUnit || 'kg');
     const [qty, setQty] = useState(initial.qty || '1');
+    const [hsCode, setHsCode] = useState(initial.hsCode || '');
+    const [mode, setMode] = useState(() => resolveMode(initial.uom || 'cm'));
     const [apiResults, setApiResults] = useState(null);
     const [isCalculating, setIsCalculating] = useState(false);
     const [calcError, setCalcError] = useState('');
@@ -171,7 +176,12 @@ export default function CbmCalculator({
             syncTimerRef.current = null;
         }
 
-        const hasPartialInput = Boolean(String(length || '').trim() || String(width || '').trim() || String(height || '').trim());
+        const hasPartialInput = Boolean(
+            String(length || '').trim()
+            || String(width || '').trim()
+            || String(height || '').trim()
+            || (showHsCode && String(hsCode || '').trim())
+        );
         const next = results
             ? formatStoredCbmValue({
                 length,
@@ -179,9 +189,10 @@ export default function CbmCalculator({
                 height,
                 uom,
                 weight: effectiveWeight,
-                weightUnit,
+                weightUnit: useExternalWeight ? 'kg' : weightUnit,
                 qty,
                 results,
+                hsCode: showHsCode ? hsCode : '',
             })
             : (hasPartialInput ? valueRef.current : '');
 
@@ -189,7 +200,7 @@ export default function CbmCalculator({
             scrollLockRef.current = window.scrollY;
             onChangeRef.current(next);
         }
-    }, [results, length, width, height, uom, effectiveWeight, weightUnit, qty]);
+    }, [results, length, width, height, uom, effectiveWeight, weightUnit, qty, hsCode, showHsCode, useExternalWeight]);
 
     useEffect(() => {
         if (skipFirstSync.current) {
@@ -217,6 +228,15 @@ export default function CbmCalculator({
         setWeight(nextValue);
         if (onWeightChange) {
             onWeightChange(nextValue);
+        }
+    };
+
+    const handleModeChange = (modeValue) => {
+        const selected = MODE_OPTIONS.find((option) => option.value === modeValue) || MODE_OPTIONS[0];
+        setMode(selected.value);
+        setUom(selected.uom);
+        if (!useExternalWeight) {
+            setWeightUnit(selected.weightUnit);
         }
     };
 
@@ -286,16 +306,44 @@ export default function CbmCalculator({
 
             <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                 <h6 className="mb-0">{tx('Inputs')}</h6>
-                <span className="badge text-bg-light border text-dark">{tx('Mode: Cubic Meter (m³)')}</span>
+                <select
+                    className="form-select form--control form-select-sm border text-dark"
+                    style={{ width: 'auto' }}
+                    value={mode}
+                    onChange={(e) => handleModeChange(e.target.value)}
+                    onBlur={handleDimensionBlur}
+                    aria-label={tx('Mode')}
+                >
+                    {MODE_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>{tx(option.label)}</option>
+                    ))}
+                </select>
             </div>
 
             <div className="row gy-3">
+                {showHsCode && (
+                    <div className="col-md-2 col-6">
+                        <label className="form-label">{tx('HS code')}</label>
+                        <input
+                            type="text"
+                            className="form-control form--control form-control-lg"
+                            value={hsCode}
+                            onChange={(e) => setHsCode(e.target.value)}
+                            onBlur={handleDimensionBlur}
+                            placeholder="e.g. 8471.30"
+                        />
+                    </div>
+                )}
                 <div className="col-md-2 col-6">
                     <label className="form-label">{tx('UOM')}</label>
                     <select
                         className="form-select form--control form-control-lg"
                         value={uom}
-                        onChange={(e) => setUom(e.target.value)}
+                        onChange={(e) => {
+                            const next = e.target.value;
+                            setUom(next);
+                            setMode(resolveMode(next));
+                        }}
                         onBlur={handleDimensionBlur}
                     >
                         {UOM_OPTIONS.map((option) => (
@@ -361,7 +409,17 @@ export default function CbmCalculator({
                             <select
                                 className="form-select form--control form-control-lg"
                                 value={weightUnit}
-                                onChange={(e) => setWeightUnit(e.target.value)}
+                                onChange={(e) => {
+                                    const next = e.target.value;
+                                    setWeightUnit(next);
+                                    if (next === 'lb') {
+                                        setMode('inches');
+                                        setUom('inch');
+                                    } else if (next === 'kg') {
+                                        setMode('meter');
+                                        setUom('meter');
+                                    }
+                                }}
                             >
                                 {WEIGHT_UNIT_OPTIONS.map((option) => (
                                     <option key={option.value} value={option.value}>{tx(option.label)}</option>
@@ -397,14 +455,21 @@ export default function CbmCalculator({
                         <p className="text-warning small mb-3">{tx(calcError)}</p>
                     )}
                     <div className="row gy-3 cbm-calculator__results-grid">
-                        <CbmResultField tx={tx} label="Volume (Cubic Meter)" labelExtra={uomLabel} value={results?.volumeM3} suffix=" m³" />
-                        <CbmResultField tx={tx} label="Volume (Cubic Feet)" value={results?.volumeFt3} suffix=" ft³" />
-                        <CbmResultField tx={tx} label="Weight (Kg)" value={results?.totalWeightKg} suffix=" kg" />
-                        <CbmResultField tx={tx} label="Weight (lb)" value={results?.totalWeightLb} suffix=" lb" />
-                        <CbmResultField tx={tx} label="Volumetric Weight Sea (Kg)" value={results?.volumetricWeightSeaKg} suffix=" kg" />
-                        <CbmResultField tx={tx} label="Volumetric Weight Sea (lb)" value={results?.volumetricWeightSeaLb} suffix=" lb" />
-                        <CbmResultField tx={tx} label="Volumetric Weight Air (Kg)" value={results?.volumetricWeightAirKg} suffix=" kg" />
-                        <CbmResultField tx={tx} label="Volumetric Weight Air (lb)" value={results?.volumetricWeightAirLb} suffix=" lb" />
+                        {mode === 'inches' ? (
+                            <>
+                                <CbmResultField tx={tx} label="Volume (Cubic Feet)" labelExtra={uomLabel} value={results?.volumeFt3} suffix=" ft³" />
+                                <CbmResultField tx={tx} label="Weight (lb)" value={results?.totalWeightLb} suffix=" lb" />
+                                <CbmResultField tx={tx} label="Volumetric Weight Sea (lb)" value={results?.volumetricWeightSeaLb} suffix=" lb" />
+                                <CbmResultField tx={tx} label="Volumetric Weight Air (lb)" value={results?.volumetricWeightAirLb} suffix=" lb" />
+                            </>
+                        ) : (
+                            <>
+                                <CbmResultField tx={tx} label="Volume (Cubic Meter)" labelExtra={uomLabel} value={results?.volumeM3} suffix=" m³" />
+                                <CbmResultField tx={tx} label="Weight (Kg)" value={results?.totalWeightKg} suffix=" kg" />
+                                <CbmResultField tx={tx} label="Volumetric Weight Sea (Kg)" value={results?.volumetricWeightSeaKg} suffix=" kg" />
+                                <CbmResultField tx={tx} label="Volumetric Weight Air (Kg)" value={results?.volumetricWeightAirKg} suffix=" kg" />
+                            </>
+                        )}
                         <CbmResultField tx={tx} label="20 Feet Container" value={results?.container20} suffix={` ${tx('units')}`} />
                         <CbmResultField tx={tx} label="40 Feet Container" value={results?.container40} suffix={` ${tx('units')}`} />
                         <CbmResultField tx={tx} label="40 Feet HC Container" value={results?.container40hc} suffix={` ${tx('units')}`} />
@@ -416,7 +481,9 @@ export default function CbmCalculator({
             )}
 
             <p className="text-muted small mt-3 mb-0">
-                {tx('Sea freight volumetric weight uses L × W × H (cm) ÷ 5000. Air freight uses ÷ 6000. Container counts use standard shipping container dimensions.')}
+                {mode === 'inches'
+                    ? tx('Sea freight volumetric weight uses L × W × H (inches, converted to cm) ÷ 5000. Air freight uses ÷ 6000. Weight shown in lb.')
+                    : tx('Sea freight volumetric weight uses L × W × H (cm) ÷ 5000. Air freight uses ÷ 6000. Container counts use standard shipping container dimensions.')}
             </p>
         </div>
     );
