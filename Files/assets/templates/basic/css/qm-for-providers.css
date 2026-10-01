@@ -54,7 +54,7 @@ body .qm-fp h1,
 
 .qm-fp5-hero {
   padding: 3.75rem 0 2rem;
-  background: linear-gradient(180deg, #ecfdf5 0%, #fff 70%);
+  background: linear-gradient(180deg, #eff6ff 0%, #fff 70%);
 }
 
 .qm-fp5-badge {
@@ -64,8 +64,8 @@ body .qm-fp h1,
   padding: 0.35rem 0.75rem;
   border-radius: 999px;
   background: #fff;
-  border: 1px solid rgba(29, 191, 115, 0.28);
-  color: #1dbf73;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  color: #1d4ed8;
   font-size: 0.82rem;
   font-weight: 700;
   margin-bottom: 1rem;
@@ -87,7 +87,7 @@ body .qm-fp--5 h1 {
   list-style: none;
   margin: 0;
   padding: 0;
-  border-left: 2px solid rgba(29, 191, 115, 0.28);
+  border-left: 2px solid rgba(37, 99, 235, 0.2);
 }
 
 .qm-fp5-timeline li {
@@ -130,12 +130,12 @@ body .qm-fp--5 h1 {
 }
 
 .qm-fp5-aside {
-  background: linear-gradient(165deg, #116b45 0%, #0f3d2e 48%, #1a2e24 100%);
+  background: linear-gradient(160deg, #0b6bcb 0%, #0f2744 70%);
   color: #ffffff;
   border-radius: 18px;
   padding: 1.6rem 1.5rem 1.5rem;
-  border: 1px solid rgba(29, 191, 115, 0.45);
-  box-shadow: 0 18px 42px rgba(15, 61, 46, 0.28);
+  border: 1px solid rgba(11, 107, 203, 0.35);
+  box-shadow: 0 18px 42px rgba(15, 70, 140, 0.22);
 }
 
 .qm-fp5-aside h2 {
@@ -165,7 +165,7 @@ body .qm-fp--5 h1 {
 }
 
 .qm-fp5-aside li::marker {
-  color: #1dbf73;
+  color: #60a5fa;
 }
 
 .qm-fp5-aside .btn--base {

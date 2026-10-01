@@ -10,58 +10,55 @@ export default function LocationDetail({ pageTitle, seo, location, intro, catego
         <FrontendLayout
             pageTitle={pageTitle}
             seo={seo}
-            customSubPageTitle="Locations"
-            toRoute={routes.locations}
+            showBreadcrumb={false}
+            bodyClass="qm-fiverr-theme"
         >
-            <section className="pb-120 seo-location-page">
+            <section className="qm-loc-hero qm-loc-hero--detail">
                 <div className="container">
-                    <div className="row gy-4 align-items-start">
-                        <div className="col-lg-5">
-                            <h1 className="section-heading__title h2 mb-3">
-                                Service Providers in {location.name}
-                            </h1>
-                            {location.region && (
-                                <p className="text-muted mb-3">{location.region}</p>
-                            )}
-                            <p className="section-heading__desc mb-4">{intro}</p>
-                            <div className="d-flex flex-wrap gap-2">
-                                <Link href={postJobUrl} className="btn btn--base">
-                                    Post a Requirement
-                                </Link>
-                                <Link href={routes.categories} className="btn btn-outline--base">
-                                    Browse Categories
-                                </Link>
-                            </div>
-                            <p className="mt-3 mb-0">
-                                <Link href={routes.locations} className="text--base">
-                                    ← All locations
-                                </Link>
-                            </p>
-                        </div>
+                    <Link href={routes.locations} className="qm-loc-back">
+                        ← All locations
+                    </Link>
+                    <p className="qm-loc-hero__eyebrow">{location.region || 'Local providers'}</p>
+                    <h1 className="qm-loc-hero__title">Service Providers in {location.name}</h1>
+                    <p className="qm-loc-hero__desc">{intro}</p>
+                    <div className="qm-loc-hero__actions">
+                        <Link href={postJobUrl} className="btn btn--base btn--lg">
+                            Post a Requirement
+                        </Link>
+                        <Link href={routes.categories} className="btn btn-outline--base btn--lg">
+                            Browse Categories
+                        </Link>
+                    </div>
+                </div>
+            </section>
 
-                        <div className="col-lg-7">
-                            <h2 className="h4 mb-4">Popular Categories</h2>
-                            <div className="row gy-3">
-                                {categories.map((category) => (
-                                    <div key={category.id} className="col-md-6">
-                                        <div className="subcategory-card h-100">
-                                            <h3 className="subcategory-card__title">{category.name}</h3>
-                                            {category.description && (
-                                                <p className="subcategory-card__desc">{category.description}</p>
-                                            )}
-                                            <div className="d-flex flex-wrap gap-2 mt-auto pt-3">
-                                                <Link href={category.serviceUrl} className="btn btn--base btn--sm">
-                                                    Get Quotes
-                                                </Link>
-                                                <Link href={category.categoryUrl} className="btn btn-outline--base btn--sm">
-                                                    Category
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+            <section className="qm-loc-page pb-120">
+                <div className="container">
+                    <div className="qm-loc-section-head">
+                        <h2>Popular categories in {location.name}</h2>
+                        <p>Pick a service to see providers and request quotes in this area.</p>
+                    </div>
+
+                    <div className="qm-loc-cat-grid">
+                        {(categories || []).map((category) => (
+                            <article key={category.id} className="qm-loc-cat-card">
+                                <div className="qm-loc-cat-card__icon" aria-hidden="true">
+                                    <i className="las la-briefcase" />
+                                </div>
+                                <h3 className="qm-loc-cat-card__title">{category.name}</h3>
+                                {category.description && (
+                                    <p className="qm-loc-cat-card__desc">{category.description}</p>
+                                )}
+                                <div className="qm-loc-cat-card__actions">
+                                    <Link href={category.serviceUrl} className="btn btn--base btn--sm">
+                                        Get Quotes
+                                    </Link>
+                                    <Link href={category.categoryUrl} className="btn btn-outline--base btn--sm">
+                                        Category
+                                    </Link>
+                                </div>
+                            </article>
+                        ))}
                     </div>
                 </div>
             </section>
