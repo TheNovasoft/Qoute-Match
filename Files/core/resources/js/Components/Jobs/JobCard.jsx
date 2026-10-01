@@ -3,97 +3,122 @@ import VerificationBadges from '@/Components/Shared/VerificationBadges';
 
 export default function JobCard({ job }) {
     return (
-        <div className={`expert-developer${job.isExpired ? ' expert-developer--expired' : ''}`}>
+        <article className={`qm-job-card expert-developer${job.isExpired ? ' expert-developer--expired qm-job-card--expired' : ''}`}>
             {job.isExpired && job.expiredLabel && (
-                <div className="job-expired-notice" role="status">
+                <div className="job-expired-notice qm-job-card__notice" role="status">
                     <i className="las la-exclamation-circle"></i> {job.expiredLabel}
                 </div>
             )}
-            <div className="expert-developer__top">
-                <div className="left">
-                    <div className="left__top">
-                        <h6 className="expert-developer__title">
-                            <Link href={job.url}>{job.title}</Link>
-                        </h6>
-                    </div>
-                    <span className="expert-developer__time">{job.timeLabel}</span>
-                    <div className="job-information-area">
-                        <div>
-                            <span className="title">
-                                Budget <sup>[{job.customBudget ? 'Customized' : 'Fixed'}]</sup>
-                            </span>
-                            <p className="text">{job.budget}</p>
-                        </div>
-                        <div>
-                            <span className="title">Experience level</span>
-                            <p className="text">{job.skillLevel}</p>
-                        </div>
+
+            <div className="qm-job-card__head">
+                <div className="qm-job-card__head-main">
+                    <h3 className="qm-job-card__title expert-developer__title">
+                        <Link href={job.url}>{job.title}</Link>
+                    </h3>
+                    <div className="qm-job-card__meta">
+                        <span className="qm-job-card__meta-item">
+                            <i className="las la-clock" aria-hidden="true"></i>
+                            {job.timeLabel}
+                        </span>
+                        <span className="qm-job-card__meta-item">
+                            <i className="las la-gavel" aria-hidden="true"></i>
+                            {job.bidsCount} {Number(job.bidsCount) === 1 ? 'quote' : 'quotes'}
+                        </span>
+                        {job.postcodeMatch && (
+                            <span className="qm-job-card__chip qm-job-card__chip--success">Area match</span>
+                        )}
                     </div>
                 </div>
-                <div className="right">
-                    <Link href={job.url} target="_blank" className="btn btn--base btn--xsm">Bid Now</Link>
-                    <p className="total-bid mt-1">
-                        <span className="text">Bids: {job.bidsCount}</span>
-                    </p>
+                <Link href={job.url} className="btn btn--base qm-job-card__cta">
+                    View & quote
+                </Link>
+            </div>
+
+            <div className="qm-job-card__stats">
+                <div className="qm-job-card__stat">
+                    <span className="qm-job-card__stat-label">
+                        Budget · {job.customBudget ? 'Custom' : 'Fixed'}
+                    </span>
+                    <span className="qm-job-card__stat-value">{job.budget}</span>
+                </div>
+                <div className="qm-job-card__stat">
+                    <span className="qm-job-card__stat-label">Experience</span>
+                    <span className="qm-job-card__stat-value">{job.skillLevel}</span>
                 </div>
             </div>
-            <p className="expert-developer__desc">{job.description}</p>
-            <ul className="skill-list justify-content-start">
-                {job.skills?.map((skill, index) => (
-                    <li key={index} className="skill-list__item">
-                        <span className="skill-list__link">{skill.name}</span>
-                    </li>
-                ))}
-            </ul>
-            {job.skillMatch !== null && job.skillMatch !== undefined && (
-                <div className="skill-match mt-2">
-                    <small className="d-block mb-1">Skill Match</small>
-                    <div className="progress">
-                        <div className={`progress-bar ${job.skillMatchBar}`} style={{ width: `${job.skillMatch}%`, minWidth: '25px' }}>
-                            {job.skillMatch}%
+
+            {job.description && (
+                <p className="qm-job-card__desc expert-developer__desc">{job.description}</p>
+            )}
+
+            {job.skills?.length > 0 && (
+                <ul className="qm-job-card__tags skill-list">
+                    {job.skills.map((skill, index) => (
+                        <li key={index} className="qm-job-card__tag skill-list__item">
+                            <span className="skill-list__link">{skill.name}</span>
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            {(job.skillMatch != null || job.matchScore != null) && (
+                <div className="qm-job-card__matches">
+                    {job.skillMatch != null && (
+                        <div className="qm-job-card__match">
+                            <div className="qm-job-card__match-label">
+                                <span>Skill match</span>
+                                <strong>{job.skillMatch}%</strong>
+                            </div>
+                            <div className="progress">
+                                <div
+                                    className={`progress-bar ${job.skillMatchBar}`}
+                                    style={{ width: `${job.skillMatch}%`, minWidth: '24px' }}
+                                />
+                            </div>
                         </div>
-                    </div>
+                    )}
+                    {job.matchScore != null && (
+                        <div className="qm-job-card__match">
+                            <div className="qm-job-card__match-label">
+                                <span>Location match</span>
+                                <strong>{job.matchScore}%</strong>
+                            </div>
+                            <div className="progress">
+                                <div
+                                    className={`progress-bar ${job.matchScoreBar}`}
+                                    style={{ width: `${job.matchScore}%`, minWidth: '24px' }}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
-            {job.postcodeMatch && (
-                <span className="badge badge--success badge--sm mt-2">Postcode area match</span>
-            )}
-            {job.matchScore !== null && job.matchScore !== undefined && (
-                <div className="skill-match mt-2">
-                    <small className="d-block mb-1">Location & Service Match</small>
-                    <div className="progress">
-                        <div className={`progress-bar ${job.matchScoreBar}`} style={{ width: `${job.matchScore}%`, minWidth: '25px' }}>
-                            {job.matchScore}%
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
+        </article>
     );
 }
 
 export function BidFreelancerCard({ freelancer }) {
     return (
-        <div className="bid-item">
+        <div className="bid-item qm-talent-row">
             <Link href={freelancer.profileUrl} className="bid-item__thumb">
                 <img src={freelancer.image} alt="" />
             </Link>
             <div className="bid-item__content">
                 <div className="bid-item__top">
                     <div className="w-100">
-                        <div className="d-flex justify-content-between mx-auto align-items-center">
+                        <div className="d-flex justify-content-between mx-auto align-items-center gap-2 flex-wrap">
                             <p className="bid-item__name mb-0 d-flex align-items-center flex-wrap gap-1">
                                 {freelancer.fullname}
                                 <VerificationBadges badges={freelancer.verificationBadges} compact />
                             </p>
-                            <Link href={freelancer.profileUrl} className="btn btn--base btn--xsm">View Profile</Link>
+                            <Link href={freelancer.profileUrl} className="btn btn--base btn--xsm">View profile</Link>
                         </div>
                         <div className="d-flex aligns-items-center gap-2 justify-content-start flex-wrap my-2">
                             <div className="location">
                                 <p className="text"><i className="las la-globe"></i>{freelancer.country}</p>
                             </div>
-                            <span className="text">{freelancer.successPercent}% Job Success</span>
-                            <span className="text">Total Earned {freelancer.totalEarned}</span>
+                            <span className="text">{freelancer.successPercent}% job success</span>
+                            <span className="text">Earned {freelancer.totalEarned}</span>
                             {freelancer.badge && <span className="text">{freelancer.badge.name}</span>}
                         </div>
                         <div className="freelancer-title">{freelancer.tagline}</div>
@@ -113,9 +138,9 @@ export function BidFreelancerCard({ freelancer }) {
 
 export function SimilarJobItem({ job }) {
     return (
-        <li className="job-list__item">
+        <li className="job-list__item qm-similar-job">
             <Link href={job.url} className="job-list__link">{job.title}</Link>
-            <div className="d-flex align-items-center gap-3">
+            <div className="d-flex align-items-center gap-3 flex-wrap">
                 <span className="text">{job.timeLabel}</span>
                 <span className="text">Deadline {job.deadline}</span>
             </div>

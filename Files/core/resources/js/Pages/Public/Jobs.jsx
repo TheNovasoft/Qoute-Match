@@ -27,6 +27,7 @@ export default function Jobs({
     });
 
     const isFirstRender = useRef(true);
+    const resultCount = jobs.meta?.total ?? jobs.data?.length ?? 0;
 
     useEffect(() => {
         if (isFirstRender.current) {
@@ -56,15 +57,48 @@ export default function Jobs({
         });
     };
 
+    const clearFilters = () => {
+        setLocalFilters({
+            min_budget: '',
+            max_budget: '',
+            category_id: '',
+            subcategory_id: [],
+            project_scope: [],
+            skill_level: [],
+            search: '',
+            buyer: filters.buyer || '',
+        });
+    };
+
     const totalCategoryJobs = totalJobs || categories.reduce((sum, cat) => sum + (cat.jobsCount || 0), 0);
 
     return (
         <FrontendLayout pageTitle={pageTitle} seo={seo}>
-            <div className="job-category-section">
+            <div className="job-category-section qm-jobs-page">
                 <div className="container">
-                    <div className="job-category-wrapper">
-                        <div className="category-sidebar">
+                    <div className="qm-jobs-hero">
+                        <div>
+                            <p className="qm-jobs-hero__eyebrow">Browse open requests</p>
+                            <h1 className="qm-jobs-hero__title">Find work that fits your trade</h1>
+                            <p className="qm-jobs-hero__sub">
+                                Filter by budget, category, and experience — then send a clear quote.
+                            </p>
+                        </div>
+                        <div className="qm-jobs-hero__count">
+                            <strong>{resultCount}</strong>
+                            <span>open jobs</span>
+                        </div>
+                    </div>
+
+                    <div className="job-category-wrapper qm-jobs-layout">
+                        <aside className="category-sidebar qm-jobs-filters">
                             <span className="sidebar-filter__close d-xl-none d-flex"><i className="las la-times"></i></span>
+                            <div className="qm-jobs-filters__top">
+                                <h2 className="qm-jobs-filters__title">Filters</h2>
+                                <button type="button" className="qm-jobs-filters__clear" onClick={clearFilters}>
+                                    Clear all
+                                </button>
+                            </div>
                             <div className="accordion sidebar--acordion">
                                 <div className="filter-block">
                                     <div className="accordion-item">
@@ -223,17 +257,21 @@ export default function Jobs({
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </aside>
 
-                        <div className="job-category-body">
+                        <div className="job-category-body qm-jobs-results">
                             <div className="job-category-body__bar d-xl-none d-block">
                                 <span className="job-category-body__bar-icon"><i className="las la-list"></i></span>
                             </div>
-                            <div className="job-category-body__top">
-                                <div className="search-container">
-                                    <input className="form--control" type="search" placeholder="Type job keyword"
+                            <div className="qm-jobs-toolbar job-category-body__top">
+                                <div className="search-container qm-jobs-search">
+                                    <input
+                                        className="form--control"
+                                        type="search"
+                                        placeholder="Search jobs by keyword…"
                                         value={localFilters.search}
-                                        onChange={(e) => setLocalFilters({ ...localFilters, search: e.target.value })} />
+                                        onChange={(e) => setLocalFilters({ ...localFilters, search: e.target.value })}
+                                    />
                                     <span className="search-container__icon"><i className="las la-search"></i></span>
                                 </div>
                             </div>
@@ -242,11 +280,11 @@ export default function Jobs({
                                     Showing active requests from <strong>{invitedBy.name}</strong>.
                                 </div>
                             )}
-                            <div className="job-category-body__content">
+                            <div className="job-category-body__content qm-jobs-list">
                                 {jobs.data?.length ? jobs.data.map((job) => (
                                     <JobCard key={job.id} job={job} />
                                 )) : (
-                                    <EmptyState message="No job found!" />
+                                    <EmptyState message="No jobs match these filters." />
                                 )}
                                 {jobs.links?.length > 3 && <Pagination links={jobs.links} />}
                             </div>

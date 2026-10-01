@@ -12,6 +12,7 @@
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/slick.css') }}">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/main.css') }}">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/custom.css') }}">
+        <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/qm-marketplace.css') }}?v={{ @filemtime(base_path('../assets/templates/basic/css/qm-marketplace.css')) ?: time() }}">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/color.php') }}?color={{ gs('base_color') }}&secondColor={{ gs('secondary_color') }}">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/apple.css') }}?v={{ @filemtime(base_path('../assets/templates/basic/css/apple.css')) ?: time() }}">
     @else
