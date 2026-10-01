@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import AppLayout from '@/Components/Layout/AppLayout';
 import Header from '@/Components/Partials/Header';
 import Footer from '@/Components/Partials/Footer';
@@ -11,7 +12,17 @@ export default function FrontendLayout({
     customPageTitle,
     customSubPageTitle,
     toRoute,
+    bodyClass = '',
 }) {
+    useEffect(() => {
+        if (!bodyClass || typeof document === 'undefined') return undefined;
+        const classes = bodyClass.split(/\s+/).filter(Boolean);
+        classes.forEach((c) => document.body.classList.add(c));
+        return () => {
+            classes.forEach((c) => document.body.classList.remove(c));
+        };
+    }, [bodyClass]);
+
     return (
         <AppLayout pageTitle={pageTitle} seo={seo}>
             <Header />

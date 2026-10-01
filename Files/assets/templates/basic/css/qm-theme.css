@@ -1,0 +1,246 @@
+/* ============================================================
+   QuoteMatch public color theme — livelier than flat Apple gray.
+   Loaded after apple.css. Public pages only (not admin/dashboard).
+   ============================================================ */
+
+:root {
+  --ink: #0f172a;
+  --muted: #475569;
+  --line: #c9d4e2;
+  --blue: #0b6bcb;
+  --blue-hover: #0958a8;
+  --dark-blue: #38bdf8;
+  --gray: #eef4fb;
+  --qm-accent: #0f8a6a;
+  --qm-accent-soft: rgba(15, 138, 106, 0.12);
+  --qm-sky: #dbeafe;
+  --qm-ink: var(--ink);
+  --qm-muted: var(--muted);
+  --qm-line: var(--line);
+  --qm-blue: var(--blue);
+  --qm-blue-hover: var(--blue-hover);
+  --qm-blue-dark: var(--dark-blue);
+  --qm-gray: var(--gray);
+  --qm-white: #ffffff;
+  --qm-shadow-soft: 0 18px 40px -20px rgba(15, 70, 140, 0.35);
+  --qm-gradient:
+    radial-gradient(circle at 12% 18%, rgba(56, 189, 248, 0.22), transparent 42%),
+    radial-gradient(circle at 88% 12%, rgba(11, 107, 203, 0.16), transparent 38%),
+    linear-gradient(165deg, #f4f8fd 0%, #e7f0fa 48%, #edf6f3 100%);
+
+  --heading-color: 222 47% 11% !important;
+  --body-color: 215 16% 37% !important;
+  --text-color: 215 16% 37% !important;
+  --base-h: 207 !important;
+  --base-s: 90% !important;
+  --base-l: 42% !important;
+}
+
+/* Public shell atmosphere */
+body:not(.admin-panel):not(.dashboard) {
+  background:
+    radial-gradient(1200px 520px at 10% -10%, rgba(56, 189, 248, 0.18), transparent 55%),
+    radial-gradient(900px 480px at 100% 0%, rgba(11, 107, 203, 0.12), transparent 50%),
+    linear-gradient(180deg, #f7fbff 0%, #ffffff 280px, #f8fafc 100%) !important;
+  color: var(--ink);
+}
+
+body:not(.admin-panel):not(.dashboard) .header.qm-site-header,
+body:not(.admin-panel):not(.dashboard) .qm-site-header.header {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-bottom: 1px solid rgba(11, 107, 203, 0.12) !important;
+  box-shadow: 0 8px 24px rgba(15, 70, 140, 0.06) !important;
+  backdrop-filter: saturate(160%) blur(12px);
+}
+
+body:not(.admin-panel):not(.dashboard) .qm-site-header .nav-menu .nav-item.active > .nav-link,
+body:not(.admin-panel):not(.dashboard) .qm-site-header .nav-menu .nav-link.active,
+body:not(.admin-panel):not(.dashboard) .qm-site-header .nav-menu .nav-link:hover {
+  color: var(--blue) !important;
+}
+
+/* Punchier primary buttons */
+body:not(.admin-panel):not(.dashboard) .btn--base,
+body:not(.admin-panel):not(.dashboard) a.btn.btn--base,
+body:not(.admin-panel):not(.dashboard) button.btn.btn--base {
+  background: linear-gradient(180deg, #1a7fe0 0%, var(--blue) 100%) !important;
+  border-color: var(--blue) !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  box-shadow: 0 10px 22px rgba(11, 107, 203, 0.28) !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .btn--base:hover,
+body:not(.admin-panel):not(.dashboard) a.btn.btn--base:hover {
+  background: linear-gradient(180deg, var(--blue-hover) 0%, #084b90 100%) !important;
+  border-color: var(--blue-hover) !important;
+  filter: none !important;
+  box-shadow: 0 12px 26px rgba(9, 88, 168, 0.34) !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .btn-outline--base,
+body:not(.admin-panel):not(.dashboard) a.btn.btn-outline--base {
+  border-color: rgba(11, 107, 203, 0.45) !important;
+  color: var(--blue) !important;
+  -webkit-text-fill-color: var(--blue) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .btn-outline--base:hover {
+  background: rgba(11, 107, 203, 0.08) !important;
+  border-color: var(--blue) !important;
+}
+
+/* Hero / banner */
+body:not(.admin-panel):not(.dashboard) .banner-section {
+  background: transparent !important;
+  position: relative;
+}
+
+body:not(.admin-panel):not(.dashboard) .banner-content__title,
+body:not(.admin-panel):not(.dashboard) .banner-content__title.s-highlight {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .banner-content__desc {
+  color: #475569 !important;
+  -webkit-text-fill-color: #475569 !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .text--base,
+body:not(.admin-panel):not(.dashboard) .s-highlight .text--base,
+body:not(.admin-panel):not(.dashboard) .highlight .s-highlight .text--base {
+  color: var(--blue) !important;
+  -webkit-text-fill-color: var(--blue) !important;
+}
+
+/* Sections with more depth */
+body:not(.admin-panel):not(.dashboard) .how-wowrk-section,
+body:not(.admin-panel):not(.dashboard) .qm-how-work,
+body:not(.admin-panel):not(.dashboard) .qm-trust,
+body:not(.admin-panel):not(.dashboard) .facility-section,
+body:not(.admin-panel):not(.dashboard) .faq-section {
+  background:
+    linear-gradient(180deg, rgba(219, 234, 254, 0.55) 0%, rgba(240, 253, 250, 0.45) 100%) !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .qm-how-card,
+body:not(.admin-panel):not(.dashboard) .qm-trust-card,
+body:not(.admin-panel):not(.dashboard) .how-work-item,
+body:not(.admin-panel):not(.dashboard) .facility-item,
+body:not(.admin-panel):not(.dashboard) .testimonails-card,
+body:not(.admin-panel):not(.dashboard) .freelancer-item {
+  background: #fff !important;
+  border: 1px solid rgba(11, 107, 203, 0.1) !important;
+  box-shadow: 0 14px 30px rgba(15, 70, 140, 0.07) !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .qm-how-card:hover,
+body:not(.admin-panel):not(.dashboard) .qm-trust-card:hover,
+body:not(.admin-panel):not(.dashboard) .how-work-item:hover,
+body:not(.admin-panel):not(.dashboard) .facility-item:hover {
+  border-color: rgba(11, 107, 203, 0.28) !important;
+  box-shadow: 0 18px 36px rgba(15, 70, 140, 0.12) !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .qm-how-card__icon,
+body:not(.admin-panel):not(.dashboard) .qm-trust-card__icon,
+body:not(.admin-panel):not(.dashboard) .trust-card__icon {
+  background: linear-gradient(145deg, rgba(56, 189, 248, 0.25), rgba(11, 107, 203, 0.14)) !important;
+  color: var(--blue) !important;
+}
+
+/* Floating hero badges — slight brand tint */
+body:not(.admin-panel):not(.dashboard) .banner-section .banner-thumb-wrapper__item {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(11, 107, 203, 0.18) !important;
+  box-shadow: 0 16px 32px rgba(15, 70, 140, 0.18) !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .banner-section .banner-thumb-wrapper__item.two {
+  background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 70%) !important;
+  border-color: rgba(15, 138, 106, 0.28) !important;
+}
+
+/* Footer */
+body:not(.admin-panel):not(.dashboard) .footer-area,
+body:not(.admin-panel):not(.dashboard) .qm-footer {
+  background: linear-gradient(180deg, #0f2744 0%, #0b1c31 100%) !important;
+  color: #e2e8f0 !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .footer-area .footer-item__title,
+body:not(.admin-panel):not(.dashboard) .qm-footer .footer-item__title {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .footer-area .footer-menu__link,
+body:not(.admin-panel):not(.dashboard) .qm-footer .footer-menu__link,
+body:not(.admin-panel):not(.dashboard) .qm-footer .footer-contact-menu__item-content,
+body:not(.admin-panel):not(.dashboard) .qm-footer .footer-contact-menu__item-content a {
+  color: #cbd5e1 !important;
+  -webkit-text-fill-color: #cbd5e1 !important;
+  opacity: 1 !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .footer-area .footer-menu__link:hover,
+body:not(.admin-panel):not(.dashboard) .qm-footer .footer-menu__link:hover {
+  color: #7dd3fc !important;
+  -webkit-text-fill-color: #7dd3fc !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .bottom-footer {
+  background: #081524 !important;
+  border-top: 1px solid rgba(148, 163, 184, 0.18) !important;
+  color: #94a3b8 !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .bottom-footer a {
+  color: #7dd3fc !important;
+}
+
+/* Provider timeline page accents */
+body:not(.admin-panel):not(.dashboard) .qm-fp5-hero {
+  background: linear-gradient(180deg, #dbeafe 0%, #f0fdf9 55%, #ffffff 100%) !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .qm-fp5-badge {
+  background: #fff !important;
+  border-color: rgba(11, 107, 203, 0.25) !important;
+  color: var(--blue) !important;
+  box-shadow: 0 8px 20px rgba(11, 107, 203, 0.12);
+}
+
+body:not(.admin-panel):not(.dashboard) .qm-fp5-aside {
+  background: linear-gradient(165deg, #116b45 0%, #0f3d2e 48%, #1a2e24 100%) !important;
+  border: 1px solid rgba(29, 191, 115, 0.45) !important;
+  box-shadow: 0 18px 42px rgba(15, 61, 46, 0.28) !important;
+  color: #fff !important;
+}
+
+/* Jobs / cards */
+body:not(.admin-panel):not(.dashboard) .qm-jobs-page {
+  background: linear-gradient(180deg, #eef5fc 0%, #fff 320px) !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .qm-job-card.expert-developer {
+  border-color: rgba(11, 107, 203, 0.12) !important;
+  box-shadow: 0 12px 28px rgba(15, 70, 140, 0.08) !important;
+}
+
+body:not(.admin-panel):not(.dashboard) .qm-job-card.expert-developer:hover {
+  border-color: rgba(11, 107, 203, 0.35) !important;
+}
+
+/* Soft brand wash behind common page frames */
+body:not(.admin-panel):not(.dashboard) .banner-section,
+body:not(.admin-panel):not(.dashboard) .my-120 {
+  position: relative;
+}
+
+body:not(.admin-panel):not(.dashboard) .scroll-top {
+  background: var(--blue) !important;
+  box-shadow: 0 10px 24px rgba(11, 107, 203, 0.35);
+}

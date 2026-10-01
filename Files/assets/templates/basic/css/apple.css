@@ -36,9 +36,9 @@
     --qm-radius-inner: 16px;
     --qm-pill: 999px;
     --qm-gradient:
-        radial-gradient(circle at 20% 20%, rgba(41, 151, 255, 0.15), transparent 35%),
-        radial-gradient(circle at 80% 70%, rgba(120, 100, 255, 0.12), transparent 40%),
-        linear-gradient(160deg, #eef1f6, #dfe4ec);
+        radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.18), transparent 35%),
+        radial-gradient(circle at 80% 70%, rgba(11, 107, 203, 0.12), transparent 40%),
+        linear-gradient(160deg, #eef5fc, #e4eef8);
 
     /* Kill Inter / Inknut Antiqua from main.css */
     --heading-font: var(--qm-font) !important;

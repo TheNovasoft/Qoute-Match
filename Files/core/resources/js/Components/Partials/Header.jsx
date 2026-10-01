@@ -3,9 +3,17 @@ import HeaderAuthLinks from '@/Components/Partials/HeaderAuthLinks';
 import LanguageSwitcher from '@/Components/Partials/LanguageSwitcher';
 import { isNavActive } from '@/utils/helpers';
 
+const GREEN_LOGO = '/assets/templates/basic/images/qm-logo-green.svg';
+
+function useGreenBrand(currentUrl = '') {
+    const path = String(currentUrl || '').split('?')[0].toLowerCase();
+    return path === '/' || path === '' || path.startsWith('/about') || path.includes('for-providers');
+}
+
 export default function Header() {
     const { site, navigation, routes, auth, url } = usePage().props;
     const currentUrl = usePage().url || url || '';
+    const greenBrand = useGreenBrand(currentUrl);
     const aboutPage = navigation?.aboutPage;
     const extraPages = navigation?.extraPages || [];
     const extraLinks = navigation?.extraLinks || [];
@@ -24,13 +32,14 @@ export default function Header() {
         || extraPages.some((page) => isNavActive(currentUrl, `/${page.slug}`, { exact: true }));
 
     const jobsActive = isNavActive(currentUrl, findJobsUrl) || isNavActive(currentUrl, '/jobs');
+    const logoSrc = greenBrand ? GREEN_LOGO : site.logo;
 
     return (
         <header className="header qm-site-header" id="header">
             <div className="container">
                 <nav className="navbar navbar-expand-xl navbar-light header-navbar">
-                    <Link className="navbar-brand logo" href={routes.home}>
-                        <img src={site.logo} alt={site.name} />
+                    <Link className={`navbar-brand logo${greenBrand ? ' logo--green' : ''}`} href={routes.home}>
+                        <img src={logoSrc} alt={site.name} />
                     </Link>
 
                     <div className="d-xl-none d-block job-link">
