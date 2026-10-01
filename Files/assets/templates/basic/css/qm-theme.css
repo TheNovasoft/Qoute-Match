@@ -159,8 +159,8 @@ body:not(.admin-panel):not(.dashboard) .banner-section .banner-thumb-wrapper__it
 }
 
 body:not(.admin-panel):not(.dashboard) .banner-section .banner-thumb-wrapper__item.two {
-  background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 70%) !important;
-  border-color: rgba(15, 138, 106, 0.28) !important;
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 70%) !important;
+  border-color: rgba(11, 107, 203, 0.28) !important;
 }
 
 /* Footer */
@@ -214,9 +214,9 @@ body:not(.admin-panel):not(.dashboard) .qm-fp5-badge {
 }
 
 body:not(.admin-panel):not(.dashboard) .qm-fp5-aside {
-  background: linear-gradient(165deg, #116b45 0%, #0f3d2e 48%, #1a2e24 100%) !important;
-  border: 1px solid rgba(29, 191, 115, 0.45) !important;
-  box-shadow: 0 18px 42px rgba(15, 61, 46, 0.28) !important;
+  background: linear-gradient(160deg, #0b6bcb 0%, #0f2744 70%) !important;
+  border: 1px solid rgba(11, 107, 203, 0.35) !important;
+  box-shadow: 0 18px 42px rgba(15, 70, 140, 0.22) !important;
   color: #fff !important;
 }
 

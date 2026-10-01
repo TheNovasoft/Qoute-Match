@@ -1,26 +1,26 @@
-/* Marketplace Trust Green — Home / About / For Providers (body.qm-fiverr-theme). */
+/* Public blue theme polish — Home / About / For Providers / Contact / Locations. */
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard),
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) {
-  --qm-fv-green: #1dbf73;
-  --qm-fv-green-hover: #19a463;
+  --qm-fv-green: #0071e3;
+  --qm-fv-green-hover: #0077ed;
   --qm-fv-charcoal: #222325;
   --qm-fv-ink: #404145;
   --qm-fv-muted: #74767e;
   --qm-fv-bg: #fafafa;
   --qm-fv-white: #ffffff;
   --qm-fv-border: #e4e5e7;
-  --base: 152 74% 43% !important;
-  --base-h: 152 !important;
-  --base-s: 74% !important;
-  --base-l: 43% !important;
-  --blue: #1dbf73 !important;
-  --blue-hover: #19a463 !important;
-  --qm-blue: #1dbf73 !important;
-  --qm-blue-hover: #19a463 !important;
+  --base: 210 100% 45% !important;
+  --base-h: 210 !important;
+  --base-s: 100% !important;
+  --base-l: 45% !important;
+  --blue: #0071e3 !important;
+  --blue-hover: #0077ed !important;
+  --qm-blue: #0071e3 !important;
+  --qm-blue-hover: #0077ed !important;
   --qm-gradient:
-    radial-gradient(circle at 12% 18%, rgba(29, 191, 115, 0.18), transparent 42%),
-    radial-gradient(circle at 88% 12%, rgba(25, 164, 99, 0.12), transparent 38%),
-    linear-gradient(165deg, #f0fdf6 0%, #e8f8ef 48%, #f7faf8 100%) !important;
+    radial-gradient(circle at 12% 18%, rgba(0, 113, 227, 0.18), transparent 42%),
+    radial-gradient(circle at 88% 12%, rgba(0, 119, 237, 0.12), transparent 38%),
+    linear-gradient(165deg, #f4f8fd 0%, #e7f0fa 48%, #f7fbff 100%) !important;
   background: var(--qm-fv-bg);
   color: var(--qm-fv-ink);
 }
@@ -28,8 +28,8 @@ body.qm-home-fiverr:not(.admin-panel):not(.dashboard) {
 /* Shorthand */
 body.qm-fiverr-theme,
 body.qm-home-fiverr {
-  --qm-fv-green: #1dbf73;
-  --qm-fv-green-hover: #19a463;
+  --qm-fv-green: #0071e3;
+  --qm-fv-green-hover: #0077ed;
   --qm-fv-charcoal: #222325;
   --qm-fv-ink: #404145;
   --qm-fv-muted: #74767e;
@@ -139,7 +139,7 @@ body.qm-home-fiverr .s-highlight span.text--base {
 /* Banner badges */
 body.qm-fiverr-theme .banner-thumb-wrapper__item,
 body.qm-home-fiverr .banner-thumb-wrapper__item {
-  border-color: rgba(29, 191, 115, 0.5) !important;
+  border-color: rgba(0, 113, 227, 0.5) !important;
 }
 
 body.qm-fiverr-theme .banner-thumb-wrapper__item:hover,
@@ -165,7 +165,7 @@ body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .how-wowrk-section,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .how-work-section,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-how-work {
   background:
-    linear-gradient(180deg, rgba(236, 253, 245, 0.65) 0%, rgba(250, 250, 250, 0.95) 100%) !important;
+    linear-gradient(180deg, rgba(219, 234, 254, 0.65) 0%, rgba(250, 250, 250, 0.95) 100%) !important;
 }
 
 body.qm-fiverr-theme .qm-how-card__step,
@@ -175,7 +175,7 @@ body.qm-home-fiverr .qm-how-card__step {
 
 body.qm-fiverr-theme .qm-how-card__icon,
 body.qm-home-fiverr .qm-how-card__icon {
-  background: rgba(29, 191, 115, 0.12) !important;
+  background: rgba(0, 113, 227, 0.12) !important;
   color: var(--qm-fv-green) !important;
 }
 
@@ -183,7 +183,7 @@ body.qm-fiverr-theme .how-work-item__icon,
 body.qm-home-fiverr .how-work-item__icon,
 body.qm-fiverr-theme .how-wowrk-section .how-work-item__icon,
 body.qm-home-fiverr .how-wowrk-section .how-work-item__icon {
-  background-color: rgba(29, 191, 115, 0.12) !important;
+  background-color: rgba(0, 113, 227, 0.12) !important;
   color: var(--qm-fv-green) !important;
 }
 
@@ -209,8 +209,8 @@ body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-how-card,
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .how-work-item,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-how-card,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .how-work-item {
-  border-color: rgba(29, 191, 115, 0.18) !important;
-  box-shadow: 0 10px 28px rgba(15, 61, 46, 0.06) !important;
+  border-color: rgba(0, 113, 227, 0.18) !important;
+  box-shadow: 0 10px 28px rgba(15, 39, 68, 0.06) !important;
 }
 
 /* —— Testimonials —— */
@@ -218,8 +218,8 @@ body.qm-fiverr-theme .testimonails-card .testimonial-item,
 body.qm-home-fiverr .testimonails-card .testimonial-item,
 body.qm-fiverr-theme .testimonial-item,
 body.qm-home-fiverr .testimonial-item {
-  background: rgba(236, 253, 245, 0.55) !important;
-  border: 1px solid rgba(29, 191, 115, 0.12) !important;
+  background: rgba(219, 234, 254, 0.55) !important;
+  border: 1px solid rgba(0, 113, 227, 0.12) !important;
 }
 
 body.qm-fiverr-theme .testimonial-item__icon,
@@ -236,7 +236,7 @@ body.qm-home-fiverr .testimonial-item__icon svg {
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .faq-section,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .faq-section {
   background:
-    linear-gradient(180deg, rgba(236, 253, 245, 0.7) 0%, rgba(250, 250, 250, 0.9) 100%) !important;
+    linear-gradient(180deg, rgba(219, 234, 254, 0.7) 0%, rgba(250, 250, 250, 0.9) 100%) !important;
 }
 
 body.qm-fiverr-theme .custom--accordion .accordion-button:not(.collapsed),
@@ -257,28 +257,28 @@ body.qm-home-fiverr .custom--accordion .accordion-button[aria-expanded="false"]:
 
 body.qm-fiverr-theme .custom--accordion .accordion-button[aria-expanded="false"]::after,
 body.qm-home-fiverr .custom--accordion .accordion-button[aria-expanded="false"]::after {
-  background: rgba(29, 191, 115, 0.14) !important;
+  background: rgba(0, 113, 227, 0.14) !important;
   color: var(--qm-fv-green) !important;
 }
 
 body.qm-fiverr-theme .faq-thumb-wrapper,
 body.qm-home-fiverr .faq-thumb-wrapper {
-  background-color: #0f3d2e !important;
-  background: #0f3d2e !important;
+  background-color: #0f2744 !important;
+  background: #0f2744 !important;
 }
 
 /* —— Newsletter —— */
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .subscribe-wrapper,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .subscribe-wrapper {
   background:
-    radial-gradient(circle at 12% 18%, rgba(29, 191, 115, 0.2), transparent 42%),
-    radial-gradient(circle at 88% 12%, rgba(25, 164, 99, 0.14), transparent 38%),
-    linear-gradient(165deg, #f0fdf6 0%, #e8f8ef 48%, #f7faf8 100%) !important;
+    radial-gradient(circle at 12% 18%, rgba(0, 113, 227, 0.2), transparent 42%),
+    radial-gradient(circle at 88% 12%, rgba(0, 119, 237, 0.14), transparent 38%),
+    linear-gradient(165deg, #f4f8fd 0%, #e7f0fa 48%, #f7fbff 100%) !important;
 }
 
 body.qm-fiverr-theme .subscribe-wrapper::before,
 body.qm-home-fiverr .subscribe-wrapper::before {
-  background: #0f3d2e !important;
+  background: #0f2744 !important;
 }
 
 body.qm-fiverr-theme .subscribe-form .input-text-style,
@@ -362,8 +362,8 @@ body.qm-home-fiverr .qm-footer .social-list__link {
   width: 36px !important;
   height: 36px !important;
   border-radius: 999px !important;
-  background: rgba(29, 191, 115, 0.16) !important;
-  border: 1px solid rgba(29, 191, 115, 0.55) !important;
+  background: rgba(0, 113, 227, 0.16) !important;
+  border: 1px solid rgba(0, 113, 227, 0.55) !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
 }
@@ -400,37 +400,23 @@ body.qm-home-fiverr .scrollToTop {
   background: var(--qm-fv-green) !important;
 }
 
-body.qm-fiverr-theme .navbar-brand.logo--green,
-body.qm-home-fiverr .navbar-brand.logo--green {
-  width: auto !important;
-  min-width: 160px !important;
-  flex: 0 0 auto !important;
-}
-
-body.qm-fiverr-theme .navbar-brand.logo--green img,
-body.qm-home-fiverr .navbar-brand.logo--green img {
-  width: 180px !important;
-  height: 40px !important;
-  max-height: 48px !important;
-  max-width: 200px !important;
-  display: block !important;
-}
+/* logo--green removed — using default site logo */
 
 /* —— For Providers (when themed) —— */
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-fp5-hero,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-fp5-hero {
-  background: linear-gradient(180deg, #ecfdf5 0%, #fff 70%) !important;
+  background: linear-gradient(180deg, #eff6ff 0%, #fff 70%) !important;
 }
 
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-fp5-badge,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-fp5-badge {
-  border-color: rgba(29, 191, 115, 0.28) !important;
+  border-color: rgba(0, 113, 227, 0.28) !important;
   color: var(--qm-fv-green) !important;
-  box-shadow: 0 8px 20px rgba(29, 191, 115, 0.12) !important;
+  box-shadow: 0 8px 20px rgba(0, 113, 227, 0.12) !important;
 }
 
 body.qm-fiverr-theme .qm-fp5-timeline {
-  border-left-color: rgba(29, 191, 115, 0.28) !important;
+  border-left-color: rgba(0, 113, 227, 0.28) !important;
 }
 
 body.qm-fiverr-theme .qm-fp5-timeline li::before {
@@ -444,8 +430,8 @@ body.qm-fiverr-theme .qm-fp-eyebrow {
 
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-fp5-aside,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-fp5-aside {
-  background: linear-gradient(165deg, #116b45 0%, #0f3d2e 48%, #1a2e24 100%) !important;
-  border-color: rgba(29, 191, 115, 0.45) !important;
+  background: linear-gradient(165deg, #0b6bcb 0%, #0f2744 48%, #0b1c31 100%) !important;
+  border-color: rgba(0, 113, 227, 0.45) !important;
   color: #fff !important;
 }
 
@@ -460,9 +446,9 @@ body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-fp5-aside ul {
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard),
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) {
   background:
-    radial-gradient(1200px 520px at 10% -10%, rgba(29, 191, 115, 0.12), transparent 55%),
-    radial-gradient(900px 480px at 100% 0%, rgba(15, 61, 46, 0.06), transparent 50%),
-    linear-gradient(180deg, #f7fbf8 0%, #ffffff 280px, #fafafa 100%) !important;
+    radial-gradient(1200px 520px at 10% -10%, rgba(0, 113, 227, 0.12), transparent 55%),
+    radial-gradient(900px 480px at 100% 0%, rgba(15, 39, 68, 0.06), transparent 50%),
+    linear-gradient(180deg, #f7fbff 0%, #ffffff 280px, #fafafa 100%) !important;
 }
 
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .facility-section,
@@ -470,5 +456,251 @@ body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-trust,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .facility-section,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-trust {
   background:
-    linear-gradient(180deg, rgba(236, 253, 245, 0.55) 0%, rgba(250, 250, 250, 0.9) 100%) !important;
+    linear-gradient(180deg, rgba(219, 234, 254, 0.55) 0%, rgba(250, 250, 250, 0.9) 100%) !important;
 }
+
+/* —— Contact page —— */
+body.qm-fiverr-theme .qm-contact-hero,
+body.qm-fiverr-theme .qm-loc-hero {
+  padding: 3.25rem 0 2.5rem;
+  background:
+    radial-gradient(900px 420px at 12% 0%, rgba(0, 113, 227, 0.16), transparent 55%),
+    linear-gradient(180deg, #eff6ff 0%, #ffffff 78%);
+}
+
+body.qm-fiverr-theme .qm-contact-hero__eyebrow,
+body.qm-fiverr-theme .qm-loc-hero__eyebrow {
+  margin: 0 0 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--qm-fv-green);
+}
+
+body.qm-fiverr-theme .qm-contact-hero__title,
+body.qm-fiverr-theme .qm-loc-hero__title {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.9rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--qm-fv-charcoal) !important;
+  -webkit-text-fill-color: var(--qm-fv-charcoal) !important;
+}
+
+body.qm-fiverr-theme .qm-contact-hero__desc,
+body.qm-fiverr-theme .qm-loc-hero__desc {
+  margin: 0;
+  max-width: 40rem;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--qm-fv-muted);
+}
+
+body.qm-fiverr-theme .qm-loc-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.35rem;
+}
+
+body.qm-fiverr-theme .qm-loc-back {
+  display: inline-block;
+  margin-bottom: 0.85rem;
+  font-weight: 600;
+  color: var(--qm-fv-green) !important;
+  -webkit-text-fill-color: var(--qm-fv-green) !important;
+  text-decoration: none;
+}
+
+body.qm-fiverr-theme .qm-contact-aside,
+body.qm-fiverr-theme .qm-contact-form {
+  background: #fff;
+  border: 1px solid rgba(0, 113, 227, 0.16);
+  border-radius: 18px;
+  padding: 1.6rem 1.45rem;
+  box-shadow: 0 14px 34px rgba(15, 39, 68, 0.07);
+  height: 100%;
+}
+
+body.qm-fiverr-theme .qm-contact-aside .contact-item__icon,
+body.qm-fiverr-theme .contact-item__icon {
+  background: rgba(0, 113, 227, 0.12) !important;
+  color: var(--qm-fv-green) !important;
+}
+
+body.qm-fiverr-theme .qm-contact-page .social-list__link {
+  background: rgba(0, 113, 227, 0.14) !important;
+  border: 1px solid rgba(0, 113, 227, 0.45) !important;
+  color: var(--qm-fv-charcoal) !important;
+  border-radius: 999px !important;
+}
+
+body.qm-fiverr-theme .qm-contact-page .social-list__link:hover {
+  background: var(--qm-fv-green) !important;
+  border-color: var(--qm-fv-green) !important;
+  color: #fff !important;
+}
+
+/* —— Locations —— */
+body.qm-fiverr-theme .qm-loc-page {
+  padding-top: 1.5rem;
+}
+
+body.qm-fiverr-theme .qm-loc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.15rem;
+}
+
+body.qm-fiverr-theme .qm-loc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  background: #fff;
+  border: 1px solid rgba(0, 113, 227, 0.14);
+  border-radius: 18px;
+  padding: 1.35rem 1.25rem 1.2rem;
+  box-shadow: 0 12px 28px rgba(15, 39, 68, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  min-height: 100%;
+}
+
+body.qm-fiverr-theme .qm-loc-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(0, 113, 227, 0.35);
+  box-shadow: 0 18px 36px rgba(15, 39, 68, 0.11);
+}
+
+body.qm-fiverr-theme .qm-loc-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 113, 227, 0.12);
+  color: var(--qm-fv-green);
+  font-size: 1.35rem;
+}
+
+body.qm-fiverr-theme .qm-loc-card__title {
+  margin: 0 0 0.25rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--qm-fv-charcoal) !important;
+  -webkit-text-fill-color: var(--qm-fv-charcoal) !important;
+}
+
+body.qm-fiverr-theme .qm-loc-card__region {
+  margin: 0 0 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--qm-fv-green);
+}
+
+body.qm-fiverr-theme .qm-loc-card__desc {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--qm-fv-muted);
+}
+
+body.qm-fiverr-theme .qm-loc-card__cta {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  color: var(--qm-fv-green) !important;
+  -webkit-text-fill-color: var(--qm-fv-green) !important;
+  text-decoration: none;
+}
+
+body.qm-fiverr-theme .qm-loc-card__cta:hover {
+  color: var(--qm-fv-green-hover) !important;
+  -webkit-text-fill-color: var(--qm-fv-green-hover) !important;
+}
+
+body.qm-fiverr-theme .qm-loc-section-head {
+  margin-bottom: 1.5rem;
+}
+
+body.qm-fiverr-theme .qm-loc-section-head h2 {
+  margin: 0 0 0.4rem;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  font-weight: 800;
+  color: var(--qm-fv-charcoal) !important;
+}
+
+body.qm-fiverr-theme .qm-loc-section-head p {
+  margin: 0;
+  color: var(--qm-fv-muted);
+}
+
+body.qm-fiverr-theme .qm-loc-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+body.qm-fiverr-theme .qm-loc-cat-card {
+  background: #fff;
+  border: 1px solid rgba(0, 113, 227, 0.14);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 10px 24px rgba(15, 39, 68, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.qm-fiverr-theme .qm-loc-cat-card:hover {
+  border-color: rgba(0, 113, 227, 0.32);
+  box-shadow: 0 16px 32px rgba(15, 39, 68, 0.1);
+}
+
+body.qm-fiverr-theme .qm-loc-cat-card__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 113, 227, 0.12);
+  color: var(--qm-fv-green);
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+}
+
+body.qm-fiverr-theme .qm-loc-cat-card__title {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--qm-fv-charcoal) !important;
+}
+
+body.qm-fiverr-theme .qm-loc-cat-card__desc {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--qm-fv-muted);
+}
+
+body.qm-fiverr-theme .qm-loc-cat-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+@media (max-width: 991px) {
+  body.qm-fiverr-theme .qm-loc-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  body.qm-fiverr-theme .qm-loc-grid,
+  body.qm-fiverr-theme .qm-loc-cat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
