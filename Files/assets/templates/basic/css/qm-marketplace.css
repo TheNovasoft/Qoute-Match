@@ -713,7 +713,7 @@ body:not(.dashboard):not(.admin-panel) .breadcrumb-section {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #1a1a1a;
+  background: #000000;
   color: #fff;
   padding: 5.5rem 0;
 }

@@ -7211,7 +7211,7 @@ div [class*="col"]:last-child .account-item__thumb {
 }
 
 .work-completion-wrapper .work-completion-content {
-  background-color: #212121;
+  background-color: #000000;
   padding: 110px 60px;
   position: relative;
   z-index: 2;

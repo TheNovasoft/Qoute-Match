@@ -35,7 +35,6 @@ export default function CmsPage({ pageTitle, seo, sections }) {
             pageTitle={pageTitle}
             seo={seo}
             showBreadcrumb={!aboutHero && !forProviders}
-            bodyClass={aboutHero || forProviders ? 'qm-fiverr-theme' : ''}
         >
             {aboutHero && (
                 <VideoPromoSection

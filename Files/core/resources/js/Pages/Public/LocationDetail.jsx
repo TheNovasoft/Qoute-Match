@@ -11,7 +11,6 @@ export default function LocationDetail({ pageTitle, seo, location, intro, catego
             pageTitle={pageTitle}
             seo={seo}
             showBreadcrumb={false}
-            bodyClass="qm-fiverr-theme"
         >
             <section className="qm-loc-hero qm-loc-hero--detail">
                 <div className="container">

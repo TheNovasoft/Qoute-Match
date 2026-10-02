@@ -14,14 +14,17 @@ export default function FrontendLayout({
     toRoute,
     bodyClass = '',
 }) {
+    const themeClass = 'qm-fiverr-theme qm-home-fiverr';
+    const mergedBodyClass = [themeClass, bodyClass].filter(Boolean).join(' ');
+
     useEffect(() => {
-        if (!bodyClass || typeof document === 'undefined') return undefined;
-        const classes = bodyClass.split(/\s+/).filter(Boolean);
+        if (!mergedBodyClass || typeof document === 'undefined') return undefined;
+        const classes = [...new Set(mergedBodyClass.split(/\s+/).filter(Boolean))];
         classes.forEach((c) => document.body.classList.add(c));
         return () => {
             classes.forEach((c) => document.body.classList.remove(c));
         };
-    }, [bodyClass]);
+    }, [mergedBodyClass]);
 
     return (
         <AppLayout pageTitle={pageTitle} seo={seo}>

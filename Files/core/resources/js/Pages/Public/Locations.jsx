@@ -3,7 +3,7 @@ import FrontendLayout from '@/Components/Layout/FrontendLayout';
 
 export default function Locations({ pageTitle, seo, locations }) {
     return (
-        <FrontendLayout pageTitle={pageTitle} seo={seo} bodyClass="qm-fiverr-theme" showBreadcrumb={false}>
+        <FrontendLayout pageTitle={pageTitle} seo={seo} showBreadcrumb={false}>
             <section className="qm-loc-hero">
                 <div className="container">
                     <p className="qm-loc-hero__eyebrow">Coverage across the UK</p>

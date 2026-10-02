@@ -16,7 +16,7 @@ export default function Contact({ pageTitle, seo, sections, contact, socialIcons
     };
 
     return (
-        <FrontendLayout pageTitle={pageTitle} seo={seo} bodyClass="qm-fiverr-theme">
+        <FrontendLayout pageTitle={pageTitle} seo={seo}>
             <section className="qm-contact-hero">
                 <div className="container">
                     <p className="qm-contact-hero__eyebrow">We're here to help</p>
