@@ -1,26 +1,26 @@
-/* Marketplace Trust Green — Home / About / For Providers (body.qm-fiverr-theme). */
+/* Public site theme — blue + pure black (#000000) + shades. */
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard),
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) {
-  --qm-fv-green: #1dbf73;
-  --qm-fv-green-hover: #19a463;
-  --qm-fv-charcoal: #222325;
-  --qm-fv-ink: #404145;
-  --qm-fv-muted: #74767e;
+  --qm-fv-blue: #0071e3;
+  --qm-fv-blue-hover: #0077ed;
+  --qm-fv-charcoal: #000000;
+  --qm-fv-ink: #333333;
+  --qm-fv-muted: #666666;
   --qm-fv-bg: #fafafa;
   --qm-fv-white: #ffffff;
   --qm-fv-border: #e4e5e7;
-  --base: 152 74% 43% !important;
-  --base-h: 152 !important;
-  --base-s: 74% !important;
-  --base-l: 43% !important;
-  --blue: #1dbf73 !important;
-  --blue-hover: #19a463 !important;
-  --qm-blue: #1dbf73 !important;
-  --qm-blue-hover: #19a463 !important;
+  --base: 210 100% 45% !important;
+  --base-h: 210 !important;
+  --base-s: 100% !important;
+  --base-l: 45% !important;
+  --blue: #0071e3 !important;
+  --blue-hover: #0077ed !important;
+  --qm-blue: #0071e3 !important;
+  --qm-blue-hover: #0077ed !important;
   --qm-gradient:
-    radial-gradient(circle at 12% 18%, rgba(29, 191, 115, 0.18), transparent 42%),
-    radial-gradient(circle at 88% 12%, rgba(25, 164, 99, 0.12), transparent 38%),
-    linear-gradient(165deg, #f0fdf6 0%, #e8f8ef 48%, #f7faf8 100%) !important;
+    radial-gradient(circle at 12% 18%, rgba(0, 113, 227, 0.18), transparent 42%),
+    radial-gradient(circle at 88% 12%, rgba(0, 119, 237, 0.12), transparent 38%),
+    linear-gradient(165deg, #f4f8fd 0%, #e7f0fa 48%, #f7fbff 100%) !important;
   background: var(--qm-fv-bg);
   color: var(--qm-fv-ink);
 }
@@ -28,11 +28,11 @@ body.qm-home-fiverr:not(.admin-panel):not(.dashboard) {
 /* Shorthand */
 body.qm-fiverr-theme,
 body.qm-home-fiverr {
-  --qm-fv-green: #1dbf73;
-  --qm-fv-green-hover: #19a463;
-  --qm-fv-charcoal: #222325;
-  --qm-fv-ink: #404145;
-  --qm-fv-muted: #74767e;
+  --qm-fv-blue: #0071e3;
+  --qm-fv-blue-hover: #0077ed;
+  --qm-fv-charcoal: #000000;
+  --qm-fv-ink: #333333;
+  --qm-fv-muted: #666666;
   --qm-fv-bg: #fafafa;
   --qm-fv-white: #ffffff;
   --qm-fv-border: #e4e5e7;
@@ -61,8 +61,8 @@ body.qm-fiverr-theme .header .nav-link.active,
 body.qm-home-fiverr .header .nav-link.active,
 body.qm-fiverr-theme .header a.text--base,
 body.qm-home-fiverr .header a.text--base {
-  color: var(--qm-fv-green) !important;
-  -webkit-text-fill-color: var(--qm-fv-green) !important;
+  color: var(--qm-fv-blue) !important;
+  -webkit-text-fill-color: var(--qm-fv-blue) !important;
 }
 
 /* Solid buttons */
@@ -77,10 +77,10 @@ body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .btn--base,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .header-post-job-btn,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) a.header-post-job-btn {
   background-image: none !important;
-  background-color: var(--qm-fv-green) !important;
-  background: var(--qm-fv-green) !important;
+  background-color: var(--qm-fv-blue) !important;
+  background: var(--qm-fv-blue) !important;
   border: none !important;
-  border-color: var(--qm-fv-green) !important;
+  border-color: var(--qm-fv-blue) !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
   box-shadow: none !important;
@@ -94,7 +94,7 @@ body.qm-home-fiverr:not(.admin-panel):not(.dashboard) a.btn.btn--base:hover,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .btn.btn--base:hover,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .header-post-job-btn:hover {
   background-image: none !important;
-  background: var(--qm-fv-green-hover) !important;
+  background: var(--qm-fv-blue-hover) !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
   box-shadow: none !important;
@@ -132,20 +132,20 @@ body.qm-fiverr-theme a.text--base,
 body.qm-home-fiverr a.text--base,
 body.qm-fiverr-theme .s-highlight span.text--base,
 body.qm-home-fiverr .s-highlight span.text--base {
-  color: var(--qm-fv-green) !important;
-  -webkit-text-fill-color: var(--qm-fv-green) !important;
+  color: var(--qm-fv-blue) !important;
+  -webkit-text-fill-color: var(--qm-fv-blue) !important;
 }
 
 /* Banner badges */
 body.qm-fiverr-theme .banner-thumb-wrapper__item,
 body.qm-home-fiverr .banner-thumb-wrapper__item {
-  border-color: rgba(29, 191, 115, 0.5) !important;
+  border-color: rgba(0, 113, 227, 0.5) !important;
 }
 
 body.qm-fiverr-theme .banner-thumb-wrapper__item:hover,
 body.qm-home-fiverr .banner-thumb-wrapper__item:hover {
-  background: var(--qm-fv-green) !important;
-  border-color: var(--qm-fv-green) !important;
+  background: var(--qm-fv-blue) !important;
+  border-color: var(--qm-fv-blue) !important;
   color: #fff !important;
 }
 
@@ -165,52 +165,52 @@ body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .how-wowrk-section,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .how-work-section,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-how-work {
   background:
-    linear-gradient(180deg, rgba(236, 253, 245, 0.65) 0%, rgba(250, 250, 250, 0.95) 100%) !important;
+    linear-gradient(180deg, rgba(219, 234, 254, 0.65) 0%, rgba(250, 250, 250, 0.95) 100%) !important;
 }
 
 body.qm-fiverr-theme .qm-how-card__step,
 body.qm-home-fiverr .qm-how-card__step {
-  color: var(--qm-fv-green) !important;
+  color: var(--qm-fv-blue) !important;
 }
 
 body.qm-fiverr-theme .qm-how-card__icon,
 body.qm-home-fiverr .qm-how-card__icon {
-  background: rgba(29, 191, 115, 0.12) !important;
-  color: var(--qm-fv-green) !important;
+  background: rgba(0, 113, 227, 0.12) !important;
+  color: var(--qm-fv-blue) !important;
 }
 
 body.qm-fiverr-theme .how-work-item__icon,
 body.qm-home-fiverr .how-work-item__icon,
 body.qm-fiverr-theme .how-wowrk-section .how-work-item__icon,
 body.qm-home-fiverr .how-wowrk-section .how-work-item__icon {
-  background-color: rgba(29, 191, 115, 0.12) !important;
-  color: var(--qm-fv-green) !important;
+  background-color: rgba(0, 113, 227, 0.12) !important;
+  color: var(--qm-fv-blue) !important;
 }
 
 body.qm-fiverr-theme .how-work-item__icon i,
 body.qm-home-fiverr .how-work-item__icon i {
-  color: var(--qm-fv-green) !important;
+  color: var(--qm-fv-blue) !important;
 }
 
 body.qm-fiverr-theme .how-wowrk-section .how-work-item::before,
 body.qm-fiverr-theme .how-work-section .how-work-item::before,
 body.qm-home-fiverr .how-wowrk-section .how-work-item::before,
 body.qm-home-fiverr .how-work-section .how-work-item::before {
-  background: var(--qm-fv-green) !important;
+  background: var(--qm-fv-blue) !important;
   color: #fff !important;
 }
 
 body.qm-fiverr-theme .how-work-arrow path,
 body.qm-home-fiverr .how-work-arrow path {
-  stroke: var(--qm-fv-green) !important;
+  stroke: var(--qm-fv-blue) !important;
 }
 
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-how-card,
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .how-work-item,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-how-card,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .how-work-item {
-  border-color: rgba(29, 191, 115, 0.18) !important;
-  box-shadow: 0 10px 28px rgba(15, 61, 46, 0.06) !important;
+  border-color: rgba(0, 113, 227, 0.18) !important;
+  box-shadow: 0 10px 28px rgba(15, 39, 68, 0.06) !important;
 }
 
 /* —— Testimonials —— */
@@ -218,75 +218,75 @@ body.qm-fiverr-theme .testimonails-card .testimonial-item,
 body.qm-home-fiverr .testimonails-card .testimonial-item,
 body.qm-fiverr-theme .testimonial-item,
 body.qm-home-fiverr .testimonial-item {
-  background: rgba(236, 253, 245, 0.55) !important;
-  border: 1px solid rgba(29, 191, 115, 0.12) !important;
+  background: rgba(219, 234, 254, 0.55) !important;
+  border: 1px solid rgba(0, 113, 227, 0.12) !important;
 }
 
 body.qm-fiverr-theme .testimonial-item__icon,
 body.qm-home-fiverr .testimonial-item__icon {
-  color: var(--qm-fv-green) !important;
+  color: var(--qm-fv-blue) !important;
 }
 
 body.qm-fiverr-theme .testimonial-item__icon svg,
 body.qm-home-fiverr .testimonial-item__icon svg {
-  fill: var(--qm-fv-green) !important;
+  fill: var(--qm-fv-blue) !important;
 }
 
 /* —— FAQ —— */
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .faq-section,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .faq-section {
   background:
-    linear-gradient(180deg, rgba(236, 253, 245, 0.7) 0%, rgba(250, 250, 250, 0.9) 100%) !important;
+    linear-gradient(180deg, rgba(219, 234, 254, 0.7) 0%, rgba(250, 250, 250, 0.9) 100%) !important;
 }
 
 body.qm-fiverr-theme .custom--accordion .accordion-button:not(.collapsed),
 body.qm-home-fiverr .custom--accordion .accordion-button:not(.collapsed),
 body.qm-fiverr-theme .accordion-button__number,
 body.qm-home-fiverr .accordion-button__number {
-  color: var(--qm-fv-green) !important;
-  -webkit-text-fill-color: var(--qm-fv-green) !important;
+  color: var(--qm-fv-blue) !important;
+  -webkit-text-fill-color: var(--qm-fv-blue) !important;
 }
 
 body.qm-fiverr-theme .custom--accordion .accordion-button[aria-expanded="true"]::after,
 body.qm-fiverr-theme .custom--accordion .accordion-button[aria-expanded="false"]::after,
 body.qm-home-fiverr .custom--accordion .accordion-button[aria-expanded="true"]::after,
 body.qm-home-fiverr .custom--accordion .accordion-button[aria-expanded="false"]::after {
-  background: var(--qm-fv-green) !important;
+  background: var(--qm-fv-blue) !important;
   color: #fff !important;
 }
 
 body.qm-fiverr-theme .custom--accordion .accordion-button[aria-expanded="false"]::after,
 body.qm-home-fiverr .custom--accordion .accordion-button[aria-expanded="false"]::after {
-  background: rgba(29, 191, 115, 0.14) !important;
-  color: var(--qm-fv-green) !important;
+  background: rgba(0, 113, 227, 0.14) !important;
+  color: var(--qm-fv-blue) !important;
 }
 
 body.qm-fiverr-theme .faq-thumb-wrapper,
 body.qm-home-fiverr .faq-thumb-wrapper {
-  background-color: #0f3d2e !important;
-  background: #0f3d2e !important;
+  background-color: #000000 !important;
+  background: #000000 !important;
 }
 
 /* —— Newsletter —— */
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .subscribe-wrapper,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .subscribe-wrapper {
   background:
-    radial-gradient(circle at 12% 18%, rgba(29, 191, 115, 0.2), transparent 42%),
-    radial-gradient(circle at 88% 12%, rgba(25, 164, 99, 0.14), transparent 38%),
-    linear-gradient(165deg, #f0fdf6 0%, #e8f8ef 48%, #f7faf8 100%) !important;
+    radial-gradient(circle at 12% 18%, rgba(0, 113, 227, 0.2), transparent 42%),
+    radial-gradient(circle at 88% 12%, rgba(0, 119, 237, 0.14), transparent 38%),
+    linear-gradient(165deg, #f4f8fd 0%, #e7f0fa 48%, #f7fbff 100%) !important;
 }
 
 body.qm-fiverr-theme .subscribe-wrapper::before,
 body.qm-home-fiverr .subscribe-wrapper::before {
-  background: #0f3d2e !important;
+  background: #000000 !important;
 }
 
 body.qm-fiverr-theme .subscribe-form .input-text-style,
 body.qm-home-fiverr .subscribe-form .input-text-style,
 body.qm-fiverr-theme .subscribe-form button,
 body.qm-home-fiverr .subscribe-form button {
-  background: var(--qm-fv-green) !important;
-  border-color: var(--qm-fv-green) !important;
+  background: var(--qm-fv-blue) !important;
+  border-color: var(--qm-fv-blue) !important;
   color: #fff !important;
 }
 
@@ -295,7 +295,7 @@ body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .footer-area,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .footer-area,
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-footer,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-footer {
-  background: #222325 !important;
+  background: #000000 !important;
   color: rgba(255, 255, 255, 0.82) !important;
 }
 
@@ -320,8 +320,8 @@ body.qm-fiverr-theme .footer-area a.text--base,
 body.qm-home-fiverr .footer-area a.text--base,
 body.qm-fiverr-theme .footer-area .text--base,
 body.qm-home-fiverr .footer-area .text--base {
-  color: var(--qm-fv-green) !important;
-  -webkit-text-fill-color: var(--qm-fv-green) !important;
+  color: var(--qm-fv-blue) !important;
+  -webkit-text-fill-color: var(--qm-fv-blue) !important;
 }
 
 body.qm-fiverr-theme .footer-area .footer-item__title,
@@ -341,8 +341,8 @@ body.qm-home-fiverr .footer-contact-menu__item-icon {
   align-items: center !important;
   justify-content: center !important;
   border-radius: 999px !important;
-  background: var(--qm-fv-green) !important;
-  background-color: var(--qm-fv-green) !important;
+  background: var(--qm-fv-blue) !important;
+  background-color: var(--qm-fv-blue) !important;
   color: #fff !important;
   font-size: 13px !important;
   line-height: 1 !important;
@@ -362,8 +362,8 @@ body.qm-home-fiverr .qm-footer .social-list__link {
   width: 36px !important;
   height: 36px !important;
   border-radius: 999px !important;
-  background: rgba(29, 191, 115, 0.16) !important;
-  border: 1px solid rgba(29, 191, 115, 0.55) !important;
+  background: rgba(0, 113, 227, 0.16) !important;
+  border: 1px solid rgba(0, 113, 227, 0.55) !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
 }
@@ -372,15 +372,15 @@ body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .footer-area .social-list
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .footer-area .social-list__link:hover,
 body.qm-fiverr-theme .qm-footer .social-list__link:hover,
 body.qm-home-fiverr .qm-footer .social-list__link:hover {
-  background: var(--qm-fv-green) !important;
-  border-color: var(--qm-fv-green) !important;
+  background: var(--qm-fv-blue) !important;
+  border-color: var(--qm-fv-blue) !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
 }
 
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .bottom-footer,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .bottom-footer {
-  background: #1a1b1d !important;
+  background: #0a0a0a !important;
   border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
   color: rgba(255, 255, 255, 0.55) !important;
 }
@@ -389,63 +389,49 @@ body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .bottom-footer a,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .bottom-footer a,
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .bottom-footer-text a,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .bottom-footer-text a {
-  color: var(--qm-fv-green) !important;
-  -webkit-text-fill-color: var(--qm-fv-green) !important;
+  color: var(--qm-fv-blue) !important;
+  -webkit-text-fill-color: var(--qm-fv-blue) !important;
 }
 
 body.qm-fiverr-theme .scroll-top,
 body.qm-home-fiverr .scroll-top,
 body.qm-fiverr-theme .scrollToTop,
 body.qm-home-fiverr .scrollToTop {
-  background: var(--qm-fv-green) !important;
+  background: var(--qm-fv-blue) !important;
 }
 
-body.qm-fiverr-theme .navbar-brand.logo--green,
-body.qm-home-fiverr .navbar-brand.logo--green {
-  width: auto !important;
-  min-width: 160px !important;
-  flex: 0 0 auto !important;
-}
-
-body.qm-fiverr-theme .navbar-brand.logo--green img,
-body.qm-home-fiverr .navbar-brand.logo--green img {
-  width: 180px !important;
-  height: 40px !important;
-  max-height: 48px !important;
-  max-width: 200px !important;
-  display: block !important;
-}
+/* green accents removed — using default site logo */
 
 /* —— For Providers (when themed) —— */
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-fp5-hero,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-fp5-hero {
-  background: linear-gradient(180deg, #ecfdf5 0%, #fff 70%) !important;
+  background: linear-gradient(180deg, #eff6ff 0%, #fff 70%) !important;
 }
 
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-fp5-badge,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-fp5-badge {
-  border-color: rgba(29, 191, 115, 0.28) !important;
-  color: var(--qm-fv-green) !important;
-  box-shadow: 0 8px 20px rgba(29, 191, 115, 0.12) !important;
+  border-color: rgba(0, 113, 227, 0.28) !important;
+  color: var(--qm-fv-blue) !important;
+  box-shadow: 0 8px 20px rgba(0, 113, 227, 0.12) !important;
 }
 
 body.qm-fiverr-theme .qm-fp5-timeline {
-  border-left-color: rgba(29, 191, 115, 0.28) !important;
+  border-left-color: rgba(0, 113, 227, 0.28) !important;
 }
 
 body.qm-fiverr-theme .qm-fp5-timeline li::before {
-  background: var(--qm-fv-green) !important;
+  background: var(--qm-fv-blue) !important;
 }
 
 body.qm-fiverr-theme .qm-fp5-timeline i,
 body.qm-fiverr-theme .qm-fp-eyebrow {
-  color: var(--qm-fv-green) !important;
+  color: var(--qm-fv-blue) !important;
 }
 
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-fp5-aside,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-fp5-aside {
-  background: linear-gradient(165deg, #116b45 0%, #0f3d2e 48%, #1a2e24 100%) !important;
-  border-color: rgba(29, 191, 115, 0.45) !important;
+  background: #000000 !important;
+  border-color: rgba(0, 113, 227, 0.45) !important;
   color: #fff !important;
 }
 
@@ -460,9 +446,9 @@ body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-fp5-aside ul {
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard),
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) {
   background:
-    radial-gradient(1200px 520px at 10% -10%, rgba(29, 191, 115, 0.12), transparent 55%),
-    radial-gradient(900px 480px at 100% 0%, rgba(15, 61, 46, 0.06), transparent 50%),
-    linear-gradient(180deg, #f7fbf8 0%, #ffffff 280px, #fafafa 100%) !important;
+    radial-gradient(1200px 520px at 10% -10%, rgba(0, 113, 227, 0.12), transparent 55%),
+    radial-gradient(900px 480px at 100% 0%, rgba(15, 39, 68, 0.06), transparent 50%),
+    linear-gradient(180deg, #f7fbff 0%, #ffffff 280px, #fafafa 100%) !important;
 }
 
 body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .facility-section,
@@ -470,5 +456,662 @@ body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-trust,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .facility-section,
 body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-trust {
   background:
-    linear-gradient(180deg, rgba(236, 253, 245, 0.55) 0%, rgba(250, 250, 250, 0.9) 100%) !important;
+    linear-gradient(180deg, rgba(219, 234, 254, 0.55) 0%, rgba(250, 250, 250, 0.9) 100%) !important;
 }
+
+/* —— Contact page —— */
+body.qm-fiverr-theme .qm-contact-hero,
+body.qm-fiverr-theme .qm-loc-hero {
+  padding: 3.25rem 0 2.5rem;
+  background:
+    radial-gradient(900px 420px at 12% 0%, rgba(0, 113, 227, 0.16), transparent 55%),
+    linear-gradient(180deg, #eff6ff 0%, #ffffff 78%);
+}
+
+body.qm-fiverr-theme .qm-contact-hero__eyebrow,
+body.qm-fiverr-theme .qm-loc-hero__eyebrow {
+  margin: 0 0 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--qm-fv-blue);
+}
+
+body.qm-fiverr-theme .qm-contact-hero__title,
+body.qm-fiverr-theme .qm-loc-hero__title {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.9rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--qm-fv-charcoal) !important;
+  -webkit-text-fill-color: var(--qm-fv-charcoal) !important;
+}
+
+body.qm-fiverr-theme .qm-contact-hero__desc,
+body.qm-fiverr-theme .qm-loc-hero__desc {
+  margin: 0;
+  max-width: 40rem;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--qm-fv-muted);
+}
+
+body.qm-fiverr-theme .qm-loc-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.35rem;
+}
+
+body.qm-fiverr-theme .qm-loc-back {
+  display: inline-block;
+  margin-bottom: 0.85rem;
+  font-weight: 600;
+  color: var(--qm-fv-blue) !important;
+  -webkit-text-fill-color: var(--qm-fv-blue) !important;
+  text-decoration: none;
+}
+
+body.qm-fiverr-theme .qm-contact-aside,
+body.qm-fiverr-theme .qm-contact-form {
+  background: #fff;
+  border: 1px solid rgba(0, 113, 227, 0.16);
+  border-radius: 18px;
+  padding: 1.6rem 1.45rem;
+  box-shadow: 0 14px 34px rgba(15, 39, 68, 0.07);
+  height: 100%;
+}
+
+body.qm-fiverr-theme .qm-contact-aside .contact-item__icon,
+body.qm-fiverr-theme .contact-item__icon {
+  background: rgba(0, 113, 227, 0.12) !important;
+  color: var(--qm-fv-blue) !important;
+}
+
+body.qm-fiverr-theme .qm-contact-page .social-list__link {
+  background: rgba(0, 113, 227, 0.14) !important;
+  border: 1px solid rgba(0, 113, 227, 0.45) !important;
+  color: var(--qm-fv-charcoal) !important;
+  border-radius: 999px !important;
+}
+
+body.qm-fiverr-theme .qm-contact-page .social-list__link:hover {
+  background: var(--qm-fv-blue) !important;
+  border-color: var(--qm-fv-blue) !important;
+  color: #fff !important;
+}
+
+/* —— Locations —— */
+body.qm-fiverr-theme .qm-loc-page {
+  padding-top: 1.5rem;
+}
+
+body.qm-fiverr-theme .qm-loc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.15rem;
+}
+
+body.qm-fiverr-theme .qm-loc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  background: #fff;
+  border: 1px solid rgba(0, 113, 227, 0.14);
+  border-radius: 18px;
+  padding: 1.35rem 1.25rem 1.2rem;
+  box-shadow: 0 12px 28px rgba(15, 39, 68, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  min-height: 100%;
+}
+
+body.qm-fiverr-theme .qm-loc-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(0, 113, 227, 0.35);
+  box-shadow: 0 18px 36px rgba(15, 39, 68, 0.11);
+}
+
+body.qm-fiverr-theme .qm-loc-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 113, 227, 0.12);
+  color: var(--qm-fv-blue);
+  font-size: 1.35rem;
+}
+
+body.qm-fiverr-theme .qm-loc-card__title {
+  margin: 0 0 0.25rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--qm-fv-charcoal) !important;
+  -webkit-text-fill-color: var(--qm-fv-charcoal) !important;
+}
+
+body.qm-fiverr-theme .qm-loc-card__region {
+  margin: 0 0 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--qm-fv-blue);
+}
+
+body.qm-fiverr-theme .qm-loc-card__desc {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--qm-fv-muted);
+}
+
+body.qm-fiverr-theme .qm-loc-card__cta {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  color: var(--qm-fv-blue) !important;
+  -webkit-text-fill-color: var(--qm-fv-blue) !important;
+  text-decoration: none;
+}
+
+body.qm-fiverr-theme .qm-loc-card__cta:hover {
+  color: var(--qm-fv-blue-hover) !important;
+  -webkit-text-fill-color: var(--qm-fv-blue-hover) !important;
+}
+
+body.qm-fiverr-theme .qm-loc-section-head {
+  margin-bottom: 1.5rem;
+}
+
+body.qm-fiverr-theme .qm-loc-section-head h2 {
+  margin: 0 0 0.4rem;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  font-weight: 800;
+  color: var(--qm-fv-charcoal) !important;
+}
+
+body.qm-fiverr-theme .qm-loc-section-head p {
+  margin: 0;
+  color: var(--qm-fv-muted);
+}
+
+body.qm-fiverr-theme .qm-loc-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+body.qm-fiverr-theme .qm-loc-cat-card {
+  background: #fff;
+  border: 1px solid rgba(0, 113, 227, 0.14);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 10px 24px rgba(15, 39, 68, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.qm-fiverr-theme .qm-loc-cat-card:hover {
+  border-color: rgba(0, 113, 227, 0.32);
+  box-shadow: 0 16px 32px rgba(15, 39, 68, 0.1);
+}
+
+body.qm-fiverr-theme .qm-loc-cat-card__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 113, 227, 0.12);
+  color: var(--qm-fv-blue);
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+}
+
+body.qm-fiverr-theme .qm-loc-cat-card__title {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--qm-fv-charcoal) !important;
+}
+
+body.qm-fiverr-theme .qm-loc-cat-card__desc {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--qm-fv-muted);
+}
+
+body.qm-fiverr-theme .qm-loc-cat-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+@media (max-width: 991px) {
+  body.qm-fiverr-theme .qm-loc-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  body.qm-fiverr-theme .qm-loc-grid,
+  body.qm-fiverr-theme .qm-loc-cat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========== Site-wide: black (#000000) + blue theme ========== */
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) {
+  --qm-fv-font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --qm-font: var(--qm-fv-font);
+  --heading-font: var(--qm-fv-font) !important;
+  --body-font: var(--qm-fv-font) !important;
+  --font-heading: var(--qm-fv-font) !important;
+
+  /* Exact Fiverr black scale */
+  --qm-fv-black: #000000;
+  --qm-fv-charcoal: #000000;
+  --qm-fv-ink: #333333;
+  --qm-fv-muted: #666666;
+  --qm-fv-border: #e4e5e7;
+  --qm-fv-bg: #ffffff;
+  --qm-fv-surface: #f5f5f5;
+  --ink: #000000;
+  --muted: #666666;
+
+  --qm-fv-outline: rgba(0, 113, 227, 0.22);
+  --qm-fv-outline-soft: rgba(0, 113, 227, 0.14);
+  --qm-fv-lift:
+    0 1px 0 #fff inset,
+    0 8px 28px rgba(255, 255, 255, 0.95),
+    0 14px 40px rgba(0, 0, 0, 0.1);
+  --qm-fv-lift-hover:
+    0 1px 0 #fff inset,
+    0 12px 36px rgba(255, 255, 255, 0.98),
+    0 20px 48px rgba(0, 0, 0, 0.14);
+
+  color: var(--qm-fv-ink);
+  font-family: var(--qm-fv-font) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #fff !important;
+}
+
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) :is(
+  h1, h2, h3, h4, h5, h6,
+  p, span, a, li, label, button, input, textarea, select,
+  .btn, .nav-link, .dropdown-item,
+  .banner-content__title, .banner-content__desc,
+  .section-heading__title, .section-heading__desc,
+  .qm-how-card__title, .qm-how-card__desc,
+  .qm-trust-card__title, .qm-trust-card__desc,
+  .accordion-button, .accordion-body,
+  .footer-area, .footer-item__title
+) {
+  font-family: var(--qm-fv-font) !important;
+}
+
+/* Clean sections — no blue wash */
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .banner-section,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .how-wowrk-section,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .how-work-section,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-how-work,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .facility-section,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-trust,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .faq-section {
+  background: #fff !important;
+}
+
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-how-work,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-trust,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .faq-section {
+  background: #f5f5f5 !important;
+}
+
+/* Header */
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .header.qm-site-header {
+  background: #fff !important;
+  border-bottom: 1px solid #e4e5e7 !important;
+  box-shadow:
+    0 1px 0 #fff inset,
+    0 6px 24px rgba(255, 255, 255, 0.9),
+    0 8px 28px rgba(0, 0, 0, 0.06) !important;
+}
+
+body.qm-home-fiverr .header .nav-link,
+body.qm-home-fiverr .header .dropdown-item,
+body.qm-home-fiverr .header a:not(.btn):not(.header-post-job-btn):not(.header-join-btn) {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+body.qm-home-fiverr .header .nav-link:hover,
+body.qm-home-fiverr .header .nav-link.active {
+  color: var(--qm-fv-blue) !important;
+  -webkit-text-fill-color: var(--qm-fv-blue) !important;
+}
+
+/* Primary CTA stays brand blue; secondary = solid Fiverr black */
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .btn-outline--base,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) a.btn.btn-outline--base,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .header-join-btn {
+  background: #000000 !important;
+  background-image: none !important;
+  border: 1px solid #000000 !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .btn-outline--base:hover,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .header-join-btn:hover {
+  background: #333333 !important;
+  border-color: #333333 !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+/* Typography — heavy Fiverr charcoal */
+body.qm-home-fiverr .banner-content__title,
+body.qm-home-fiverr .banner-content__title.s-highlight,
+body.qm-home-fiverr .banner-content__title .text--base,
+body.qm-home-fiverr .banner-content__title span,
+body.qm-home-fiverr .banner-content__title strong {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em;
+}
+
+body.qm-home-fiverr .banner-content__desc {
+  color: #333333 !important;
+  -webkit-text-fill-color: #333333 !important;
+  font-weight: 500 !important;
+}
+
+body.qm-home-fiverr .section-heading__title,
+body.qm-home-fiverr h2.section-heading__title,
+body.qm-home-fiverr .section-heading .title,
+body.qm-home-fiverr .section-heading h2,
+body.qm-home-fiverr .subscribe-content__title {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em;
+}
+
+body.qm-home-fiverr .section-heading__desc,
+body.qm-home-fiverr .buyer-wrapper__title,
+body.qm-home-fiverr .subscribe-content__desc {
+  color: #333333 !important;
+  -webkit-text-fill-color: #333333 !important;
+}
+
+body.qm-home-fiverr .qm-section-eyebrow {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.75rem !important;
+}
+
+body.qm-home-fiverr .qm-trust-card__title,
+body.qm-home-fiverr .qm-how-card__title,
+body.qm-home-fiverr .facility-item__title,
+body.qm-home-fiverr .freelancer-item__name,
+body.qm-home-fiverr .testimonial-item__name,
+body.qm-home-fiverr .custom--accordion .accordion-button {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  font-weight: 800 !important;
+}
+
+body.qm-home-fiverr .qm-trust-card__desc,
+body.qm-home-fiverr .qm-how-card__desc,
+body.qm-home-fiverr .testimonial-item__desc,
+body.qm-home-fiverr .freelancer-item__designation,
+body.qm-home-fiverr .custom--accordion .accordion-body,
+body.qm-home-fiverr .text-muted {
+  color: #666666 !important;
+  -webkit-text-fill-color: #666666 !important;
+}
+
+/* Black icon / step chips */
+body.qm-home-fiverr .qm-how-card__icon,
+body.qm-home-fiverr .qm-trust-card__icon,
+body.qm-home-fiverr .how-work-item__icon {
+  background: #000000 !important;
+  color: #fff !important;
+}
+
+body.qm-home-fiverr .qm-how-card__icon i,
+body.qm-home-fiverr .qm-how-card__icon svg,
+body.qm-home-fiverr .qm-trust-card__icon i,
+body.qm-home-fiverr .how-work-item__icon i {
+  color: #fff !important;
+  fill: #fff !important;
+}
+
+body.qm-home-fiverr .qm-how-card__step {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  font-weight: 800 !important;
+}
+
+/* Cards — white + Fiverr border + lift */
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-trust-card,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-how-card,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .how-work-item,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .facility-item,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .freelancer-item,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .testimonial-item,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .testimonails-card .testimonial-item {
+  background: #fff !important;
+  border: 1px solid #e4e5e7 !important;
+  outline: 1px solid var(--qm-fv-outline-soft);
+  outline-offset: 0;
+  box-shadow: var(--qm-fv-lift) !important;
+}
+
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-trust-card:hover,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-how-card:hover,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .how-work-item:hover,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .facility-item:hover,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .freelancer-item:hover {
+  border-color: #000000 !important;
+  outline-color: var(--qm-fv-outline);
+  box-shadow: var(--qm-fv-lift-hover) !important;
+}
+
+/* Hero badges — black like Fiverr chips */
+body.qm-home-fiverr .banner-section .banner-thumb-wrapper__item {
+  background: #fff !important;
+  border: 1px solid #000000 !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  font-weight: 700 !important;
+  box-shadow:
+    0 1px 0 #fff inset,
+    0 10px 32px rgba(255, 255, 255, 0.9),
+    0 16px 40px rgba(0, 0, 0, 0.12) !important;
+}
+
+body.qm-home-fiverr .banner-section .banner-thumb-wrapper__item.two,
+body.qm-home-fiverr .banner-section .banner-thumb-wrapper__item.one,
+body.qm-home-fiverr .banner-section .banner-thumb-wrapper__item.three {
+  border-color: #000000 !important;
+  background: #fff !important;
+}
+
+body.qm-home-fiverr .banner-section .banner-thumb-wrapper__item:hover {
+  background: #000000 !important;
+  border-color: #000000 !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+body.qm-home-fiverr .banner-thumb-wrapper .banner-thumb {
+  border: 1px solid #e4e5e7;
+  outline: 1px solid var(--qm-fv-outline-soft);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.7) inset,
+    0 14px 42px rgba(255, 255, 255, 0.88),
+    0 22px 56px rgba(0, 0, 0, 0.14);
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+/* FAQ */
+body.qm-home-fiverr .custom--accordion .accordion-item {
+  background: #fff !important;
+  border: 1px solid #e4e5e7 !important;
+  outline: 1px solid var(--qm-fv-outline-soft);
+  box-shadow: var(--qm-fv-lift) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  margin-bottom: 0.65rem;
+}
+
+body.qm-home-fiverr .custom--accordion .accordion-button {
+  border: none !important;
+  box-shadow: none !important;
+  background: #fff !important;
+}
+
+body.qm-home-fiverr .custom--accordion .accordion-button:not(.collapsed) {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+body.qm-home-fiverr .custom--accordion .accordion-button[aria-expanded="true"]::after,
+body.qm-home-fiverr .custom--accordion .accordion-button[aria-expanded="false"]::after {
+  background: #000000 !important;
+  color: #fff !important;
+}
+
+/* Dark Fiverr panels */
+body.qm-home-fiverr .faq-thumb-wrapper,
+body.qm-home-fiverr .subscribe-wrapper::before {
+  background: #000000 !important;
+  background-color: #000000 !important;
+}
+
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .subscribe-wrapper {
+  background: #f5f5f5 !important;
+  border: 1px solid #e4e5e7;
+  outline: 1px solid var(--qm-fv-outline-soft);
+  box-shadow: var(--qm-fv-lift);
+  border-radius: 20px;
+}
+
+body.qm-home-fiverr .subscribe-form .form--control,
+body.qm-home-fiverr .subscribe-form input[type="email"],
+body.qm-home-fiverr .subscribe-form .input-text-style[type="email"] {
+  border: 1px solid #000000 !important;
+  box-shadow: 0 1px 0 #fff inset !important;
+  color: #000000 !important;
+  background: #fff !important;
+}
+
+/* Testimonials on light surface with black quote marks */
+body.qm-home-fiverr .testimonial-item__icon,
+body.qm-home-fiverr .testimonial-item__icon svg {
+  color: #000000 !important;
+  fill: #000000 !important;
+}
+
+/* Footer — classic Fiverr black */
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .footer-area,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-footer {
+  background: #000000 !important;
+}
+
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .bottom-footer {
+  background: #0a0a0a !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .footer-area .social-list__link,
+body.qm-home-fiverr .qm-footer .social-list__link {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #fff !important;
+}
+
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .footer-area .social-list__link:hover,
+body.qm-home-fiverr .qm-footer .social-list__link:hover {
+  background: #fff !important;
+  border-color: #fff !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+body.qm-home-fiverr .contact-list__item-icon,
+body.qm-home-fiverr .footer-contact-menu__item-icon {
+  background: #fff !important;
+  color: #000000 !important;
+}
+
+/* —— Force pure #000000 on every dark section / panel —— */
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .work-completion-content,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .work-completion-content,
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .work-completion-wrapper .work-completion-content,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .work-completion-wrapper .work-completion-content {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  background-image: none !important;
+}
+
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .faq-thumb-wrapper,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .faq-thumb-wrapper,
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .faq-thumb,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .faq-thumb,
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .subscribe-wrapper::before,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .subscribe-wrapper::before,
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-fp5-aside,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-fp5-aside,
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-video-promo,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-video-promo,
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .footer-area,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .footer-area,
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-footer,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-footer,
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .bottom-footer,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .bottom-footer {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  background-image: none !important;
+}
+
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .header-join-btn,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .header-join-btn,
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .btn-outline--base,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .btn-outline--base,
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) a.btn.btn-outline--base,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) a.btn.btn-outline--base {
+  background: #000000 !important;
+  background-image: none !important;
+  border-color: #000000 !important;
+}
+
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-how-card__icon,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-how-card__icon,
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .qm-trust-card__icon,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .qm-trust-card__icon,
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .how-work-item__icon,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .how-work-item__icon,
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .custom--accordion .accordion-button[aria-expanded="true"]::after,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .custom--accordion .accordion-button[aria-expanded="true"]::after,
+body.qm-fiverr-theme:not(.admin-panel):not(.dashboard) .custom--accordion .accordion-button[aria-expanded="false"]::after,
+body.qm-home-fiverr:not(.admin-panel):not(.dashboard) .custom--accordion .accordion-button[aria-expanded="false"]::after {
+  background: #000000 !important;
+  background-color: #000000 !important;
+}
+

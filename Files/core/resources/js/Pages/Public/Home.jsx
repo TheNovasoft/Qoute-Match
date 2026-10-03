@@ -10,7 +10,7 @@ export default function Home({ pageTitle, seo, sections, banner }) {
     useTemplateSliders([visibleSections]);
 
     return (
-        <FrontendLayout pageTitle={pageTitle} seo={seo} showBreadcrumb={false} bodyClass="qm-fiverr-theme">
+        <FrontendLayout pageTitle={pageTitle} seo={seo} showBreadcrumb={false}>
             <Banner data={banner} />
             <SectionRenderer sections={visibleSections} />
         </FrontendLayout>

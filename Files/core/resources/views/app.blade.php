@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="{{ asset('assets/global/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/global/css/line-awesome.min.css') }}">
     @unless (request()->is('admin') || request()->is('admin/*'))
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/slick.css') }}">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/main.css') }}">
         <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/custom.css') }}">

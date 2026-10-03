@@ -17,12 +17,22 @@ export default function Contact({ pageTitle, seo, sections, contact, socialIcons
 
     return (
         <FrontendLayout pageTitle={pageTitle} seo={seo}>
-            <div className="contact-section mb-120">
+            <section className="qm-contact-hero">
                 <div className="container">
-                    <div className="row gy-4 justify-content-between align-items-center flex-wrap-reverse">
+                    <p className="qm-contact-hero__eyebrow">We're here to help</p>
+                    <h1 className="qm-contact-hero__title">{contact.heading || 'Contact QuoteMatch'}</h1>
+                    <p className="qm-contact-hero__desc">
+                        {contact.subheading || 'Questions about posting a job, quotes, or your account? Send us a message.'}
+                    </p>
+                </div>
+            </section>
+
+            <div className="contact-section qm-contact-page mb-120">
+                <div className="container">
+                    <div className="row gy-4 justify-content-between align-items-stretch flex-wrap-reverse">
                         <div className="col-xl-4">
-                            <div className="contact-item-wrapper">
-                                <h5 className="contact-item-wrapper__title">{contact.title}</h5>
+                            <div className="contact-item-wrapper qm-contact-aside">
+                                <h5 className="contact-item-wrapper__title">{contact.title || 'Get in touch'}</h5>
                                 <div className="contact-item">
                                     <span className="contact-item__icon"><i className="fa-solid fa-house-user"></i></span>
                                     <div className="contact-item__content">
@@ -60,9 +70,11 @@ export default function Contact({ pageTitle, seo, sections, contact, socialIcons
                             </div>
                         </div>
                         <div className="col-xl-7">
-                            <div className="contact-form-wrapper">
-                                <h4 className="contact-form-wrapper__title">{contact.heading}</h4>
-                                <p className="contact-form-wrapper__desc">{contact.subheading}</p>
+                            <div className="contact-form-wrapper qm-contact-form">
+                                <h4 className="contact-form-wrapper__title">Send a message</h4>
+                                <p className="contact-form-wrapper__desc">
+                                    Tell us what you need — we usually reply within one business day.
+                                </p>
                                 <form onSubmit={submit} className="verify-form">
                                     <div className="row">
                                         <div className="col-sm-6 form-group">
