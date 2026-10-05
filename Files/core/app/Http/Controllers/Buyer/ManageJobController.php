@@ -294,7 +294,7 @@ class ManageJobController extends Controller
             );
         }
 
-        $job->save();
+        $job->saveSafely();
 
         $notify[] = ['success', 'Request details saved. Continue to the next questions.'];
         return to_route('buyer.job.post.details', $job->id)->withNotify($notify);
@@ -532,7 +532,7 @@ class ManageJobController extends Controller
         $job->project_scope = $request->project_scope;
         $job->job_longevity = $request->job_longevity;
         $job->skill_level = $request->skill_level;
-        $job->save();
+        $job->saveSafely();
 
         $job->skills()->sync($skillIds);
 
@@ -593,7 +593,7 @@ class ManageJobController extends Controller
             $job->is_approved = Status::JOB_APPROVED;
         }
 
-        $job->save();
+        $job->saveSafely();
 
         if ($status === Status::JOB_PUBLISH && !$wasPublished) {
             \App\Lib\InvoiceService::forJobPublished($job);

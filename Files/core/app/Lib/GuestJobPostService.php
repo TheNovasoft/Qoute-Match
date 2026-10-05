@@ -281,7 +281,7 @@ class GuestJobPostService
             $job->is_approved = Status::JOB_APPROVED;
         }
 
-        $job->save();
+        $job->saveSafely();
         $job->skills()->sync($draft['skill_ids'] ?? []);
 
         if ((int) $budgetData['status'] === Status::JOB_PUBLISH) {
