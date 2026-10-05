@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Constants\Status;
+use App\Lib\JobSchema;
 use App\Lib\QuoteDeadlineService;
 use App\Traits\GlobalStatus;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,18 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 class Job extends Model
 {
     use GlobalStatus;
+
+    protected static function booted(): void
+    {
+        static::saving(function (Job $job) {
+            JobSchema::stripMissingColumns($job);
+        });
+    }
+
+    public function saveSafely(array $options = []): bool
+    {
+        return JobSchema::saveJob($this, $options);
+    }
 
     protected $casts = [
         'skill_ids'    => 'array',
