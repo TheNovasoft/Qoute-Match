@@ -21,6 +21,11 @@ class FriendlyNotify
         return 'A provider is already hired for this job. Open My Jobs to view the active project.';
     }
 
+    public static function jobPublishFailed(): string
+    {
+        return 'We could not publish your job right now. Please check your answers and try again. If the problem continues, contact support.';
+    }
+
     public static function providerNotFound(): string
     {
         return 'We could not find the provider for this quote. Contact support if this keeps happening.';
