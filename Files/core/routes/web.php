@@ -10,6 +10,22 @@ Route::post('tools/translate/batch', 'TranslateController@translateBatch')->name
 
 Route::get('/clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+
+    $dbRepair = 'skipped';
+    try {
+        \Illuminate\Support\Facades\DB::statement(
+            'ALTER TABLE `jobs` ADD COLUMN `quote_validity_days` SMALLINT UNSIGNED NULL AFTER `deadline`'
+        );
+        $dbRepair = 'column_added';
+    } catch (\Throwable $exception) {
+        $message = $exception->getMessage();
+        $dbRepair = str_contains($message, 'Duplicate column') ? 'column_already_exists' : 'failed: '.$message;
+    }
+
+    return response()->json([
+        'cache' => 'cleared',
+        'jobs_quote_validity_days' => $dbRepair,
+    ]);
 });
 
 Route::get('/repair-jobs-db', function () {
