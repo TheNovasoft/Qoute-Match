@@ -427,7 +427,7 @@ class ManageJobController extends Controller
         $job->budget = $request->custom_budget == '1' ? 0 : ($request->budget ?? 0);
         $job->custom_budget = $request->custom_budget;
         $job->deadline = $request->deadline ?: null;
-        if (Schema::hasColumn('jobs', 'quote_validity_days')) {
+        if (\App\Lib\JobSchema::hasColumn('quote_validity_days')) {
             $job->quote_validity_days = $request->filled('quote_validity_days')
                 ? (int) $request->quote_validity_days
                 : null;
@@ -446,7 +446,7 @@ class ManageJobController extends Controller
 
         try {
             DB::transaction(function () use ($job, $skillIds) {
-                $job->save();
+                $job->saveSafely();
                 $job->skills()->sync($skillIds);
             });
         } catch (\Throwable $exception) {
@@ -581,9 +581,11 @@ class ManageJobController extends Controller
         $job->budget = $request->custom_budget == '1' ? 0 : ($request->budget ?? 0);
         $job->custom_budget = $request->custom_budget;
         $job->deadline = $request->deadline ?: null;
-        $job->quote_validity_days = $request->filled('quote_validity_days')
-            ? (int) $request->quote_validity_days
-            : $job->quote_validity_days;
+        if (\App\Lib\JobSchema::hasColumn('quote_validity_days')) {
+            $job->quote_validity_days = $request->filled('quote_validity_days')
+                ? (int) $request->quote_validity_days
+                : $job->quote_validity_days;
+        }
         $job->questions = $request->questions;
         $job->status = $status;
 
