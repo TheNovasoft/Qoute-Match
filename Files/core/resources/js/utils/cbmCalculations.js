@@ -9,6 +9,7 @@ export const UOM_OPTIONS = [
     { value: 'mm', label: 'mm' },
     { value: 'cm', label: 'cm' },
     { value: 'meter', label: 'meter' },
+    { value: 'inch', label: 'inches' },
 ];
 
 export const WEIGHT_UNIT_OPTIONS = [
@@ -16,6 +17,17 @@ export const WEIGHT_UNIT_OPTIONS = [
     { value: 'gm', label: 'Gm' },
     { value: 'lb', label: 'Lb' },
 ];
+
+/** Mode switch: Meter → meter + kg, Inches → inch + lb */
+export const MODE_OPTIONS = [
+    { value: 'meter', label: 'Mode: Meter', uom: 'meter', weightUnit: 'kg' },
+    { value: 'inches', label: 'Mode: Inches', uom: 'inch', weightUnit: 'lb' },
+];
+
+export function resolveMode(uom) {
+    const dim = String(uom || 'cm').toLowerCase();
+    return (dim === 'inch' || dim === 'in') ? 'inches' : 'meter';
+}
 
 export const CONTAINERS = {
     ft20: { label: '20 Feet Container', length: 589, width: 230, height: 230 },
@@ -29,11 +41,14 @@ export function toCentimeters(value, uom) {
         return 0;
     }
 
-    switch (uom) {
+    switch (String(uom || 'cm').toLowerCase()) {
         case 'mm':
             return amount * CM_PER_MM;
         case 'meter':
             return amount * CM_PER_METER;
+        case 'inch':
+        case 'in':
+            return amount * 2.54;
         case 'cm':
         default:
             return amount;
@@ -190,15 +205,21 @@ export function parseStoredCbmValue(value) {
         weight: '',
         weightUnit: 'kg',
         qty: '1',
+        hsCode: '',
     };
 
     if (!value || typeof value !== 'string') {
         return defaults;
     }
 
-    const dimensionMatch = value.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(mm|cm|meter)?/i);
+    const dimensionMatch = value.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(mm|cm|meter|inch|in)?/i);
     if (!dimensionMatch) {
         return defaults;
+    }
+
+    let uom = (dimensionMatch[4] || 'cm').toLowerCase();
+    if (uom === 'in') {
+        uom = 'inch';
     }
 
     const parsed = {
@@ -206,12 +227,21 @@ export function parseStoredCbmValue(value) {
         length: dimensionMatch[1],
         width: dimensionMatch[2],
         height: dimensionMatch[3],
-        uom: (dimensionMatch[4] || 'cm').toLowerCase(),
+        uom,
     };
 
-    const weightMatch = value.match(/(\d+(?:\.\d+)?)\s*kg/i);
-    if (weightMatch) {
-        parsed.weight = weightMatch[1];
+    const hsMatch = value.match(/HS\s+([\d.\s-]{2,20})/i);
+    if (hsMatch) {
+        parsed.hsCode = hsMatch[1].trim();
+    }
+
+    const weightLbMatch = value.match(/(\d+(?:\.\d+)?)\s*lb\b/i);
+    const weightKgMatch = value.match(/(\d+(?:\.\d+)?)\s*kg\b/i);
+    if (weightLbMatch && !weightKgMatch) {
+        parsed.weight = weightLbMatch[1];
+        parsed.weightUnit = 'lb';
+    } else if (weightKgMatch) {
+        parsed.weight = weightKgMatch[1];
         parsed.weightUnit = 'kg';
     }
 
@@ -237,6 +267,7 @@ export function formatStoredCbmValue({
     weightUnit,
     qty,
     results,
+    hsCode = '',
 }) {
     const l = Number(length);
     const w = Number(width);
@@ -250,9 +281,11 @@ export function formatStoredCbmValue({
     const quantity = Math.max(1, Number(qty) || 1);
     const weightKg = toKilograms(weight, weightUnit);
 
-    const parts = [
-        `${l} x ${w} x ${h} ${uomLabel}`,
-    ];
+    const parts = [];
+    if (String(hsCode || '').trim()) {
+        parts.push(`HS ${String(hsCode).trim()}`);
+    }
+    parts.push(`${l} x ${w} x ${h} ${uomLabel}`);
 
     if (weightKg > 0) {
         parts.push(`${round(weightKg, 3)} kg`);
@@ -287,6 +320,12 @@ export function buildCbmApiPayload({
         return null;
     }
 
+    const dimUom = String(uom || 'cm').toLowerCase();
+    const useInch = dimUom === 'inch' || dimUom === 'in';
+    const apiLength = useInch ? round(l * 2.54, 3) : l;
+    const apiWidth = useInch ? round(w * 2.54, 3) : w;
+    const apiHeight = useInch ? round(h * 2.54, 3) : h;
+
     const weightAmount = Number(weight) > 0 ? Number(weight) : 0;
     let apiWeight = weightAmount;
     let apiWeightUnit = weightUnit;
@@ -297,11 +336,11 @@ export function buildCbmApiPayload({
     }
 
     return {
-        lv: l,
-        bv: w,
-        hv: h,
+        lv: apiLength,
+        bv: apiWidth,
+        hv: apiHeight,
         qv: Math.max(1, Number(qty) || 1),
-        uom,
+        uom: useInch ? 'cm' : (uom || 'cm'),
         wv: apiWeight,
         wu: apiWeightUnit,
     };

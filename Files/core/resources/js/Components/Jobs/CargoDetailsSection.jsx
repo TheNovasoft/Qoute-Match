@@ -6,6 +6,8 @@ import {
     aggregateCbmResultsFromBoxes,
     formatStoredCbmBoxes,
     parseStoredCbmBoxes,
+    parseStoredCbmValue,
+    toKilograms,
 } from '@/utils/cbmCalculations';
 
 function FieldError({ message, tx }) {
@@ -73,7 +75,25 @@ export default function CargoDetailsSection({
     const syncCbmField = useCallback((nextBoxes, multiple) => {
         const formatted = formatStoredCbmBoxes(nextBoxes, { multiple });
         onChange(cbmField, formatted);
-    }, [cbmField, onChange]);
+
+        if (multiple) {
+            const hsCodes = [];
+            let totalKg = 0;
+            (nextBoxes || []).forEach((stored) => {
+                if (!String(stored || '').trim()) {
+                    return;
+                }
+                const parsed = parseStoredCbmValue(stored);
+                if (parsed.hsCode) {
+                    hsCodes.push(parsed.hsCode);
+                }
+                const qty = Math.max(1, Number(parsed.qty) || 1);
+                totalKg += toKilograms(parsed.weight, parsed.weightUnit) * qty;
+            });
+            onChange(step.hsField, hsCodes.join(', '));
+            onChange(step.weightField, totalKg > 0 ? String(Math.round(totalKg * 1000) / 1000) : '');
+        }
+    }, [cbmField, onChange, step.hsField, step.weightField]);
 
 
     const handleContainerSelect = (value) => {
@@ -157,8 +177,10 @@ export default function CargoDetailsSection({
         if (!showCbm || lclPackMode !== 'multiple') {
             return null;
         }
-        return aggregateCbmResultsFromBoxes(boxValues, data[step.weightField] || '');
-    }, [showCbm, lclPackMode, boxValues, data, step.weightField]);
+        return aggregateCbmResultsFromBoxes(boxValues, '');
+    }, [showCbm, lclPackMode, boxValues]);
+
+    const isMultiple = showCbm && isLcl && lclPackMode === 'multiple';
 
     return (
         <>
@@ -180,41 +202,45 @@ export default function CargoDetailsSection({
                 </div>
             )}
 
-            <div className={isWizard ? 'col-md-6' : 'col-md-6'}>
-                {isWizard && <label className="form-label">{step.hsMeta?.name || tx('HS code')}</label>}
-                <input
-                    type="text"
-                    className={isWizard
-                        ? `form-control form--control form-control-lg${errors[step.hsField] ? ' is-invalid' : ''}`
-                        : inputClass(errors[step.hsField])}
-                    placeholder={isWizard ? 'e.g. 8471.30' : tx('HS code')}
-                    value={data[step.hsField] || ''}
-                    onChange={(e) => onChange(step.hsField, e.target.value)}
-                />
-                {isWizard && step.hsMeta?.instruction && (
-                    <small className="text-muted d-block mt-1">{step.hsMeta.instruction}</small>
-                )}
-                <FieldError message={errors[step.hsField]} tx={tx} />
-            </div>
+            {!isMultiple && (
+                <>
+                    <div className={isWizard ? 'col-md-6' : 'col-md-6'}>
+                        {isWizard && <label className="form-label">{step.hsMeta?.name || tx('HS code')}</label>}
+                        <input
+                            type="text"
+                            className={isWizard
+                                ? `form-control form--control form-control-lg${errors[step.hsField] ? ' is-invalid' : ''}`
+                                : inputClass(errors[step.hsField])}
+                            placeholder={isWizard ? 'e.g. 8471.30' : tx('HS code')}
+                            value={data[step.hsField] || ''}
+                            onChange={(e) => onChange(step.hsField, e.target.value)}
+                        />
+                        {isWizard && step.hsMeta?.instruction && (
+                            <small className="text-muted d-block mt-1">{step.hsMeta.instruction}</small>
+                        )}
+                        <FieldError message={errors[step.hsField]} tx={tx} />
+                    </div>
 
-            <div className={isWizard ? 'col-md-6' : 'col-md-6'}>
-                {isWizard && <label className="form-label">{step.weightMeta?.name || tx('Weight (kg)')}</label>}
-                <input
-                    type="number"
-                    min="0"
-                    step="any"
-                    className={isWizard
-                        ? `form-control form--control form-control-lg${errors[step.weightField] ? ' is-invalid' : ''}`
-                        : inputClass(errors[step.weightField])}
-                    placeholder={isWizard ? 'e.g. 500' : tx('Weight (kg)')}
-                    value={data[step.weightField] || ''}
-                    onChange={(e) => onChange(step.weightField, e.target.value)}
-                />
-                {isWizard && step.weightMeta?.instruction && (
-                    <small className="text-muted d-block mt-1">{step.weightMeta.instruction}</small>
-                )}
-                <FieldError message={errors[step.weightField]} tx={tx} />
-            </div>
+                    <div className={isWizard ? 'col-md-6' : 'col-md-6'}>
+                        {isWizard && <label className="form-label">{step.weightMeta?.name || tx('Weight (kg)')}</label>}
+                        <input
+                            type="number"
+                            min="0"
+                            step="any"
+                            className={isWizard
+                                ? `form-control form--control form-control-lg${errors[step.weightField] ? ' is-invalid' : ''}`
+                                : inputClass(errors[step.weightField])}
+                            placeholder={isWizard ? 'e.g. 500' : tx('Weight (kg)')}
+                            value={data[step.weightField] || ''}
+                            onChange={(e) => onChange(step.weightField, e.target.value)}
+                        />
+                        {isWizard && step.weightMeta?.instruction && (
+                            <small className="text-muted d-block mt-1">{step.weightMeta.instruction}</small>
+                        )}
+                        <FieldError message={errors[step.weightField]} tx={tx} />
+                    </div>
+                </>
+            )}
 
             {showCbm && isLcl && (
                 <div className="col-12">
@@ -260,8 +286,9 @@ export default function CargoDetailsSection({
                         key={`cbm-${index}-${lclPackMode}`}
                         value={boxValue}
                         onChange={(value) => handleBoxChange(index, value)}
-                        weightKg={data[step.weightField] || ''}
-                        hideWeightInput
+                        weightKg={lclPackMode === 'multiple' ? null : (data[step.weightField] || '')}
+                        hideWeightInput={lclPackMode !== 'multiple'}
+                        showHsCode={lclPackMode === 'multiple'}
                         hideResults={lclPackMode === 'multiple'}
                     />
                 </div>

@@ -1,6 +1,12 @@
 import { usePage } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 
+/** Reliable flags when admin language image is missing or wrong. */
+const FLAG_BY_CODE = {
+    en: 'https://flagcdn.com/w40/gb.png',
+    ur: 'https://flagcdn.com/w40/pk.png',
+};
+
 export default function LanguageSwitcher({ className = '' }) {
     const { locale, site, routes } = usePage().props;
     const [open, setOpen] = useState(false);
@@ -22,7 +28,13 @@ export default function LanguageSwitcher({ className = '' }) {
         return `${base}/${code}`;
     };
 
-    const flagUrl = (lang) => lang.imageUrl || null;
+    const flagUrl = (lang) => {
+        const code = String(lang?.code || '').toLowerCase();
+        if (FLAG_BY_CODE[code]) {
+            return FLAG_BY_CODE[code];
+        }
+        return lang?.imageUrl || null;
+    };
 
     return (
         <div className={`header-lang-switcher ${className}${open ? ' is-open' : ''}`}>
