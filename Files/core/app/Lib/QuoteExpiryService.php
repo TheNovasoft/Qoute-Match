@@ -3,6 +3,7 @@
 namespace App\Lib;
 
 use App\Constants\Status;
+use App\Lib\JobSchema;
 use App\Models\Bid;
 use App\Models\Job;
 use Carbon\Carbon;
@@ -13,9 +14,14 @@ class QuoteExpiryService
 
     public static function validityDaysForJob(?Job $job): int
     {
-        $days = (int) ($job?->quote_validity_days ?? 0);
+        if ($job && JobSchema::hasColumn('quote_validity_days')) {
+            $days = (int) ($job->quote_validity_days ?? 0);
+            if ($days > 0) {
+                return $days;
+            }
+        }
 
-        return $days > 0 ? $days : self::DEFAULT_VALIDITY_DAYS;
+        return self::DEFAULT_VALIDITY_DAYS;
     }
 
     public static function expiresAtForNewBid(Job $job): Carbon

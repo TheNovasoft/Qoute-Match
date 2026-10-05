@@ -427,11 +427,11 @@ class ManageJobController extends Controller
         $job->budget = $request->custom_budget == '1' ? 0 : ($request->budget ?? 0);
         $job->custom_budget = $request->custom_budget;
         $job->deadline = $request->deadline ?: null;
-        if (\App\Lib\JobSchema::hasColumn('quote_validity_days')) {
-            $job->quote_validity_days = $request->filled('quote_validity_days')
-                ? (int) $request->quote_validity_days
-                : null;
-        }
+        \App\Lib\JobSchema::assignOptionalColumn(
+            $job,
+            'quote_validity_days',
+            $request->filled('quote_validity_days') ? (int) $request->quote_validity_days : null
+        );
         $job->questions = [];
 
         if ($saveAsDraft) {
@@ -581,10 +581,12 @@ class ManageJobController extends Controller
         $job->budget = $request->custom_budget == '1' ? 0 : ($request->budget ?? 0);
         $job->custom_budget = $request->custom_budget;
         $job->deadline = $request->deadline ?: null;
-        if (\App\Lib\JobSchema::hasColumn('quote_validity_days')) {
-            $job->quote_validity_days = $request->filled('quote_validity_days')
-                ? (int) $request->quote_validity_days
-                : $job->quote_validity_days;
+        if ($request->filled('quote_validity_days')) {
+            \App\Lib\JobSchema::assignOptionalColumn(
+                $job,
+                'quote_validity_days',
+                (int) $request->quote_validity_days
+            );
         }
         $job->questions = $request->questions;
         $job->status = $status;

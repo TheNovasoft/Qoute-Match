@@ -12,6 +12,16 @@ Route::get('/clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
 });
 
+Route::get('/repair-jobs-db', function () {
+    \App\Lib\JobSchema::ensureCriticalColumns();
+
+    return response()->json([
+        'ok' => true,
+        'quote_validity_days' => \App\Lib\JobSchema::hasColumn('quote_validity_days'),
+        'hint' => 'Run git pull on server so Job saves stay safe without this URL.',
+    ]);
+});
+
 
 
 // User Support Ticket

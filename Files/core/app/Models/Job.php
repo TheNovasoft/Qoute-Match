@@ -33,6 +33,20 @@ class Job extends Model
         return parent::save($options);
     }
 
+    protected function performInsert(\Illuminate\Database\Eloquent\Builder $query): bool
+    {
+        JobSchema::stripMissingColumns($this);
+
+        return parent::performInsert($query);
+    }
+
+    protected function performUpdate(\Illuminate\Database\Eloquent\Builder $query): bool
+    {
+        JobSchema::stripMissingColumns($this);
+
+        return parent::performUpdate($query);
+    }
+
     public function saveSafely(array $options = []): bool
     {
         return JobSchema::saveJob($this, $options);

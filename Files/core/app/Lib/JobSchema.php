@@ -103,6 +103,17 @@ class JobSchema
         return in_array($column, self::jobColumns(), true);
     }
 
+    public static function assignOptionalColumn(Job $job, string $column, mixed $value): void
+    {
+        if (! self::hasColumn($column)) {
+            $job->offsetUnset($column);
+
+            return;
+        }
+
+        $job->setAttribute($column, $value);
+    }
+
     public static function stripMissingColumns(Job $job): void
     {
         $allowed = array_flip(self::jobColumns());
