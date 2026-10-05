@@ -5,15 +5,46 @@ namespace App\Lib;
 use App\Models\Job;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class JobSchema
 {
     private static ?array $jobColumns = null;
 
+    /** @var array<string, string> column => DDL when missing from live DB */
+    private const CRITICAL_COLUMNS = [
+        'quote_validity_days' => 'ALTER TABLE `jobs` ADD COLUMN `quote_validity_days` SMALLINT UNSIGNED NULL AFTER `deadline`',
+    ];
+
     /**
-     * Live column list from MySQL (avoids stale bootstrap/schema cache on production).
-     *
+     * Add required job columns when the live DB is behind (ignores Laravel schema cache).
+     */
+    public static function ensureCriticalColumns(): void
+    {
+        foreach (self::CRITICAL_COLUMNS as $column => $ddl) {
+            if (self::hasColumn($column)) {
+                continue;
+            }
+
+            try {
+                DB::statement($ddl);
+                self::forgetColumnCache();
+            } catch (\Throwable $exception) {
+                $message = $exception->getMessage();
+                if (
+                    str_contains($message, 'Duplicate column')
+                    || str_contains($message, 'already exists')
+                ) {
+                    self::forgetColumnCache();
+
+                    continue;
+                }
+
+                report($exception);
+            }
+        }
+    }
+
+    /**
      * @return list<string>
      */
     public static function jobColumns(): array
@@ -22,23 +53,44 @@ class JobSchema
             return self::$jobColumns;
         }
 
-        if (! Schema::hasTable('jobs')) {
-            self::$jobColumns = [];
+        self::$jobColumns = self::fetchJobColumnsFromDatabase();
 
-            return self::$jobColumns;
+        return self::$jobColumns;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function fetchJobColumnsFromDatabase(): array
+    {
+        try {
+            $rows = DB::select('SHOW COLUMNS FROM `jobs`');
+            if ($rows !== []) {
+                return array_values(array_map(
+                    static fn ($row) => (string) ($row->Field ?? ''),
+                    $rows
+                ));
+            }
+        } catch (\Throwable) {
+            // Table may not exist during install.
         }
 
         try {
-            $rows = DB::select('SHOW COLUMNS FROM `jobs`');
-            self::$jobColumns = array_values(array_map(
+            $database = DB::connection()->getDatabaseName();
+            $rows = DB::select(
+                'SELECT COLUMN_NAME AS Field FROM information_schema.COLUMNS
+                 WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
+                 ORDER BY ORDINAL_POSITION',
+                [$database, 'jobs']
+            );
+
+            return array_values(array_map(
                 static fn ($row) => (string) ($row->Field ?? ''),
                 $rows
             ));
         } catch (\Throwable) {
-            self::$jobColumns = Schema::getColumnListing('jobs');
+            return [];
         }
-
-        return self::$jobColumns;
     }
 
     public static function forgetColumnCache(): void
@@ -55,6 +107,10 @@ class JobSchema
     {
         $allowed = array_flip(self::jobColumns());
 
+        if ($allowed === []) {
+            return;
+        }
+
         foreach (array_keys($job->getAttributes()) as $key) {
             if ($key === 'id') {
                 continue;
@@ -68,13 +124,15 @@ class JobSchema
 
     public static function saveJob(Job $job, array $options = []): bool
     {
+        self::ensureCriticalColumns();
+
         $lastException = null;
 
         for ($attempt = 0; $attempt < 5; $attempt++) {
             self::stripMissingColumns($job);
 
             try {
-                return $job->save($options);
+                return $job->persistWithoutColumnGuard($options);
             } catch (QueryException $exception) {
                 $lastException = $exception;
                 $message = $exception->getMessage();
@@ -84,7 +142,19 @@ class JobSchema
                 }
 
                 if (preg_match("/Unknown column '([^']+)'/", $message, $matches)) {
-                    $job->offsetUnset($matches[1]);
+                    $missing = $matches[1];
+                    if (isset(self::CRITICAL_COLUMNS[$missing])) {
+                        try {
+                            DB::statement(self::CRITICAL_COLUMNS[$missing]);
+                        } catch (\Throwable $ddlException) {
+                            report($ddlException);
+                        }
+                        self::forgetColumnCache();
+
+                        continue;
+                    }
+
+                    $job->offsetUnset($missing);
                 }
 
                 self::forgetColumnCache();

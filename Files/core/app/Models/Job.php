@@ -20,6 +20,19 @@ class Job extends Model
         });
     }
 
+    public function save(array $options = []): bool
+    {
+        return JobSchema::saveJob($this, $options);
+    }
+
+    /**
+     * Persist without re-entering JobSchema::saveJob (internal).
+     */
+    public function persistWithoutColumnGuard(array $options = []): bool
+    {
+        return parent::save($options);
+    }
+
     public function saveSafely(array $options = []): bool
     {
         return JobSchema::saveJob($this, $options);

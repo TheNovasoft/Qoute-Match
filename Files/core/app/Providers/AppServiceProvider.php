@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Constants\Status;
+use App\Lib\JobSchema;
 use App\Lib\MailConfigurator;
 use App\Lib\Searchable;
 use App\Models\Frontend;
@@ -80,6 +81,12 @@ class AppServiceProvider extends ServiceProvider
             $lockFile = storage_path('framework/installed.lock');
             if (! file_exists($lockFile)) {
                 @file_put_contents($lockFile, now()->toIso8601String());
+            }
+
+            try {
+                JobSchema::ensureCriticalColumns();
+            } catch (\Throwable $exception) {
+                report($exception);
             }
         }
 
