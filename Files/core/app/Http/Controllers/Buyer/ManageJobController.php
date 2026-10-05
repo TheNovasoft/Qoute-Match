@@ -18,6 +18,8 @@ use App\Models\Project;
 use App\Models\Skill;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -298,21 +300,30 @@ class ManageJobController extends Controller
         return to_route('buyer.job.post.details', $job->id)->withNotify($notify);
     }
 
-    public function storeComplete(Request $request, $id = 0)
+    public function storeComplete(Request $request, $id = null)
     {
+        $jobId = (int) ($id ?? 0);
+
         $request->merge([
-            'slug' => JobSlugGenerator::unique($request->title ?? '', (int) $id, $request->slug),
+            'custom_budget' => filter_var($request->input('custom_budget'), FILTER_VALIDATE_BOOLEAN)
+                || (string) $request->input('custom_budget') === '1'
+                ? '1'
+                : '0',
+            'project_scope' => (string) ($request->input('project_scope') ?? '2'),
+            'job_longevity' => (string) ($request->input('job_longevity') ?? '2'),
+            'skill_level' => (string) ($request->input('skill_level') ?? '3'),
+            'slug' => JobSlugGenerator::unique($request->title ?? '', $jobId, $request->slug),
         ]);
 
         $request->validate([
             'title'          => 'required|string|max:255',
-            'slug'           => ['required', 'string', 'max:255', Rule::unique('jobs', 'slug')->ignore($id)],
+            'slug'           => ['required', 'string', 'max:255', Rule::unique('jobs', 'slug')->ignore($jobId ?: null)],
             'category_id' => ['required', 'integer', 'gt:0', Rule::exists('categories', 'id')->where(function ($query) {
                 $query->where('status', Status::YES);
             }),],
             'description'    => 'required|string',
             'skill_ids'      => 'nullable|array',
-            'skill_ids.*'    => 'exists:skills,id',
+            'skill_ids.*'    => 'integer|min:1',
             'project_scope'  => 'required|in:1,2,3',
             'job_longevity'  => 'required|in:1,2,3,4',
             'skill_level'    => 'required|in:1,2,3,4',
@@ -338,15 +349,15 @@ class ManageJobController extends Controller
 
         $buyer = auth()->guard('buyer')->user();
 
-        if ($id) {
-            $existingJob = Job::where('buyer_id', $buyer->id)->findOrFail($id);
+        if ($jobId) {
+            $existingJob = Job::where('buyer_id', $buyer->id)->findOrFail($jobId);
             if (!$this->buyerCanEditJob($existingJob)) {
                 $notify[] = ['error', FriendlyNotify::alreadyHired()];
                 return back()->withNotify($notify);
             }
         }
 
-        $job = $id ? Job::where('buyer_id', $buyer->id)->findOrFail($id) : new Job();
+        $job = $jobId ? Job::where('buyer_id', $buyer->id)->findOrFail($jobId) : new Job();
         $existingRequestData = $job->request_data;
 
         if ($category->requestForm) {
@@ -365,28 +376,36 @@ class ManageJobController extends Controller
         $job->subcategory_id = $request->subcategory_id;
         $job->description = $request->description;
 
-        if ($category->requestForm) {
-            $job->request_data = RequestFormService::processSubmission(
-                $request,
-                $category->requestForm->form_data,
-                $existingRequestData,
-                true
-            );
-        } else {
-            $job->request_data = null;
-        }
+        try {
+            if ($category->requestForm) {
+                $job->request_data = RequestFormService::processSubmission(
+                    $request,
+                    $category->requestForm->form_data,
+                    $existingRequestData,
+                    true
+                );
+            } else {
+                $job->request_data = null;
+            }
 
-        if ($request->filled('container_type')) {
-            $request->validate([
-                'container_type' => 'string|in:Full Container,LCL',
-            ]);
-            $job->request_data = RequestFormService::mergeExtraField(
-                $job->request_data ?? [],
-                'container_type',
-                'Container Type',
-                'radio',
-                $request->container_type
-            );
+            if ($request->filled('container_type')) {
+                $request->validate([
+                    'container_type' => 'string|in:Full Container,LCL',
+                ]);
+                $job->request_data = RequestFormService::mergeExtraField(
+                    $job->request_data ?? [],
+                    'container_type',
+                    'Container Type',
+                    'radio',
+                    $request->container_type
+                );
+            }
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return back()->withErrors([
+                'error' => FriendlyNotify::jobPublishFailed(),
+            ])->withInput();
         }
 
         $skillIds = GuestJobPostService::resolveSkillIds(
@@ -408,9 +427,11 @@ class ManageJobController extends Controller
         $job->budget = $request->custom_budget == '1' ? 0 : ($request->budget ?? 0);
         $job->custom_budget = $request->custom_budget;
         $job->deadline = $request->deadline ?: null;
-        $job->quote_validity_days = $request->filled('quote_validity_days')
-            ? (int) $request->quote_validity_days
-            : null;
+        if (Schema::hasColumn('jobs', 'quote_validity_days')) {
+            $job->quote_validity_days = $request->filled('quote_validity_days')
+                ? (int) $request->quote_validity_days
+                : null;
+        }
         $job->questions = [];
 
         if ($saveAsDraft) {
@@ -418,13 +439,42 @@ class ManageJobController extends Controller
             $job->is_approved = Status::NO;
         } else {
             $job->status = Status::JOB_PUBLISH;
-            $job->is_approved = Status::JOB_APPROVED;
+            $job->is_approved = (int) gs('job_auto_approved') === Status::ENABLE
+                ? Status::JOB_APPROVED
+                : Status::JOB_PENDING;
         }
 
-        $job->save();
-        $job->skills()->sync($skillIds);
+        try {
+            DB::transaction(function () use ($job, $skillIds) {
+                $job->save();
+                $job->skills()->sync($skillIds);
+            });
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return back()->withErrors([
+                'error' => FriendlyNotify::jobPublishFailed(),
+            ])->withInput();
+        }
 
         if (! $saveAsDraft && ! $wasPublished) {
+            $this->runAfterJobPublished($job, $buyer);
+        }
+
+        if ($saveAsDraft) {
+            $notify[] = ['success', 'Your job has been saved as a draft. You can publish it from your job list when ready.'];
+
+            return to_route('buyer.job.post.index')->withNotify($notify);
+        }
+
+        $notify[] = ['success', $jobId ? 'Job post updated successfully' : 'Job post created successfully'];
+
+        return to_route('buyer.job.post.view', $job->id)->withNotify($notify);
+    }
+
+    private function runAfterJobPublished(Job $job, $buyer): void
+    {
+        try {
             \App\Lib\InvoiceService::forJobPublished($job);
 
             $adminNotification = new AdminNotification();
@@ -439,17 +489,9 @@ class ManageJobController extends Controller
             } else {
                 \App\Lib\JobPostNotificationService::notifySubmittedForReview($job);
             }
+        } catch (\Throwable $exception) {
+            report($exception);
         }
-
-        if ($saveAsDraft) {
-            $notify[] = ['success', 'Your job has been saved as a draft. You can publish it from your job list when ready.'];
-
-            return to_route('buyer.job.post.index')->withNotify($notify);
-        }
-
-        $notify[] = ['success', $id ? 'Job post updated successfully' : 'Job post created successfully'];
-
-        return to_route('buyer.job.post.view', $job->id)->withNotify($notify);
     }
 
     public function createFreelancerDetails($id)

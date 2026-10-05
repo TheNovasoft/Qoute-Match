@@ -481,9 +481,16 @@ function JobPostFlowInner({
         form.post(completeStoreUrl, {
             forceFormData: hasFileUploads(payload),
             preserveScroll: true,
-            onError: () => {
+            onError: (errors) => {
                 coreRef.current.category_id = String(payload.category_id);
                 coreRef.current.subcategory_id = String(payload.subcategory_id);
+                const firstField = Object.keys(errors || {})[0];
+                if (firstField && firstField !== 'error') {
+                    const stepWithField = visibleSteps.find((step) => stepFieldKeys(step).includes(firstField));
+                    if (stepWithField) {
+                        startEdit(stepWithField.id);
+                    }
+                }
             },
         });
     };
@@ -501,6 +508,13 @@ function JobPostFlowInner({
                     <p className="job-flow-review__value">{tx(summarizeStep(step, flowData, categories))}</p>
                 </div>
             ))}
+            {(form.errors.error || form.errors.skill_ids) && (
+                <FriendlyErrorAlert
+                    message={form.errors.error || form.errors.skill_ids}
+                    routes={routes}
+                    className="mb-3"
+                />
+            )}
             <button
                 type="button"
                 className="btn btn--base job-flow-submit"

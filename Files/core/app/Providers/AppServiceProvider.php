@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if ($this->app->bound('debugbar') && ! config('app.debug')) {
+        if ($this->app->bound('debugbar') && (! config('app.debug') || ! $this->app->environment('local'))) {
             $this->app->make('debugbar')->disable();
         }
 
@@ -44,7 +44,13 @@ class AppServiceProvider extends ServiceProvider
 
             if ($this->app->bound('debugbar')) {
                 $enabled = config('debugbar.enabled');
-                if ($enabled === false || $enabled === 'false' || $request->header('X-Inertia')) {
+                if (
+                    ! $this->app->environment('local')
+                    || $enabled === false
+                    || $enabled === 'false'
+                    || $request->header('X-Inertia')
+                    || $request->header('X-Requested-With') === 'XMLHttpRequest'
+                ) {
                     $this->app->make('debugbar')->disable();
                 }
             }

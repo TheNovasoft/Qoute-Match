@@ -40,7 +40,9 @@ class JobPostNotificationService
     public static function shortCodes(Job $job): array
     {
         $buyerViewUrl = route('buyer.job.post.view', $job->id);
-        $publicUrl = route('explore.bid.job', $job->slug);
+        $publicUrl = filled($job->slug)
+            ? route('explore.bid.job', $job->slug)
+            : route('freelance.jobs');
         $browseUrl = route('freelance.jobs');
 
         return [
